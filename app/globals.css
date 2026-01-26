@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+
+:root {
+  /* Light theme */
+  --background: 248 250 252;
+  --foreground: 15 23 42;
+  --surface: 255 255 255;
+  --surface-muted: 241 245 249;
+  --surface-strong: 226 232 240;
+  --ink: 15 23 42;
+  --ink-muted: 51 65 85;
+  --ink-subtle: 100 116 139;
+  --line: 226 232 240;
+  --line-strong: 203 213 225;
+  --neon-primary: 0 128 65;
+  --neon-secondary: 14 116 144;
+  --grid-color: 14 116 144;
+  --bg-spot-1: 14 116 144;
+  --bg-spot-2: 245 158 11;
+}
+
+.dark {
+  /* Dark theme */
+  --background: 11 18 32;
+  --foreground: 248 250 252;
+  --surface: 15 23 42;
+  --surface-muted: 17 24 39;
+  --surface-strong: 30 41 59;
+  --ink: 248 250 252;
+  --ink-muted: 203 213 225;
+  --ink-subtle: 148 163 184;
+  --line: 30 41 59;
+  --line-strong: 51 65 85;
+  --neon-primary: 0 230 118;
+  --neon-secondary: 0 255 255;
+  --grid-color: 0 230 118;
+  --bg-spot-1: 6 182 212;
+  --bg-spot-2: 0 230 118;
+}
+
+body {
+  color: rgb(var(--foreground));
+  background-color: rgb(var(--background));
+  background-image:
+    radial-gradient(900px circle at 10% -10%, rgb(var(--bg-spot-1) / 0.18), transparent 60%),
+    radial-gradient(800px circle at 95% -20%, rgb(var(--bg-spot-2) / 0.14), transparent 55%);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Grid Overlay - subtle enough to not block text */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    linear-gradient(rgb(var(--grid-color) / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--grid-color) / 0.08) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface/90 border border-line/60 backdrop-blur-xl;
+  }
+
+  .card-hover {
+    @apply bg-surface/80 border border-line/50 transition-colors;
+  }
+  
+  .card-hover:hover {
+    @apply bg-surface/95;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-gold-500 text-black font-medium shadow-sm transition-colors hover:bg-gold-600 focus:outline-none focus:ring-2 focus:ring-gold-500/40 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-line/70 bg-surface-muted/70 text-ink font-medium transition-colors hover:bg-surface-muted/90 focus:outline-none focus:ring-2 focus:ring-accent-500/30 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-surface/80 backdrop-blur-md border border-line/70;
+  }
+  
+  .glass-card {
+    @apply bg-surface border border-line shadow-sm;
+  }
+
+  .glass-input {
+    @apply bg-surface-muted border border-line text-ink placeholder:text-ink-subtle focus:ring-cyber-500;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+  }
+
+  .gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-cyber-500 via-accent-400 to-gold-500;
+  }
+
+  .gradient-sunset {
+    @apply bg-gradient-to-br from-gold-500 via-cyber-500 to-accent-500;
+  }
+
+  .gradient-vibrant {
+    @apply bg-gradient-to-r from-cyber-500 to-accent-500;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.35s ease-out both;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.25s ease-out both;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Ensure Chat text is always legible */
+.prose {
+  @apply text-ink max-w-none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-strong rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-cyber-500;
+}
