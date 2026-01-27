@@ -37,6 +37,21 @@ export default function HomePage() {
   }, [isLoading, isAuthenticated, clearCurrentSession]);
 
   const checkAuth = async () => {
+    // First check if password is required
+    try {
+      const checkResponse = await fetch("/api/auth/login");
+      const checkData = await checkResponse.json();
+
+      // If no password required, skip auth
+      if (!checkData.requiresPassword) {
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error("Password check failed:", error);
+    }
+
     const deviceToken = localStorage.getItem("poseidon-device-token");
     const tokenHash = localStorage.getItem("poseidon-token-hash");
 
