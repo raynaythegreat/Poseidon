@@ -42,6 +42,10 @@ import {
   startRenderDeploy,
   waitForRenderDeployment,
 } from "@/lib/render-deploy";
+import ThreeColumnLayout from "@/components/chat/ThreeColumnLayout";
+import ChatHeaderBubble from "@/components/chat/ChatHeaderBubble";
+import FileTreeSidebar from "@/components/chat/FileTreeSidebar";
+import PreviewPanel from "@/components/chat/PreviewPanel";
 
 interface Repository {
   id: number;
@@ -1498,6 +1502,11 @@ export default function ChatInterface() {
   const [customModels, setCustomModels] = useState<ModelOption[]>([]);
   const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({});
   const [isClient, setIsClient] = useState(false);
+
+  // File tree and preview state
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [fileTree, setFileTree] = useState<any[]>([]);
+  const [fileContent, setFileContent] = useState<string>("");
 
   // Load custom provider config
   const loadCustomModels = useCallback(() => {
@@ -4288,367 +4297,210 @@ export default function ChatInterface() {
   ) : null;
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Minimal Header */}
-      <MinimalChatHeader
-        selectedRepo={selectedRepo}
-        onRepoSelect={setSelectedRepo}
-        modelInfo={modelInfo}
-        onModelClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setShowModelDropdown(!showModelDropdown);
-        }}
-        onNewChat={handleNewChat}
-      />
-
-      {/* Floating Controls - Toggle with keyboard shortcut */}
-      {showFloatingControls && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
-          <FloatingControls
-            chatMode={chatMode}
-            onChatModeChange={setChatMode}
-            autoApprove={autoApprove}
-            onAutoApproveToggle={() => {
-              const nextAutoApprove = !autoApprove;
-              setAutoApprove(nextAutoApprove);
-              if (nextAutoApprove && chatMode === "plan" && pendingRepoChanges && !applyingRepoChanges) {
-                void applyPendingRepoChanges();
-              }
-            }}
+    <>
+    <ThreeColumnLayout
+      leftPanel={
+        <FileTreeSidebar
+          files={fileTree}
+          selectedFile={selectedFile}
+          onFileSelect={setSelectedFile}
+          repoName={selectedRepo?.name}
+        />
+      }
+      centerPanel={
+        <div className="flex flex-col h-full">
+          {/* Header Bubble - Integrated into chat flow like lovable.dev */}
+          <ChatHeaderBubble
             selectedRepo={selectedRepo}
-            onDeploy={async (provider) => {
-              if (!selectedRepo) return;
-              setDeploymentProvider(provider);
-              if (!currentSessionId) {
-                createNewSession({
-                  repoName: selectedRepo.name,
-                  repoFullName: selectedRepo.full_name,
-                  model: selectedModel,
-                  provider: selectedModelInfo.provider,
-                  messages: stripAttachmentPreviews(messages),
-                });
-              }
-              await deployWithAutoRetry({
-                provider,
-                repository: selectedRepo.full_name,
-                projectName: selectedRepo.name,
-                branch: selectedRepo.default_branch || "main",
-              });
-            }}
-            isDeploying={deploying}
+            modelInfo={modelInfo}
+            onModelClick={() => setShowModelDropdown(!showModelDropdown)}
+            onNewChat={handleNewChat}
+            onMenuClick={() => setShowFloatingControls(!showFloatingControls)}
           />
-        </div>
-      )}
 
-      {/* Model Dropdown Portal */}
-      {modelDropdown &&
-        (isClient
-          ? createPortal(modelDropdown, document.body)
-          : modelDropdown)}
-
-      {/* Unified Status Bar */}
-      {(ollamaLoading || groqLoading || openrouterLoading || fireworksLoading ||
-        geminiLoading || openaiLoading || claudeLoading ||
-        ollamaError || groqError || openrouterError || fireworksError ||
-        geminiError || openaiError || claudeError ||
-        (!providerConfigured && status)) && (
-        <div className="px-4 py-2 bg-white/5 border-b border-white/10">
-          <div className="max-w-4xl mx-auto text-xs text-white/70 text-center">
-            {ollamaLoading && "Loading Ollama models..."}
-            {groqLoading && "Loading Groq models..."}
-            {openrouterLoading && "Loading OpenRouter models..."}
-            {fireworksLoading && "Loading Fireworks models..."}
-            {geminiLoading && "Loading Gemini models..."}
-            {openaiLoading && "Loading OpenAI models..."}
-            {claudeLoading && "Loading Claude models..."}
-            {ollamaError && `Ollama: ${ollamaError}`}
-            {groqError && `Groq: ${groqError}`}
-            {openrouterError && `OpenRouter: ${openrouterError}`}
-            {fireworksError && `Fireworks: ${fireworksError}`}
-            {geminiError && `Gemini: ${geminiError}`}
-            {openaiError && `OpenAI: ${openaiError}`}
-            {claudeError && `Claude: ${claudeError}`}
-            {!providerConfigured && status && `${modelInfo.name} needs a ${modelInfo.provider.toUpperCase()} API key`}
-          </div>
-        </div>
-      )}
-
-      {pendingRepoChanges &&
-        selectedRepo &&
-        pendingRepoChangesRepoFullName === selectedRepo.full_name && (
-          <div className="px-3 py-2 sm:px-4 sm:py-3 border-b border-line/60 bg-surface-muted/70 text-ink text-xs sm:text-sm">
-            <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
-              <div className="flex-1">
-                <div className="font-semibold text-sm mb-1">
-                  📝 Ready to Commit
-                </div>
-                <div className="text-ink">
-                  <strong>{pendingRepoChanges.commitMessage}</strong>
-                </div>
-                <div className="text-ink/70 text-xs mt-1">
-                  {pendingRepoChanges.files.length} file
-                  {pendingRepoChanges.files.length === 1 ? "" : "s"} will be
-                  changed
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPendingRepoChanges(null);
-                    setPendingRepoChangesRepoFullName(null);
-                  }}
-                  disabled={applyingRepoChanges}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-surface-muted/70 text-ink text-xs font-medium hover:bg-surface-strong/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Discard
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyPendingRepoChanges()}
-                  disabled={applyingRepoChanges || !status?.github?.configured}
-                  className="btn-gold px-3 py-1.5 text-xs"
-                  title={
-                    status?.github?.configured
-                      ? "Apply changes to GitHub"
-                      : "Configure GitHub in Settings"
-                  }
-                >
-                  Apply to GitHub
-                </button>
+          {/* Status bar */}
+          {(ollamaLoading || groqLoading || openrouterLoading || fireworksLoading ||
+            geminiLoading || openaiLoading || claudeLoading ||
+            !providerConfigured) && status && (
+            <div className="px-4 py-2 bg-white/5 border-b border-white/10">
+              <div className="text-xs text-white/70 text-center">
+                {ollamaLoading && "Loading Ollama models..."}
+                {groqLoading && "Loading Groq models..."}
+                {openrouterLoading && "Loading OpenRouter models..."}
+                {fireworksLoading && "Loading Fireworks models..."}
+                {geminiLoading && "Loading Gemini models..."}
+                {openaiLoading && "Loading OpenAI models..."}
+                {claudeLoading && "Loading Claude models..."}
+                {!providerConfigured && `${modelInfo.name} needs a ${modelInfo.provider.toUpperCase()} API key`}
               </div>
             </div>
-            <details className="text-xs">
-              <summary className="cursor-pointer text-ink hover:text-ink font-medium">
-                Show files ({pendingRepoChanges.files.length})
-              </summary>
-              <ul className="mt-2 space-y-1 pl-4">
-                {pendingRepoChanges.files.map((file, index) => (
-                  <li key={index} className="text-ink font-mono">
-                    • {file.path}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </div>
-        )}
-
-      {applyingRepoChanges && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink-muted text-xs sm:text-sm">
-          Applying file changes to GitHub…
-        </div>
-      )}
-
-      {applyRepoError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-xs sm:text-sm">
-          Failed to apply file changes: {applyRepoError}
-        </div>
-      )}
-
-      {modelInfo.provider === "ollama" &&
-        status?.ollama?.reachable === false && (
-          <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm flex items-center justify-between gap-2 flex-wrap">
-            <span>
-              Ollama is offline.{" "}
-              {status.ollama.error ||
-                "Start Ollama and check OLLAMA_BASE_URL (or your tunnel)."}
-            </span>
-            <button
-              onClick={retryOllamaConnection}
-              disabled={ollamaRetrying}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {ollamaRetrying ? (
-                <>
-                  <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
-                  </svg>
-                  Retrying...
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                    />
-                  </svg>
-                  Retry Connection
-                </>
-              )}
-            </button>
-          </div>
-        )}
-
-      {modelInfo.provider === "ollama" && ollamaError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm flex items-center justify-between gap-2 flex-wrap">
-          <span>Ollama models unavailable: {ollamaError}</span>
-          <button
-            onClick={retryOllamaConnection}
-            disabled={ollamaRetrying}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {ollamaRetrying ? (
-              <>
-                <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                Retrying...
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
-                Retry
-              </>
-            )}
-          </button>
-        </div>
-      )}
-
-      {modelInfo.provider === "ollama" &&
-        status?.ollama?.reachable === true &&
-        status?.ollama?.configured &&
-        !ollamaLoading &&
-        !ollamaError &&
-        ollamaModels.length === 0 && (
-          <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-            No Ollama models found. Pull a model on your Ollama server (for
-            example{" "}
-            <code className="px-1 py-0.5 bg-amber-100/60 rounded">
-              ollama pull llama3.1:8b
-            </code>
-            ), then refresh.
-          </div>
-        )}
-
-      {/* Messages */}
-      <div className="flex-1 overflow-hidden">
-        <MessageList
-          messages={messages}
-          isLoading={isLoading}
-          repoName={selectedRepo?.name ?? null}
-          chatMode={chatMode}
-          onTemplateSelect={(prompt) => {
-            setInput(prompt);
-            requestAnimationFrame(() => chatInputRef.current?.focus());
-          }}
-        />
-      </div>
-
-      {/* Proceed Button */}
-      {showProceedButton && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-t border-line bg-gradient-to-r from-gold-50 to-accent-50 dark:from-surface-strong dark:to-surface-strong/50">
-          {chatMode === "plan" ? (
-            <button
-              type="button"
-              onClick={handleApproveAndBuild}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm bg-gradient-to-r from-gold-500 to-accent-500 text-white text-sm font-medium hover:from-gold-600 hover:to-accent-600 transition-all duration-200 shadow-md hover:shadow-none"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-              Approve Plan & Switch to Build
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleProceedClick}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm bg-gradient-to-r from-gold-500 to-accent-500 text-white text-sm font-medium hover:from-gold-600 hover:to-accent-600 transition-all duration-200 shadow-md hover:shadow-none"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-              Proceed with Suggestion
-            </button>
           )}
+
+          {/* Messages - Scrollable area */}
+          <div className="flex-1 overflow-y-auto">
+            <MessageList
+              messages={messages}
+              isLoading={isLoading}
+              repoName={selectedRepo?.name}
+              onTemplateSelect={(prompt) => {
+                setInput(prompt);
+                requestAnimationFrame(() => chatInputRef.current?.focus());
+              }}
+              chatMode={chatMode}
+            />
+          </div>
+
+          {/* Proceed Button */}
+          {showProceedButton && (
+            <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-t border-white/10 bg-gradient-to-r from-pink-500/10 to-purple-500/10">
+              {chatMode === "plan" ? (
+                <button
+                  type="button"
+                  onClick={handleApproveAndBuild}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium hover:from-pink-600 hover:to-purple-600 transition-all duration-200 shadow-md hover:shadow-none"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  Approve Plan & Switch to Build
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleProceedClick}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium hover:from-pink-600 hover:to-purple-600 transition-all duration-200 shadow-md hover:shadow-none"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  Proceed with Suggestion
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Input - Fixed at bottom */}
+          <div className="border-t border-white/10 p-4">
+            <ChatInput
+              value={input}
+              onChange={setInput}
+              onSubmit={sendMessage}
+              onStop={stopGenerating}
+              textareaRef={chatInputRef}
+              attachments={pendingAttachments.map((att) => ({
+                id: att.id,
+                name: att.name,
+                kind: att.kind,
+                size: att.size,
+                previewUrl: att.previewUrl,
+              }))}
+              onFilesSelected={addAttachments}
+              onRemoveAttachment={removeAttachment}
+              onOpenImageGenerator={() => {
+                setImageGeneratorError(null);
+                setShowImageGenerator(true);
+              }}
+              onOpenImageHistory={() => {
+                setShowImageHistory(true);
+              }}
+              canGenerateImages={canGenerateImages}
+              attachmentError={attachmentError}
+              disabled={isLoading}
+              loading={isLoading}
+              placeholder="What would you like to build?"
+            />
+          </div>
+        </div>
+      }
+      rightPanel={
+        <PreviewPanel
+          selectedFile={selectedFile}
+          fileContent={fileContent}
+        />
+      }
+    />
+
+    {/* Model Dropdown Portal */}
+    {modelDropdown &&
+      (isClient
+        ? createPortal(modelDropdown, document.body)
+        : modelDropdown)}
+
+    {/* Pending Repo Changes - Keep outside layout */}
+    {pendingRepoChanges &&
+      selectedRepo &&
+      pendingRepoChangesRepoFullName === selectedRepo.full_name && (
+        <div className="px-3 py-2 sm:px-4 sm:py-3 border-b border-white/10 bg-white/5 text-white text-xs sm:text-sm">
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
+            <div className="flex-1">
+              <div className="font-semibold text-sm mb-1">
+                📝 Ready to Commit
+              </div>
+              <div className="text-white/80">
+                <strong>{pendingRepoChanges.commitMessage}</strong>
+              </div>
+              <div className="text-white/60 text-xs mt-1">
+                {pendingRepoChanges.files.length} file
+                {pendingRepoChanges.files.length === 1 ? "" : "s"} will be
+                changed
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setPendingRepoChanges(null);
+                  setPendingRepoChangesRepoFullName(null);
+                }}
+                disabled={applyingRepoChanges}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-white/10 text-white text-xs font-medium hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={() => applyPendingRepoChanges()}
+                disabled={applyingRepoChanges || !status?.github?.configured}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-medium hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                title={
+                  status?.github?.configured
+                    ? "Apply changes to GitHub"
+                    : "Configure GitHub in Settings"
+                }
+              >
+                Apply to GitHub
+              </button>
+            </div>
+          </div>
+          <details className="text-xs">
+            <summary className="cursor-pointer text-white hover:text-white font-medium">
+              Show files ({pendingRepoChanges.files.length})
+            </summary>
+            <ul className="mt-2 space-y-1 pl-4">
+              {pendingRepoChanges.files.map((file, index) => (
+                <li key={index} className="text-white font-mono">
+                  • {file.path}
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
       )}
 
-      {/* Input */}
-      <ChatInput
-        value={input}
-        onChange={setInput}
-        onSubmit={sendMessage}
-        onStop={stopGenerating}
-        textareaRef={chatInputRef}
-        attachments={pendingAttachments.map((att) => ({
-          id: att.id,
-          name: att.name,
-          kind: att.kind,
-          size: att.size,
-          previewUrl: att.previewUrl,
-        }))}
-        onFilesSelected={addAttachments}
-        onRemoveAttachment={removeAttachment}
-        onOpenImageGenerator={() => {
-          setImageGeneratorError(null);
-          setShowImageGenerator(true);
-        }}
-        onOpenImageHistory={() => {
-          setShowImageHistory(true);
-        }}
-        canGenerateImages={canGenerateImages}
-        attachmentError={attachmentError}
-        disabled={isLoading}
-        loading={isLoading}
-        placeholder={
-          selectedRepo
-            ? chatMode === "plan"
-              ? `Plan the next move for ${selectedRepo.name}...`
-              : `Build on ${selectedRepo.name}...`
-            : chatMode === "plan"
-              ? "Describe your mission and constraints..."
-              : "Start building with a clear command..."
-        }
-      />
+    {applyingRepoChanges && (
+      <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-white/10 bg-white/5 text-white/60 text-xs sm:text-sm">
+        Applying file changes to GitHub…
+      </div>
+    )}
 
-      <ImageGeneratorModal
+    {applyRepoError && (
+      <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-red-500/30 bg-red-500/10 text-red-300 text-xs sm:text-sm">
+        Failed to apply file changes: {applyRepoError}
+      </div>
+    )}
+
+    {/* Modals */}
+    <ImageGeneratorModal
         open={showImageGenerator}
         providers={imageProviders}
         defaultProvider={defaultImageProvider}
@@ -4707,6 +4559,8 @@ export default function ChatInterface() {
         fallbackNotice={fallbackNotice}
         onDismissFallback={() => setFallbackNotice(null)}
       />
-    </div>
+
+      <ApiUsageDisplay currentProvider={selectedModelInfo.provider} />
+    </>
   );
 }
