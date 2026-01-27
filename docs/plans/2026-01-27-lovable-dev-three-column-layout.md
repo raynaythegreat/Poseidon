@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Transform Poseidon's chat interface into a three-column IDE layout matching lovable.dev: file tree (left) | chat (center) | preview/inspector (right), with a minimal top bar for controls.
+**Goal:** Transform Poseidon's chat interface into a three-column IDE layout matching lovable.dev: file tree sidebar (left) | chat with integrated header bubble (center) | preview/inspector panel (right).
 
-**Architecture:** Complete layout restructure using CSS Grid/Flexbox for three-column responsive layout. Left sidebar (250px, collapsible) for repo file tree, center (flex-1) for chat messages, right sidebar (350px, collapsible) for code preview/file inspector. Minimal top bar (48px) with model selector, repo name, and key actions.
+**Architecture:** Complete layout restructure using CSS Flexbox for three-column responsive layout. Left sidebar (200px, collapses to 48px icons) for repo file tree. Center (flex-1) contains: (1) header bubble integrated as first chat element with logo/model selector/actions, (2) scrollable messages area, (3) input at bottom. Right sidebar (300px, collapsible) for code preview/file inspector.
 
 **Tech Stack:** React, Tailwind CSS, TypeScript, Next.js 14.2.5 (App Router)
 
@@ -15,7 +15,7 @@
 **Files:**
 - Create: `components/chat/ThreeColumnLayout.tsx`
 
-**Step 1: Create the layout shell component**
+**Step 1: Create the layout shell component (no top bar)**
 
 ```tsx
 "use client";
@@ -26,74 +26,69 @@ interface ThreeColumnLayoutProps {
   leftPanel: React.ReactNode;
   centerPanel: React.ReactNode;
   rightPanel: React.ReactNode;
-  topBar: React.ReactNode;
 }
 
 export default function ThreeColumnLayout({
   leftPanel,
   centerPanel,
   rightPanel,
-  topBar,
 }: ThreeColumnLayoutProps) {
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0f] text-white">
-      {/* Minimal Top Bar - 48px */}
-      <div className="h-12 border-b border-white/10 flex items-center px-4 bg-[#0a0a0f]">
-        {topBar}
-      </div>
-
-      {/* Three Column Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel - File Tree */}
-        {!leftCollapsed && (
-          <div className="w-64 border-r border-white/10 flex-shrink-0 overflow-y-auto bg-[#0f0f15]">
-            {leftPanel}
-          </div>
-        )}
-
-        {/* Left Collapse Toggle */}
-        <button
-          onClick={() => setLeftCollapsed(!leftCollapsed)}
-          className="w-6 h-6 flex items-center justify-center hover:bg-white/5 border-l border-r border-white/10 flex-shrink-0"
-        >
-          <svg className="w-3 h-3 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            {leftCollapsed ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            )}
-          </svg>
-        </button>
-
-        {/* Center Panel - Chat */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {centerPanel}
+    <div className="flex h-screen bg-[#0a0a0f] text-white">
+      {/* Left Panel - File Tree */}
+      {!leftCollapsed && (
+        <div className="w-52 border-r border-white/10 flex-shrink-0 overflow-y-auto bg-[#0f0f15]">
+          {leftPanel}
         </div>
+      )}
+      {leftCollapsed && (
+        <div className="w-12 border-r border-white/10 flex-shrink-0 flex flex-col items-center py-4 gap-4 bg-[#0f0f15]">
+          {/* Collapsed state icons */}
+        </div>
+      )}
 
-        {/* Right Collapse Toggle */}
-        <button
-          onClick={() => setRightCollapsed(!rightCollapsed)}
-          className="w-6 h-6 flex items-center justify-center hover:bg-white/5 border-l border-r border-white/10 flex-shrink-0"
-        >
-          <svg className="w-3 h-3 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            {rightCollapsed ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            )}
-          </svg>
-        </button>
+      {/* Left Collapse Button */}
+      <button
+        onClick={() => setLeftCollapsed(!leftCollapsed)}
+        className="w-6 h-6 flex items-center justify-center hover:bg-white/5 border-r border-white/10 flex-shrink-0"
+      >
+        <svg className="w-3 h-3 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {leftCollapsed ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          )}
+        </svg>
+      </button>
 
-        {/* Right Panel - Preview/Inspector */}
-        {!rightCollapsed && (
-          <div className="w-80 border-l border-white/10 flex-shrink-0 overflow-y-auto bg-[#0f0f15]">
-            {rightPanel}
-          </div>
-        )}
+      {/* Center Panel - Chat */}
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {centerPanel}
       </div>
+
+      {/* Right Collapse Button */}
+      <button
+        onClick={() => setRightCollapsed(!rightCollapsed)}
+        className="w-6 h-6 flex items-center justify-center hover:bg-white/5 border-l border-white/10 flex-shrink-0"
+      >
+        <svg className="w-3 h-3 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {rightCollapsed ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          )}
+        </svg>
+      </button>
+
+      {/* Right Panel - Preview/Inspector */}
+      {!rightCollapsed && (
+        <div className="w-72 border-l border-white/10 flex-shrink-0 overflow-y-auto bg-[#0f0f15]">
+          {rightPanel}
+        </div>
+      )}
     </div>
   );
 }
@@ -113,101 +108,133 @@ git commit -m "feat: create three-column layout shell component"
 
 ---
 
-## Task 2: Create Minimal Top Bar Component
+## Task 2: Create Chat Header Bubble Component
 
 **Files:**
-- Create: `components/chat/MinimalTopBar.tsx`
+- Create: `components/chat/ChatHeaderBubble.tsx`
 
-**Step 1: Create the top bar component**
+**Step 1: Create the header bubble component (integrated into chat flow)**
 
 ```tsx
 "use client";
 
 import { useState } from "react";
 
-interface MinimalTopBarProps {
+interface ChatHeaderBubbleProps {
   selectedRepo: { id: number; name: string; full_name: string } | null;
   modelInfo: { name: string; provider: string };
-  onRepoClick: () => void;
   onModelClick: () => void;
   onNewChat: () => void;
+  onMenuClick: () => void;
 }
 
-export default function MinimalTopBar({
+export default function ChatHeaderBubble({
   selectedRepo,
   modelInfo,
-  onRepoClick,
   onModelClick,
   onNewChat,
-}: MinimalTopBarProps) {
+  onMenuClick,
+}: ChatHeaderBubbleProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="flex items-center justify-between w-full">
-      {/* Left: Logo and Repo */}
-      <div className="flex items-center gap-3">
-        <h1 className="text-lg font-semibold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-          Poseidon
-        </h1>
-        {selectedRepo && (
+    <div className="px-4 py-3 border-b border-white/5">
+      <div className="max-w-3xl mx-auto flex items-center justify-between">
+        {/* Left: Logo/Brand and Model */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Logo/Brand */}
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 flex items-center justify-center">
+              <span className="text-sm font-bold text-white">P</span>
+            </div>
+            <span className="font-semibold text-white">Poseidon</span>
+          </div>
+
+          {/* Separator */}
+          <div className="w-px h-4 bg-white/20" />
+
+          {/* Model Selector */}
           <button
-            onClick={onRepoClick}
-            className="text-sm text-white/60 hover:text-white/80 transition-colors"
-          >
-            {selectedRepo.name}
-          </button>
-        )}
-      </div>
-
-      {/* Center: Model Selector */}
-      <button
-        onClick={onModelClick}
-        className="px-3 py-1 text-xs rounded-md bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:text-white/90 transition-all"
-      >
-        {modelInfo.name}
-      </button>
-
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onNewChat}
-          className="p-1.5 rounded-md hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"
-          title="New chat"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-
-        <div className="relative">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-1.5 rounded-md hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"
+            onClick={onModelClick}
+            className="text-sm text-white/60 hover:text-white/90 transition-colors flex items-center gap-1.5"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            {modelInfo.name}
+          </button>
+
+          {/* Repo name if selected */}
+          {selectedRepo && (
+            <>
+              <div className="w-px h-4 bg-white/20" />
+              <span className="text-sm text-white/60">{selectedRepo.name}</span>
+            </>
+          )}
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-1">
+          {/* New Chat Button */}
+          <button
+            onClick={onNewChat}
+            className="p-2 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"
+            title="New chat"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>
 
-          {showMenu && (
-            <div className="absolute right-0 mt-2 w-48 rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl shadow-xl z-50">
-              <div className="p-2 border-b border-white/10">
-                <div className="text-xs text-white/50 px-2 py-1">MODE</div>
-                <div className="flex gap-1 p-1">
-                  <button className="flex-1 px-2 py-1 text-xs rounded bg-white/10 text-white">Plan</button>
-                  <button className="flex-1 px-2 py-1 text-xs rounded text-white/60 hover:text-white">Build</button>
+          {/* Menu Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-xl z-50 overflow-hidden">
+                {/* Mode Toggle */}
+                <div className="p-3 border-b border-white/10">
+                  <div className="text-xs text-white/50 px-1 mb-2">MODE</div>
+                  <div className="flex gap-1">
+                    <button className="flex-1 px-3 py-2 text-xs rounded-lg bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 text-white">
+                      Plan
+                    </button>
+                    <button className="flex-1 px-3 py-2 text-xs rounded-lg text-white/60 hover:text-white hover:bg-white/5">
+                      Build
+                    </button>
+                  </div>
+                </div>
+
+                {/* Auto-approve */}
+                <div className="p-2">
+                  <button className="w-full px-3 py-2 text-sm text-left text-white/70 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Auto-approve
+                  </button>
+                </div>
+
+                {/* Deploy Options */}
+                <div className="p-2 border-t border-white/10">
+                  <div className="text-xs text-white/50 px-3 mb-1">DEPLOY</div>
+                  <button className="w-full px-3 py-2 text-sm text-left text-white/70 hover:bg-white/5 rounded-lg transition-colors">
+                    Deploy to Vercel
+                  </button>
+                  <button className="w-full px-3 py-2 text-sm text-left text-white/70 hover:bg-white/5 rounded-lg transition-colors">
+                    Deploy to Render
+                  </button>
                 </div>
               </div>
-              <div className="p-2">
-                <button className="w-full px-2 py-1.5 text-xs text-left text-white/70 hover:bg-white/5 rounded flex items-center gap-2">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Auto-approve
-                </button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -223,8 +250,8 @@ Expected: TypeScript compiles successfully
 **Step 3: Commit**
 
 ```bash
-git add components/chat/MinimalTopBar.tsx
-git commit -m "feat: create minimal top bar component"
+git add components/chat/ChatHeaderBubble.tsx
+git commit -m "feat: create chat header bubble component"
 ```
 
 ---
@@ -506,7 +533,7 @@ git commit -m "feat: create preview panel component"
 
 ```tsx
 import ThreeColumnLayout from "@/components/chat/ThreeColumnLayout";
-import MinimalTopBar from "@/components/chat/MinimalTopBar";
+import ChatHeaderBubble from "@/components/chat/ChatHeaderBubble";
 import FileTreeSidebar from "@/components/chat/FileTreeSidebar";
 import PreviewPanel from "@/components/chat/PreviewPanel";
 ```
@@ -518,6 +545,7 @@ Find the state declarations (around line 300) and add:
 ```tsx
 const [selectedFile, setSelectedFile] = useState<string | null>(null);
 const [fileTree, setFileTree] = useState<any[]>([]);
+const [fileContent, setFileContent] = useState<string>("");
 ```
 
 **Step 3: Replace the entire return statement**
@@ -527,17 +555,6 @@ Find the main return statement (starts with `return (` around line 4290) and rep
 ```tsx
   return (
     <ThreeColumnLayout
-      topBar={
-        <MinimalTopBar
-          selectedRepo={selectedRepo}
-          modelInfo={modelInfo}
-          onRepoClick={() => {/* Show repo selector */}}
-          onModelClick={() => {
-            setShowModelDropdown(!showModelDropdown);
-          }}
-          onNewChat={handleNewChat}
-        />
-      }
       leftPanel={
         <FileTreeSidebar
           files={fileTree}
@@ -548,6 +565,15 @@ Find the main return statement (starts with `return (` around line 4290) and rep
       }
       centerPanel={
         <div className="flex flex-col h-full">
+          {/* Header Bubble - Integrated into chat flow like lovable.dev */}
+          <ChatHeaderBubble
+            selectedRepo={selectedRepo}
+            modelInfo={modelInfo}
+            onModelClick={() => setShowModelDropdown(!showModelDropdown)}
+            onNewChat={handleNewChat}
+            onMenuClick={() => {/* Open menu */}}
+          />
+
           {/* Status bar */}
           {(ollamaLoading || groqLoading || openrouterLoading || fireworksLoading ||
             geminiLoading || openaiLoading || claudeLoading ||
@@ -566,48 +592,44 @@ Find the main return statement (starts with `return (` around line 4290) and rep
             </div>
           )}
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-6">
-            <div className="max-w-3xl mx-auto">
-              <MessageList
-                messages={messages}
-                isLoading={isLoading}
-                repoName={selectedRepo?.name}
-                onTemplateSelect={(prompt) => {
-                  setValue(prompt);
-                  handleSubmit();
-                }}
-                chatMode={chatMode}
-              />
-            </div>
+          {/* Messages - Scrollable area */}
+          <div className="flex-1 overflow-y-auto">
+            <MessageList
+              messages={messages}
+              isLoading={isLoading}
+              repoName={selectedRepo?.name}
+              onTemplateSelect={(prompt) => {
+                setValue(prompt);
+                handleSubmit();
+              }}
+              chatMode={chatMode}
+            />
           </div>
 
-          {/* Input */}
+          {/* Input - Fixed at bottom */}
           <div className="border-t border-white/10 p-4">
-            <div className="max-w-3xl mx-auto">
-              <ChatInput
-                value={value}
-                onChange={setValue}
-                onSubmit={handleSubmit}
-                onStop={handleStop}
-                textareaRef={textareaRef}
-                attachments={pendingAttachments}
-                onFilesSelected={handleFileSelect}
-                onRemoveAttachment={removeAttachment}
-                onOpenImageGenerator={() => setShowImageGenerator(true)}
-                onOpenImageHistory={() => setShowImageHistory(true)}
-                disabled={disabled}
-                loading={isLoading}
-                placeholder="What would you like to build?"
-              />
-            </div>
+            <ChatInput
+              value={value}
+              onChange={setValue}
+              onSubmit={handleSubmit}
+              onStop={handleStop}
+              textareaRef={textareaRef}
+              attachments={pendingAttachments}
+              onFilesSelected={handleFileSelect}
+              onRemoveAttachment={removeAttachment}
+              onOpenImageGenerator={() => setShowImageGenerator(true)}
+              onOpenImageHistory={() => setShowImageHistory(true)}
+              disabled={disabled}
+              loading={isLoading}
+              placeholder="What would you like to build?"
+            />
           </div>
         </div>
       }
       rightPanel={
         <PreviewPanel
           selectedFile={selectedFile}
-          fileContent={/* Get file content from repo context */}
+          fileContent={fileContent}
         />
       }
     />
