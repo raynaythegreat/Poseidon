@@ -32,8 +32,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         throw new Error(data.error || "Login failed");
       }
 
-      localStorage.setItem("gatekeep-device-token", data.deviceToken);
-      localStorage.setItem("gatekeep-token-hash", data.tokenHash);
+      localStorage.setItem("poseidon-device-token", data.deviceToken);
+      localStorage.setItem("poseidon-token-hash", data.tokenHash);
       onLogin();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -50,7 +50,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           <div className="w-20 h-20 rounded-none gradient-sunset flex items-center justify-center shadow-none mx-auto mb-4 animate-gradient ring-1 ring-white/50 dark:ring-white/10">
             <GlassesLogo className="w-11 h-11 text-white drop-shadow-none" />
           </div>
-          <h1 className="text-3xl font-semibold gradient-text font-display tracking-wide">GateKeep</h1>
+          <h1 className="text-3xl font-semibold gradient-text font-display tracking-wide">Poseidon</h1>
           <p className="text-ink-muted mt-2 font-medium">Secure access to your AI command center</p>
         </div>
 

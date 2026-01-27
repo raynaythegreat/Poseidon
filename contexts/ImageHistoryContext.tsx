@@ -34,7 +34,7 @@ const ImageHistoryContext = createContext<ImageHistoryContextType | undefined>(
   undefined,
 );
 
-const STORAGE_KEY = "gatekeep_image_history";
+const STORAGE_KEY = "poseidon_image_history";
 const MAX_IMAGES = 100; // Limit to prevent localStorage overflow
 
 export function ImageHistoryProvider({ children }: { children: ReactNode }) {
@@ -121,7 +121,7 @@ export function ImageHistoryProvider({ children }: { children: ReactNode }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `gatekeep-image-history-${Date.now()}.json`;
+    a.download = `poseidon-image-history-${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

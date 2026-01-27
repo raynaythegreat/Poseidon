@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import GlassesLogo from "@/components/ui/GlassesLogo";
+import ProviderCard from "@/components/ui/ProviderCard";
+import RotatingCardsButton from "@/components/ui/RotatingCardsButton";
+import RotatingCardsToggle from "@/components/ui/RotatingCardsToggle";
 import CustomProviderSettings from "./CustomProviderSettings";
 
 interface SettingsPageProps {
@@ -183,12 +186,12 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
           kind: "error",
           text: statusData?.ollama?.error
             ? localRetryUnsupported
-              ? `Ollama is still offline: ${statusData.ollama.error} (Open GateKeep on your Mac to restart Ollama/cloudflared.)`
+              ? `Ollama is still offline: ${statusData.ollama.error} (Open Poseidon on your Mac to restart Ollama/cloudflared.)`
               : `Ollama is still offline: ${statusData.ollama.error}`
             : localRetryData?.attempted
               ? "Ollama is still offline after retry. Start Ollama or check OLLAMA_BASE_URL (or your tunnel)."
               : localRetryUnsupported
-                ? "Ollama is offline. This deployment can't restart your tunnel—open GateKeep on your Mac to start Ollama/cloudflared, then retry."
+                ? "Ollama is offline. This deployment can't restart your tunnel—open Poseidon on your Mac to start Ollama/cloudflared, then retry."
                 : "Ollama is still offline. Start Ollama or check OLLAMA_BASE_URL (or your tunnel).",
         });
         return;
@@ -671,17 +674,18 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
             <h3 className="text-lg font-semibold text-ink">
               API Configuration
             </h3>
-            <button
+            <RotatingCardsButton
               onClick={fetchStatus}
-              className="px-3 py-1.5 rounded-sm text-sm font-medium border border-line/60 text-ink hover:bg-surface-muted/70 dark:hover:bg-surface-strong/60 transition-colors"
+              className="px-3 py-1.5 rounded-sm text-sm font-medium"
+              variant="secondary"
             >
               Refresh
-            </button>
+            </RotatingCardsButton>
           </div>
           {runtimeLabel && (
             <p className="text-sm text-ink-muted mb-3">{runtimeLabel}</p>
           )}
-          <div className="card rounded-none divide-y divide-line/60">
+          <div className="space-y-3">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <svg
@@ -715,306 +719,239 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                   item.configured &&
                   item.reachable === null;
 
-                const badgeText = showChecking
-                  ? "Checking"
+                const providerStatus = showChecking
+                  ? ("loading" as const)
                   : showOffline
-                    ? "Offline"
+                    ? ("error" as const)
                     : item.configured
-                      ? "Connected"
-                      : "Not Configured";
+                      ? ("connected" as const)
+                      : ("disconnected" as const);
 
-                const badgeClass = showChecking
-                  ? "bg-surface-muted/70 text-ink-muted"
-                  : showOffline
-                    ? "bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300"
-                    : item.configured
-                      ? "bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400"
-                      : "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400";
+                // Build error message
+                let errorMessage: string | undefined;
+                let warningMessage: string | undefined;
+
+                if (showOffline && item.error) {
+                  errorMessage = item.error;
+                } else if (item.warning) {
+                  warningMessage = item.warning;
+                }
 
                 return (
-                  <div
+                  <ProviderCard
                     key={item.name}
-                    className="flex items-center justify-between p-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-none bg-surface-muted/70 flex items-center justify-center text-ink">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-ink">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-ink-muted">
-                          {item.description}
-                        </p>
-                        {showOffline && item.error && (
-                          <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                            {item.error}
-                          </p>
-                        )}
-                        {item.warning && (
-                          <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                            {item.warning}
-                          </p>
-                        )}
-                        {item.name === "Groq" && item.configured === false && (
-                          <p className="text-xs text-ink-muted mt-1">
-                            {groqSetupHint}
-                          </p>
-                        )}
-                        {item.name === "Groq" && groqSyncMessage && (
-                          <div
-                            className={`text-xs mt-1 ${
-                              groqSyncMessage.kind === "success"
-                                ? "text-green-700 dark:text-green-300"
-                                : "text-amber-700 dark:text-amber-300"
-                            }`}
-                          >
-                            <p>{groqSyncMessage.text}</p>
-                            {groqSyncMessage.deploymentUrl && (
-                              <p className="mt-1">
-                                <a
-                                  href={groqSyncMessage.deploymentUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="underline"
-                                >
-                                  Open deployment
-                                </a>
-                              </p>
-                            )}
-                          </div>
-                        )}
-                        {item.name === "Render" &&
-                          item.configured === false && (
-                            <p className="text-xs text-ink-muted mt-1">
-                              {renderSetupHint}
-                            </p>
-                          )}
-                        {item.name === "Render" && renderSyncMessage && (
-                          <div
-                            className={`text-xs mt-1 ${
-                              renderSyncMessage.kind === "success"
-                                ? "text-green-700 dark:text-green-300"
-                                : "text-amber-700 dark:text-amber-300"
-                            }`}
-                          >
-                            <p>{renderSyncMessage.text}</p>
-                            {renderSyncMessage.deploymentUrl && (
-                              <p className="mt-1">
-                                <a
-                                  href={renderSyncMessage.deploymentUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="underline"
-                                >
-                                  Open deployment
-                                </a>
-                              </p>
-                            )}
-                          </div>
-                        )}
-                        {item.name === "Ollama" &&
-                          item.configured === false && (
-                            <p className="text-xs text-ink-muted mt-1">
-                              {ollamaSetupHint}
-                            </p>
-                          )}
-                        {item.name === "Ollama" && status?.ollama?.url && (
-                          <p className="text-xs text-ink-muted mt-1">
-                            URL:{" "}
-                            <code className={inlineCodeClass}>
-                              {status.ollama.url}
-                            </code>
-                            {status.ollama.source
-                              ? ` (${status.ollama.source})`
-                              : null}
-                          </p>
-                        )}
-                        {item.name === "Ollama" && ollamaRetryMessage && (
-                          <p
-                            className={`text-xs mt-1 ${
-                              ollamaRetryMessage.kind === "success"
-                                ? "text-green-700 dark:text-green-300"
-                                : "text-amber-700 dark:text-amber-300"
-                            }`}
-                          >
-                            {ollamaRetryMessage.text}
-                          </p>
-                        )}
-                        {item.name === "Ollama" && ollamaNgrokMessage && (
-                          <div
-                            className={`text-xs mt-1 ${
-                              ollamaNgrokMessage.kind === "success"
-                                ? "text-green-700 dark:text-green-300"
-                                : "text-amber-700 dark:text-amber-300"
-                            }`}
-                          >
-                            <p>{ollamaNgrokMessage.text}</p>
-                            {ollamaNgrokMessage.url && (
-                              <p className="mt-1">
-                                <code className={inlineCodeClass}>
-                                  {ollamaNgrokMessage.url}
-                                </code>
-                              </p>
-                            )}
-                            {ollamaNgrokMessage.deploymentUrl && (
-                              <p className="mt-1">
-                                <a
-                                  href={ollamaNgrokMessage.deploymentUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="underline"
-                                >
-                                  Open deployment
-                                </a>
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap justify-end">
-                      <div
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${badgeClass}`}
-                      >
-                        {badgeText}
-                      </div>
-                      {item.name === "Groq" &&
-                        status?.runtime?.onVercel === false &&
-                        status?.runtime?.onRender !== true && (
-                          <button
-                            type="button"
-                            onClick={syncGroqToVercel}
-                            disabled={
-                              groqSyncing ||
-                              !status?.vercel?.configured ||
-                              !status?.github?.configured
-                            }
-                            className="btn-gold gap-1.5 px-3 py-1 rounded-full text-xs"
-                            title={
-                              status?.vercel?.configured &&
-                              status?.github?.configured
-                                ? "Sets GROQ_API_KEY in Vercel (Production + Preview) and triggers a deploy"
-                                : "Configure VERCEL_TOKEN and GITHUB_TOKEN in .env.local to sync automatically"
-                            }
-                          >
-                            {groqSyncing ? "Syncing…" : "Sync to Vercel"}
-                          </button>
-                        )}
-                      {item.name === "Render" &&
-                        status?.runtime?.onVercel === false &&
-                        status?.runtime?.onRender !== true && (
-                          <button
-                            type="button"
-                            onClick={syncRenderToVercel}
-                            disabled={
-                              renderSyncing ||
-                              !status?.vercel?.configured ||
-                              !status?.github?.configured
-                            }
-                            className="btn-gold gap-1.5 px-3 py-1 rounded-full text-xs"
-                            title={
-                              status?.vercel?.configured &&
-                              status?.github?.configured
-                                ? "Sets RENDER_API_KEY in Vercel (Production + Preview) and triggers a deploy"
-                                : "Configure VERCEL_TOKEN and GITHUB_TOKEN in .env.local to sync automatically"
-                            }
-                          >
-                            {renderSyncing ? "Syncing…" : "Sync to Vercel"}
-                          </button>
-                        )}
-                      {item.name === "Ollama" &&
-                        status?.runtime?.onVercel === false &&
-                        status?.runtime?.onRender !== true && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={startNgrokTunnel}
-                              disabled={ollamaNgrokStarting}
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                              {ollamaNgrokStarting
-                                ? "Starting ngrok…"
-                                : "Start ngrok"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={syncNgrokToVercel}
+                    name={item.name}
+                    description={item.description}
+                    icon={item.icon}
+                    status={providerStatus}
+                    error={errorMessage}
+                    warning={warningMessage}
+                    action={
+                      <div className="flex items-center gap-2 flex-wrap justify-end">
+                        {item.name === "Groq" &&
+                          status?.runtime?.onVercel === false &&
+                          status?.runtime?.onRender !== true && (
+                            <RotatingCardsButton
+                              onClick={syncGroqToVercel}
                               disabled={
-                                ollamaNgrokSyncing ||
-                                !status?.vercel?.configured
+                                groqSyncing ||
+                                !status?.vercel?.configured ||
+                                !status?.github?.configured
                               }
-                              className="btn-gold gap-1.5 px-3 py-1 rounded-full text-xs"
-                              title={
-                                status?.vercel?.configured
-                                  ? "Starts ngrok (if needed), updates OLLAMA_BASE_URL in Vercel, and triggers a deploy"
-                                  : "Configure VERCEL_TOKEN in .env.local to sync automatically"
-                              }
+                              className="gap-1.5 px-3 py-1 rounded-full text-xs"
+                              variant="gold"
                             >
-                              {ollamaNgrokSyncing
-                                ? "Syncing…"
-                                : "Sync to Vercel"}
-                            </button>
-                          </>
-                        )}
-                      {item.name === "Ollama" && item.configured && (
-                        <button
-                          type="button"
-                          onClick={retryFetchOllama}
-                          disabled={ollamaRetrying || showChecking}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          title="Retry fetching Ollama models"
-                        >
-                          {ollamaRetrying ? (
+                              {groqSyncing ? "Syncing…" : "Sync to Vercel"}
+                            </RotatingCardsButton>
+                          )}
+                        {item.name === "Render" &&
+                          status?.runtime?.onVercel === false &&
+                          status?.runtime?.onRender !== true && (
+                            <RotatingCardsButton
+                              onClick={syncRenderToVercel}
+                              disabled={
+                                renderSyncing ||
+                                !status?.vercel?.configured ||
+                                !status?.github?.configured
+                              }
+                              className="gap-1.5 px-3 py-1 rounded-full text-xs"
+                              variant="gold"
+                            >
+                              {renderSyncing ? "Syncing…" : "Sync to Vercel"}
+                            </RotatingCardsButton>
+                          )}
+                        {item.name === "Ollama" &&
+                          status?.runtime?.onVercel === false &&
+                          status?.runtime?.onRender !== true && (
                             <>
-                              <svg
-                                className="animate-spin h-3.5 w-3.5"
-                                viewBox="0 0 24 24"
+                              <button
+                                type="button"
+                                onClick={startNgrokTunnel}
+                                disabled={ollamaNgrokStarting}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                  fill="none"
-                                />
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                />
-                              </svg>
-                              Retrying…
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                className="w-3.5 h-3.5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
+                                {ollamaNgrokStarting
+                                  ? "Starting ngrok…"
+                                  : "Start ngrok"}
+                              </button>
+                              <RotatingCardsButton
+                                onClick={syncNgrokToVercel}
+                                disabled={
+                                  ollamaNgrokSyncing ||
+                                  !status?.vercel?.configured
+                                }
+                                className="gap-1.5 px-3 py-1 rounded-full text-xs"
+                                variant="gold"
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                                />
-                              </svg>
-                              Retry
+                                {ollamaNgrokSyncing
+                                  ? "Syncing…"
+                                  : "Sync to Vercel"}
+                              </RotatingCardsButton>
                             </>
                           )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                        {item.name === "Ollama" && item.configured && (
+                          <button
+                            type="button"
+                            onClick={retryFetchOllama}
+                            disabled={ollamaRetrying || showChecking}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            title="Retry fetching Ollama models"
+                          >
+                            {ollamaRetrying ? (
+                              <>
+                                <svg
+                                  className="animate-spin h-3.5 w-3.5"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="none"
+                                  />
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                  />
+                                </svg>
+                                Retrying…
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                                  />
+                                </svg>
+                                Retry
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    }
+                  />
                 );
               })
             )}
           </div>
+
+          {/* Hints Section */}
+          {(groqSyncMessage || renderSyncMessage || ollamaRetryMessage || ollamaNgrokMessage ||
+            (!status?.groq?.configured) || (!status?.render?.configured) || (!status?.ollama?.configured)) && (
+            <div className="mt-4 space-y-2">
+              {groqSyncMessage && (
+                <div className={`p-3 rounded-sm text-sm ${
+                  groqSyncMessage.kind === "success"
+                    ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300"
+                    : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                }`}>
+                  <p>{groqSyncMessage.text}</p>
+                  {groqSyncMessage.deploymentUrl && (
+                    <p className="mt-1">
+                      <a
+                        href={groqSyncMessage.deploymentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Open deployment
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+              {renderSyncMessage && (
+                <div className={`p-3 rounded-sm text-sm ${
+                  renderSyncMessage.kind === "success"
+                    ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300"
+                    : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                }`}>
+                  <p>{renderSyncMessage.text}</p>
+                  {renderSyncMessage.deploymentUrl && (
+                    <p className="mt-1">
+                      <a
+                        href={renderSyncMessage.deploymentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Open deployment
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+              {ollamaRetryMessage && (
+                <div className={`p-3 rounded-sm text-sm ${
+                  ollamaRetryMessage.kind === "success"
+                    ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300"
+                    : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                }`}>
+                  {ollamaRetryMessage.text}
+                </div>
+              )}
+              {ollamaNgrokMessage && (
+                <div className={`p-3 rounded-sm text-sm ${
+                  ollamaNgrokMessage.kind === "success"
+                    ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300"
+                    : "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                }`}>
+                  <p>{ollamaNgrokMessage.text}</p>
+                  {ollamaNgrokMessage.url && (
+                    <p className="mt-1">
+                      <code className={inlineCodeClass}>{ollamaNgrokMessage.url}</code>
+                    </p>
+                  )}
+                  {ollamaNgrokMessage.deploymentUrl && (
+                    <p className="mt-1">
+                      <a
+                        href={ollamaNgrokMessage.deploymentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Open deployment
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <p className="mt-3 text-sm text-ink-muted">
             Local: configure keys in{" "}
             <code className={inlineCodeClass}>
@@ -1025,6 +962,47 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
 
           <div className="mt-8">
             <CustomProviderSettings />
+          </div>
+        </section>
+
+        {/* Security */}
+        <section>
+          <h3 className="text-lg font-semibold text-ink mb-4">
+            Security
+          </h3>
+          <div className="card rounded-none p-4">
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium text-ink">
+                  Password Protection
+                </h4>
+                <p className="text-sm text-ink-muted mt-1">
+                  The downloaded Electron app doesn&apos;t require a password. For Vercel deployments, you can set a custom password.
+                </p>
+              </div>
+              {status?.runtime?.onVercel ? (
+                <div className="p-3 rounded-sm bg-surface-muted/50 border border-line/40">
+                  <p className="text-sm text-ink mb-2">
+                    To set a password for your Vercel deployment:
+                  </p>
+                  <ol className="text-sm text-ink-muted space-y-1 list-decimal list-inside">
+                    <li>Go to your Vercel Project Settings</li>
+                    <li>Navigate to Environment Variables</li>
+                    <li>Add <code className={inlineCodeClass}>APP_PASSWORD</code> with your desired password</li>
+                    <li>Redeploy your application</li>
+                  </ol>
+                  <p className="text-xs text-ink-muted mt-3">
+                    If APP_PASSWORD is not set, the default password is &quot;password&quot;
+                  </p>
+                </div>
+              ) : (
+                <div className="p-3 rounded-sm bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    ✓ Running locally - no password required
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -1040,53 +1018,14 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                   Theme
                 </h4>
                 <p className="text-sm text-ink-muted">
-                  Choose your preferred color scheme
+                  {theme === "dark" ? "Dark mode enabled" : "Light mode enabled"}
                 </p>
               </div>
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-2 px-4 py-2 rounded-none border border-line/60 text-ink hover:bg-surface-muted/70 dark:hover:bg-surface-strong/60 transition-colors"
-              >
-                {theme === "dark" ? (
-                  <>
-                    <svg
-                      className="w-5 h-5 text-accent-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium text-ink">
-                      Light
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-5 h-5 text-ink-muted"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium text-ink">
-                      Dark
-                    </span>
-                  </>
-                )}
-              </button>
+              <RotatingCardsToggle
+                checked={theme === "dark"}
+                onChange={toggleTheme}
+                label=""
+              />
             </div>
           </div>
         </section>
@@ -1106,12 +1045,13 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                   Sign out of your current session
                 </p>
               </div>
-              <button
+              <RotatingCardsButton
                 onClick={onLogout}
-                className="px-4 py-2 rounded-none bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                className="px-4 py-2 rounded-none text-sm"
+                variant="secondary"
               >
                 Sign Out
-              </button>
+              </RotatingCardsButton>
             </div>
           </div>
         </section>
@@ -1128,7 +1068,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
               </div>
               <div>
                 <h4 className="font-semibold text-ink">
-                  GateKeep
+                  Poseidon
                 </h4>
                 <p className="text-sm text-ink-muted">Version 1.0.0</p>
                 <p className="text-xs text-ink-muted mt-1">

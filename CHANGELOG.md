@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to GateKeep will be documented in this file.
+All notable changes to Poseidon will be documented in this file.
 
 ## [1.1.0] - 2026-01-12
 

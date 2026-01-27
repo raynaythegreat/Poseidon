@@ -1,16 +1,31 @@
 {
-  "name": "gatekeep",
+  "name": "poseidon",
   "version": "1.0.0",
   "description": "Cyber-styled AI dev command center with GitHub and deployment workflows",
+  "main": "public/electron.js",
   "scripts": {
     "dev": "next dev -p 1998",
     "build": "next build",
     "start": "next start -p 1998",
     "lint": "next lint",
     "sync-ngrok": "bash scripts/sync-ngrok.sh",
-    "watch-ngrok": "node scripts/watch-ngrok.js"
+    "watch-ngrok": "node scripts/watch-ngrok.js",
+    "electron": "electron .",
+    "electron-dev": "NODE_ENV=development electron .",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:linux": "npm run build && electron-builder --linux"
   },
-  "keywords": ["github", "vercel", "ai", "deployment", "web-agent", "react", "nextjs"],
+  "keywords": [
+    "github",
+    "vercel",
+    "ai",
+    "deployment",
+    "web-agent",
+    "react",
+    "nextjs"
+  ],
   "author": "raynaythegreat",
   "license": "MIT",
   "dependencies": {
@@ -31,6 +46,8 @@
     "@types/react-dom": "^18.2.18",
     "@types/react-syntax-highlighter": "^15.5.11",
     "autoprefixer": "^10.4.16",
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.2.5",
     "postcss": "^8.4.32",

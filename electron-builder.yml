@@ -1,0 +1,42 @@
+appId: com.poseidon.app
+productName: Poseidon
+directories:
+  buildResources: build
+  output: dist
+asar: false
+files:
+  - "**/*"
+extraFiles:
+  - from: "node_modules/next/dist"
+    to: "node_modules/next/dist"
+  - from: ".next"
+    to: ".next"
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  icon: build/icon.png
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.png
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: Development
+  icon: build/icon.png

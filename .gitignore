@@ -44,8 +44,8 @@ coverage/
 # Misc
 *.log
 .vercel
-.gatekeep.pids
-.gatekeep.log
+.poseidon.pids
+.poseidon.log
 dev.log
 next.log
 .env*.local

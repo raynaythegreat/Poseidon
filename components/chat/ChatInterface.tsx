@@ -17,6 +17,8 @@ import {
   ChatAttachment,
 } from "@/contexts/ChatHistoryContext";
 import RepoSelector from "./RepoSelector";
+import MinimalChatHeader from "./MinimalChatHeader";
+import FloatingControls from "./FloatingControls";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
 import ImageGeneratorModal, {
@@ -1439,6 +1441,7 @@ export default function ChatInterface() {
     "ollama:gemini-3-flash-preview:cloud",
   );
   const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [showFloatingControls, setShowFloatingControls] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
   const [fallbackNotice, setFallbackNotice] = useState<string | null>(null);
@@ -1499,7 +1502,7 @@ export default function ChatInterface() {
   // Load custom provider config
   const loadCustomModels = useCallback(() => {
     try {
-      const stored = localStorage.getItem("gatekeep_custom_provider");
+      const stored = localStorage.getItem("poseidon_custom_provider");
       if (stored) {
         const config = JSON.parse(stored) as CustomProviderConfig;
         if (config.enabled && Array.isArray(config.models)) {
@@ -1552,6 +1555,9 @@ export default function ChatInterface() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isLoading) {
         abortControllerRef.current?.abort();
+      }
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === "C") {
+        setShowFloatingControls((prev) => !prev);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -1798,7 +1804,7 @@ export default function ChatInterface() {
       if (statusData?.ollama?.error) {
         setOllamaError(
           localRetryUnsupported
-            ? `${statusData.ollama.error} (Open GateKeep on your Mac to restart Ollama/cloudflared.)`
+            ? `${statusData.ollama.error} (Open Poseidon on your Mac to restart Ollama/cloudflared.)`
             : statusData.ollama.error,
         );
         return;
@@ -1806,7 +1812,7 @@ export default function ChatInterface() {
 
       if (localRetryUnsupported) {
         setOllamaError(
-          "Ollama is offline. This deployment can't restart your tunnel—open GateKeep on your Mac to start Ollama/cloudflared, then retry.",
+          "Ollama is offline. This deployment can't restart your tunnel—open Poseidon on your Mac to start Ollama/cloudflared, then retry.",
         );
       }
     } catch (error) {
@@ -4283,325 +4289,63 @@ export default function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header 1: Repo / Projects + Models */}
-      <div className="relative z-20 px-2 sm:px-3 py-2 border-b border-line/60 bg-surface/90 backdrop-blur-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-          <div className="flex-1 w-full">
-            <RepoSelector selectedRepo={selectedRepo} onSelect={setSelectedRepo} />
-          </div>
+      {/* Minimal Header */}
+      <MinimalChatHeader
+        selectedRepo={selectedRepo}
+        onRepoSelect={setSelectedRepo}
+        modelInfo={modelInfo}
+        onModelClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setShowModelDropdown(!showModelDropdown);
+        }}
+        onNewChat={handleNewChat}
+      />
 
-          {/* Model Selector */}
-          <div
-            className="relative w-full sm:w-40 md:w-48 lg:w-48 flex-shrink-0"
-            ref={dropdownRef}
-          >
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setShowModelDropdown(!showModelDropdown);
-              }}
-              className="flex items-center justify-between gap-1.5 w-full px-2.5 py-1.5 text-xs rounded-sm border border-line/60 bg-surface/95 text-ink hover:border-accent-500/60 transition-colors"
-              title={modelInfo.name}
-            >
-              <span className="min-w-0 font-medium truncate">
-                {modelInfo.name}
-              </span>
-              <svg
-                className="w-4 h-4 flex-shrink-0 text-ink-muted"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-
-            {modelDropdown &&
-              (isClient
-                ? createPortal(modelDropdown, document.body)
-                : modelDropdown)}
-          </div>
+      {/* Floating Controls - Toggle with keyboard shortcut */}
+      {showFloatingControls && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
+          <FloatingControls
+            chatMode={chatMode}
+            onChatModeChange={setChatMode}
+            autoApprove={autoApprove}
+            onAutoApproveToggle={() => {
+              const nextAutoApprove = !autoApprove;
+              setAutoApprove(nextAutoApprove);
+              if (nextAutoApprove && chatMode === "plan" && pendingRepoChanges && !applyingRepoChanges) {
+                void applyPendingRepoChanges();
+              }
+            }}
+            selectedRepo={selectedRepo}
+            onDeploy={async (provider) => {
+              if (!selectedRepo) return;
+              setDeploymentProvider(provider);
+              if (!currentSessionId) {
+                createNewSession({
+                  repoName: selectedRepo.name,
+                  repoFullName: selectedRepo.full_name,
+                  model: selectedModel,
+                  provider: selectedModelInfo.provider,
+                  messages: stripAttachmentPreviews(messages),
+                });
+              }
+              await deployWithAutoRetry({
+                provider,
+                repository: selectedRepo.full_name,
+                projectName: selectedRepo.name,
+                branch: selectedRepo.default_branch || "main",
+              });
+            }}
+            isDeploying={deploying}
+          />
         </div>
-      </div>
+      )}
 
-      {/* Header 2: Actions */}
-      <div className="px-2 sm:px-3 py-2 border-b border-line/60 bg-surface/85 backdrop-blur-xl">
-        <div className="flex flex-wrap items-center justify-between gap-2 w-full">
-          {/* Left Side: Plan/Build Toggle and Auto Button */}
-          <div className="flex items-center gap-2">
-            {/* Plan/Build Toggle */}
-            <div className="inline-flex rounded-sm border border-line/60 bg-surface/85 p-0.5 backdrop-blur">
-              <button
-                type="button"
-                onClick={() => setChatMode("plan")}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
-                  chatMode === "plan"
-                    ? "gradient-sunset text-white shadow-sm ring-1 ring-white/30"
-                    : "text-ink hover:text-ink  hover:bg-surface-muted/60 dark:hover:bg-surface-strong/70"
-                }`}
-                title="Plan mode: Review and approve changes before committing"
-              >
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                Plan
-              </button>
-              <button
-                type="button"
-                onClick={() => setChatMode("build")}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
-                  chatMode === "build"
-                    ? "gradient-sunset text-white shadow-sm ring-1 ring-white/30"
-                    : "text-ink hover:text-ink  hover:bg-surface-muted/60 dark:hover:bg-surface-strong/70"
-                }`}
-                title="Build mode: Auto-commit changes without approval"
-              >
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.125 1.125 0 011.902 1.093c.578 1.139 2.154 1.7 3.011 1.093a1.125 1.125 0 01.329-1.902c1.756-.426 1.756-2.924 0-3.35a1.125 1.125 0 01-1.093-1.902c-1.139-.578-1.7-2.154-1.093-3.011a1.125 1.125 0 01-1.902-.329c-.426-1.756-2.924-1.756-3.35 0a1.125 1.125 0 01-1.093 1.902c1.139-.578 1.7-2.154 1.093-3.011a1.125 1.125 0 011.902-.329zM12 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                Build
-              </button>
-            </div>
-
-            {/* Auto Approve Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextAutoApprove = !autoApprove;
-                setAutoApprove(nextAutoApprove);
-                if (
-                  nextAutoApprove &&
-                  chatMode === "plan" &&
-                  pendingRepoChanges &&
-                  !applyingRepoChanges
-                ) {
-                  void applyPendingRepoChanges();
-                }
-              }}
-              className={`px-2.5 py-1 text-xs font-medium rounded-sm border transition-all flex items-center gap-1.5 ${
-                autoApprove
-                  ? "gradient-sunset text-white border-accent-500 shadow-sm ring-1 ring-white/30"
-                  : "bg-surface/90 text-ink border-line/60 hover:border-accent-500/60"
-              }`}
-              title={autoApprove ? "Auto-commit enabled" : "Auto-commit disabled"}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Auto</span>
-            </button>
-          </div>
-
-          {/* Right Side: Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Refresh Button - only show when repo selected */}
-            {selectedRepo && (
-              <button
-                type="button"
-                onClick={() => loadRepoContext(selectedRepo)}
-                disabled={loadingContext}
-                className="w-8 h-8 rounded-sm bg-surface/85 text-ink border border-line/60 hover:border-accent-500/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                title="Refresh repo context"
-                aria-label="Refresh repo context"
-              >
-                <svg
-                  className={`w-3.5 h-3.5 ${loadingContext ? "animate-spin" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
-              </button>
-            )}
-
-            {/* Deployment Buttons */}
-            {selectedRepo && (
-            <>
-              <button
-                onClick={async () => {
-                  if (!selectedRepo) return;
-                  setDeploymentProvider("vercel");
-                  if (!currentSessionId) {
-                    createNewSession({
-                      repoName: selectedRepo.name,
-                      repoFullName: selectedRepo.full_name,
-                      model: selectedModel,
-                      provider: selectedModelInfo.provider,
-                      messages: stripAttachmentPreviews(messages),
-                    });
-                  }
-                  await deployWithAutoRetry({
-                    provider: "vercel",
-                    repository: selectedRepo.full_name,
-                    projectName: selectedRepo.name,
-                    branch: selectedRepo.default_branch || "main",
-                  });
-                }}
-                disabled={
-                  deploying ||
-                  deployAutoFixing ||
-                  !status?.vercel?.configured
-                }
-                className="btn-gold px-2 sm:px-2.5 py-1.5 text-xs flex items-center justify-center gap-1 sm:gap-1.5"
-                title={
-                  status?.vercel?.configured
-                    ? "Deploy to Vercel"
-                    : "Configure Vercel in Settings"
-                }
-              >
-                {deploying && deploymentProvider === "vercel" ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      />
-                    </svg>
-                    <span>Deploying...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 76 65" fill="currentColor">
-                      <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" />
-                    </svg>
-                    <span className="hidden sm:inline">Vercel</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={async () => {
-                  if (!selectedRepo) return;
-                  setDeploymentProvider("render");
-                  if (!currentSessionId) {
-                    createNewSession({
-                      repoName: selectedRepo.name,
-                      repoFullName: selectedRepo.full_name,
-                      model: selectedModel,
-                      provider: selectedModelInfo.provider,
-                      messages: stripAttachmentPreviews(messages),
-                    });
-                  }
-                  await deployWithAutoRetry({
-                    provider: "render",
-                    repository: selectedRepo.full_name,
-                    projectName: selectedRepo.name,
-                    branch: selectedRepo.default_branch || "main",
-                  });
-                }}
-                disabled={
-                  deploying ||
-                  deployAutoFixing ||
-                  !status?.render?.configured
-                }
-                className="btn-gold px-2 sm:px-2.5 py-1.5 text-xs flex items-center justify-center gap-1 sm:gap-1.5"
-                title={
-                  status?.render?.configured
-                    ? "Deploy to Render"
-                    : "Configure Render in Settings"
-                }
-              >
-                {deploying && deploymentProvider === "render" ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      />
-                    </svg>
-                    <span>Deploying...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z" />
-                    </svg>
-                    <span className="hidden sm:inline">Render</span>
-                  </>
-                )}
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={handleNewChat}
-            className="px-2 sm:px-2.5 py-1.5 text-xs font-medium rounded-sm bg-surface/90 text-ink border border-line/60 hover:bg-surface-muted/70 dark:hover:bg-surface-strong/70 transition-colors flex items-center justify-center gap-1 sm:gap-1.5"
-            title="New chat"
-            aria-label="New chat"
-          >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            <span className="hidden sm:inline">New</span>
-          </button>
-
-          {/* API Usage Display - always visible, compact */}
-          <ApiUsageDisplay currentProvider={modelInfo.provider} compact />
-        </div>
-      </div>
-      </div>
+      {/* Model Dropdown Portal */}
+      {modelDropdown &&
+        (isClient
+          ? createPortal(modelDropdown, document.body)
+          : modelDropdown)}
 
       {!providerConfigured && status && (
         <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">

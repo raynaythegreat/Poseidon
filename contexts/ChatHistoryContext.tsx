@@ -76,7 +76,7 @@ const ChatHistoryContext = createContext<ChatHistoryContextType | undefined>(
   undefined,
 );
 
-const STORAGE_KEY = "gatekeep-chat-history";
+const STORAGE_KEY = "poseidon-chat-history";
 const MAX_SESSIONS = 50;
 
 function generateId(): string {
@@ -107,7 +107,7 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
     try {
-      const storedToken = localStorage.getItem("gatekeep-device-token");
+      const storedToken = localStorage.getItem("poseidon-device-token");
       if (storedToken) {
         setDeviceToken(storedToken);
       }

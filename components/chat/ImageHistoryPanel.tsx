@@ -24,7 +24,7 @@ export default function ImageHistoryPanel({
   const handleDownload = (image: ImageHistoryItem) => {
     const a = document.createElement("a");
     a.href = image.imageData;
-    a.download = `gatekeep-${image.id}.${image.mimeType.split("/")[1] || "png"}`;
+    a.download = `poseidon-${image.id}.${image.mimeType.split("/")[1] || "png"}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -80,17 +80,17 @@ To automatically start the ngrok watcher when you log in:
 2. Create a launchd service:
 ```bash
 # Create the plist file
-cat > ~/Library/LaunchAgents/com.gatekeep.ngrok-watcher.plist << 'EOF'
+cat > ~/Library/LaunchAgents/com.poseidon.ngrok-watcher.plist << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.gatekeep.ngrok-watcher</string>
+    <string>com.poseidon.ngrok-watcher</string>
     <key>ProgramArguments</key>
     <array>
         <string>/usr/local/bin/node</string>
-        <string>/Users/ray/Documents/GateKeep/scripts/watch-ngrok.js</string>
+        <string>/Users/ray/Documents/Poseidon/scripts/watch-ngrok.js</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
@@ -105,16 +105,16 @@ cat > ~/Library/LaunchAgents/com.gatekeep.ngrok-watcher.plist << 'EOF'
 EOF
 
 # Load the service
-launchctl load ~/Library/LaunchAgents/com.gatekeep.ngrok-watcher.plist
+launchctl load ~/Library/LaunchAgents/com.poseidon.ngrok-watcher.plist
 ```
 
 3. To stop/start the service:
 ```bash
 # Stop
-launchctl unload ~/Library/LaunchAgents/com.gatekeep.ngrok-watcher.plist
+launchctl unload ~/Library/LaunchAgents/com.poseidon.ngrok-watcher.plist
 
 # Start
-launchctl load ~/Library/LaunchAgents/com.gatekeep.ngrok-watcher.plist
+launchctl load ~/Library/LaunchAgents/com.poseidon.ngrok-watcher.plist
 ```
 
 ## 📝 Environment Variables

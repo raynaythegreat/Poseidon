@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PROJECT_DIR="/home/doughstackr/GateKeep"
-PID_FILE="$PROJECT_DIR/.gatekeep.pids"
-LOG_FILE="$PROJECT_DIR/.gatekeep.log"
+PROJECT_DIR="/Users/ray/Documents/Poseidon"
+PID_FILE="$PROJECT_DIR/.poseidon.pids"
+LOG_FILE="$PROJECT_DIR/.poseidon.log"
 USE_CLOUDFLARED_TUNNEL="${USE_CLOUDFLARED_TUNNEL:-0}"
 SYNC_CLOUDFLARED_URL="${SYNC_CLOUDFLARED_URL:-0}"
 
@@ -19,7 +19,7 @@ kill_tree() {
 
 function stop_processes() {
   if [ -f "$PID_FILE" ]; then
-    echo "🛑 Stopping existing GateKeep processes..."
+    echo "🛑 Stopping existing Poseidon processes..."
     while read pid; do
       if ps -p $pid > /dev/null; then
         kill_tree $pid
@@ -37,7 +37,7 @@ function stop_processes() {
 
 function start_processes() {
   cd "$PROJECT_DIR" || exit 1
-  echo "🚀 Starting GateKeep..."
+  echo "🚀 Starting Poseidon..."
   
   # Use Dev Server for stability
   echo "   - Starting Development Server..."
@@ -82,14 +82,14 @@ function start_processes() {
     ) &
   fi
   
-  echo "✅ GateKeep is running!"
+  echo "✅ Poseidon is running!"
   echo "   - App: http://localhost:1998"
 }
 
 case "$1" in
   start)
     if [ -f "$PID_FILE" ]; then
-      echo "⚠️  GateKeep seems to be running. Use 'restart'."
+      echo "⚠️  Poseidon seems to be running. Use 'restart'."
     else
       start_processes
     fi

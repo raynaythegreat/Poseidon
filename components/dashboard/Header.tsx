@@ -21,7 +21,7 @@ export default function Header({ activeTab }: HeaderProps) {
         <div className="flex items-center gap-2">
           <div>
             <h1 className="text-lg font-semibold gradient-text font-display tracking-wide">
-              GateKeep
+              Poseidon
             </h1>
           </div>
         </div>

@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     // Linux (systemd) implementation
     attempted.ollama = true;
     logs.push("Restarting Ollama via systemd…");
-    const restartResult = await runCommand("systemctl", ["--user", "restart", "gatekeep-ollama.service"]);
+    const restartResult = await runCommand("systemctl", ["--user", "restart", "poseidon-ollama.service"]);
     if (restartResult.ok) {
       logs.push("Ollama service restarted successfully.");
     } else {

@@ -7,9 +7,9 @@ import { DeploymentProvider } from "@/contexts/DeploymentContext";
 import { ImageHistoryProvider } from "@/contexts/ImageHistoryContext";
 
 export const metadata: Metadata = {
-  title: "GateKeep - AI Dev Command Center",
+  title: "Poseidon - AI Dev Command Center",
   description:
-    "GateKeep is a cyber-styled AI command center for planning, building, and deploying web applications with confidence.",
+    "Poseidon is a cyber-styled AI command center for planning, building, and deploying web applications with confidence.",
   icons: {
     icon: '/favicon.ico',
   },

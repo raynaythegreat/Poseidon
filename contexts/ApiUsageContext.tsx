@@ -108,7 +108,7 @@ interface ApiUsageContextValue {
   resetUsage: () => void;
 }
 
-const STORAGE_KEY = "gatekeep-api-usage";
+const STORAGE_KEY = "poseidon-api-usage";
 
 const DEFAULT_LIMITS: ApiLimits = {
   claude: {

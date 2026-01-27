@@ -931,7 +931,7 @@ export async function POST(request: NextRequest) {
               baseURL: "https://openrouter.ai/api/v1",
               defaultHeaders: {
                 "HTTP-Referer": appUrl,
-                "X-Title": "GateKeep",
+                "X-Title": "Poseidon",
               },
             });
 
@@ -1223,7 +1223,7 @@ export async function POST(request: NextRequest) {
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "User-Agent": "GateKeep/1.0",
+                "User-Agent": "Poseidon/1.0",
                 "ngrok-skip-browser-warning": "true",
                 "Origin": "http://localhost:11434",
                 ...(providerKey

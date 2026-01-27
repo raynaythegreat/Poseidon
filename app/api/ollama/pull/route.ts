@@ -146,7 +146,7 @@ export async function POST(request: Request) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "User-Agent": "GateKeep/1.0",
+    "User-Agent": "Poseidon/1.0",
     ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
     ...(cfAccessClientId && cfAccessClientSecret
       ? {

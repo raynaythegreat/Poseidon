@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
-const APP_PASSWORD = process.env.APP_PASSWORD || "password";
+const APP_PASSWORD = process.env.APP_PASSWORD || "";
+
+// Skip password for Electron app (detected via user-agent or custom header)
+function isElectronRequest(request: NextRequest): boolean {
+  const userAgent = request.headers.get("user-agent") || "";
+  return userAgent.includes("Electron") || request.headers.get("x-electron-app") === "true";
+}
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -11,9 +17,33 @@ function generateDeviceToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
+// GET - Check if password is required
+export async function GET(request: NextRequest) {
+  // Skip auth for Electron
+  if (isElectronRequest(request)) {
+    return NextResponse.json({ requiresPassword: false });
+  }
+
+  // Check if APP_PASSWORD is set
+  const requiresPassword = APP_PASSWORD.length > 0;
+  return NextResponse.json({ requiresPassword });
+}
+
 // POST - Login with password
 export async function POST(request: NextRequest) {
   try {
+    // Skip auth for Electron
+    if (isElectronRequest(request)) {
+      const deviceToken = generateDeviceToken();
+      const tokenHash = hashPassword(deviceToken + "electron");
+
+      return NextResponse.json({
+        success: true,
+        deviceToken,
+        tokenHash,
+      });
+    }
+
     const { password } = await request.json();
 
     if (!password) {
@@ -41,6 +71,11 @@ export async function POST(request: NextRequest) {
 // PUT - Validate existing session
 export async function PUT(request: NextRequest) {
   try {
+    // Skip auth for Electron
+    if (isElectronRequest(request)) {
+      return NextResponse.json({ valid: true });
+    }
+
     const { deviceToken, tokenHash } = await request.json();
 
     if (!deviceToken || !tokenHash) {

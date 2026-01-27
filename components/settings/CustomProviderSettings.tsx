@@ -165,7 +165,7 @@ function ProviderForm({ provider, onSave, onRemove }: { provider: CustomProvider
     )
 }
 
-const STORAGE_KEY = "gatekeep_custom_providers_list";
+const STORAGE_KEY = "poseidon_custom_providers_list";
 
 export default function CustomProviderSettings() {
     const [providers, setProviders] = useState<CustomProviderConfig[]>([]);

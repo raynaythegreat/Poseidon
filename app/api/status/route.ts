@@ -248,7 +248,7 @@ export async function GET() {
       const customHeaders = getOllamaCustomHeaders();
       const headers: Record<string, string> = {
         Accept: "application/json",
-        "User-Agent": "GateKeep/1.0",
+        "User-Agent": "Poseidon/1.0",
         "ngrok-skip-browser-warning": "true",
         "Origin": "http://localhost:11434",
         ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),

@@ -74,7 +74,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           <GlassesLogo className="w-7 h-7 text-white" />
         </div>
         <div>
-          <h1 className="font-display font-semibold text-lg gradient-text tracking-wide">GateKeep</h1>
+          <h1 className="font-display font-semibold text-lg gradient-text tracking-wide">Poseidon</h1>
           <p className="text-xs text-ink-muted font-medium">AI Dev Command</p>
         </div>
       </div>

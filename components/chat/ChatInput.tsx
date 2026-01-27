@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, type RefObject } from "react";
 import Image from "next/image";
+import RotatingCardsButton from "@/components/ui/RotatingCardsButton";
 
 interface ChatInputAttachment {
   id: string;
@@ -249,10 +250,10 @@ export default function ChatInput({
               </svg>
             </button>
           ) : (
-            <button
+            <RotatingCardsButton
               onClick={onSubmit}
               disabled={disabled || (!value.trim() && attachments.length === 0)}
-              className="flex-shrink-0 w-10 h-10 rounded-none gradient-sunset flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 hover:shadow-none transition-all shadow-md"
+              className="flex-shrink-0 w-10 h-10 rounded-none px-0 flex items-center justify-center"
               aria-label="Send message"
             >
               <svg
@@ -269,7 +270,7 @@ export default function ChatInput({
                   d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
                 />
               </svg>
-            </button>
+            </RotatingCardsButton>
           )}
         </div>
         <p className="text-xs text-ink-subtle text-center mt-2">

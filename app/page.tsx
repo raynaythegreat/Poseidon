@@ -17,9 +17,18 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const { loadSession, clearCurrentSession } = useChatHistory();
 
+  // Check if running in Electron app
+  const isElectron = typeof window !== 'undefined' && !!(window as any).electronAPI;
+
   useEffect(() => {
-    checkAuth();
-  }, []);
+    // Skip auth for Electron app
+    if (isElectron) {
+      setIsAuthenticated(true);
+      setIsLoading(false);
+    } else {
+      checkAuth();
+    }
+  }, [isElectron]);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -28,8 +37,8 @@ export default function HomePage() {
   }, [isLoading, isAuthenticated, clearCurrentSession]);
 
   const checkAuth = async () => {
-    const deviceToken = localStorage.getItem("gatekeep-device-token");
-    const tokenHash = localStorage.getItem("gatekeep-token-hash");
+    const deviceToken = localStorage.getItem("poseidon-device-token");
+    const tokenHash = localStorage.getItem("poseidon-token-hash");
 
     if (!deviceToken || !tokenHash) {
       setIsLoading(false);
@@ -47,8 +56,8 @@ export default function HomePage() {
       if (data.valid) {
         setIsAuthenticated(true);
       } else {
-        localStorage.removeItem("gatekeep-device-token");
-        localStorage.removeItem("gatekeep-token-hash");
+        localStorage.removeItem("poseidon-device-token");
+        localStorage.removeItem("poseidon-token-hash");
       }
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -62,8 +71,8 @@ export default function HomePage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("gatekeep-device-token");
-    localStorage.removeItem("gatekeep-token-hash");
+    localStorage.removeItem("poseidon-device-token");
+    localStorage.removeItem("poseidon-token-hash");
     setIsAuthenticated(false);
   };
 

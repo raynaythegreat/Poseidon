@@ -7,7 +7,7 @@ interface MinimalChatHeaderProps {
   selectedRepo: { id: number; name: string; full_name: string } | null;
   onRepoSelect: (repo: any) => void;
   modelInfo: { name: string; provider: string };
-  onModelClick: () => void;
+  onModelClick: (e: React.MouseEvent) => void;
   onNewChat: () => void;
 }
 
