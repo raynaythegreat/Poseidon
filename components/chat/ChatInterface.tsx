@@ -1699,6 +1699,61 @@ export default function ChatInterface() {
     return () => controller.abort();
   }, [selectedRepoFullName]);
 
+  // Load file tree when repo selected
+  useEffect(() => {
+    if (!selectedRepo) {
+      setFileTree([]);
+      return;
+    }
+
+    const loadFileTree = async () => {
+      try {
+        const response = await fetch(
+          `/api/github/repos/${selectedRepo.full_name}/structure`
+        );
+        if (response.ok) {
+          const structure = await response.json();
+          // Convert structure to FileNode format
+          const buildTree = (path: string, nodes: any[]): any[] => {
+            return nodes.map((node) => ({
+              path: node.path,
+              name: node.name || node.path.split("/").pop(),
+              type: node.type === "tree" ? "directory" : "file",
+              children: node.children ? buildTree(node.path, node.children) : undefined,
+            }));
+          };
+          setFileTree(buildTree("", structure || []));
+        }
+      } catch (error) {
+        console.error("Failed to load file tree:", error);
+      }
+    };
+
+    loadFileTree();
+  }, [selectedRepo]);
+
+  // Load file content when file selected
+  useEffect(() => {
+    if (!selectedFile || !selectedRepo) return;
+
+    const loadFileContent = async () => {
+      try {
+        const response = await fetch(
+          `/api/github/repos/${selectedRepo.full_name}/files?path=${encodeURIComponent(selectedFile)}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          // Store file content for preview panel
+          setFileContent(data.content);
+        }
+      } catch (error) {
+        console.error("Failed to load file content:", error);
+      }
+    };
+
+    loadFileContent();
+  }, [selectedFile, selectedRepo]);
+
   useEffect(() => {
     if (!fallbackNotice) return;
     const timeout = setTimeout(() => setFallbackNotice(null), 8000);
