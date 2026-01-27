@@ -44,48 +44,19 @@
 
 body {
   color: rgb(var(--foreground));
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 25%, #2d1b4e 50%, #1a1a3e 75%, #0f0f23 100%);
-  background-attachment: fixed;
+  background: #0a0a0f;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-/* Animated pulse effect like lovable.dev */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent);
-  animation: pulse-glow 8s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-/* Grid Overlay - subtle enough to not block text */
+/* Remove old grid overlay */
 body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image:
-    linear-gradient(rgb(var(--grid-color) / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--grid-color) / 0.04) 1px, transparent 1px);
-  background-size: 60px 60px;
-  z-index: -1;
-  pointer-events: none;
+  display: none;
+}
+
+/* Remove old pulse effect */
+body::after {
+  display: none;
 }
 
 @layer components {
