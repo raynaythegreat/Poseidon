@@ -88,7 +88,7 @@ export default function ChatInput({
   const showStop = Boolean(loading);
 
   return (
-    <div className="border-t border-white/10 bg-white/5 px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-xl">
+    <div className="border-t border-white/5 bg-white/[0.02] px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto">
         {attachments.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
@@ -146,7 +146,7 @@ export default function ChatInput({
         )}
 
         <div
-          className="flex items-end gap-2 bg-white/10 rounded-2xl border border-white/10 p-2 focus-within:ring-2 focus-within:ring-pink-500/30 focus-within:border-pink-500/50 transition-all"
+          className="flex items-end gap-2 bg-white/[0.03] rounded-2xl border border-white/10 p-2 focus-within:ring-1 focus-within:ring-pink-500/20 focus-within:border-pink-500/30 transition-all"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             e.preventDefault();
@@ -234,7 +234,7 @@ export default function ChatInput({
             placeholder={placeholder}
             disabled={Boolean(disabled && !loading)}
             rows={1}
-            className="flex-1 bg-transparent text-base md:text-sm text-white placeholder:text-white/40 resize-none focus:outline-none px-2 py-2 max-h-[200px]"
+            className="flex-1 bg-transparent text-base md:text-sm text-white/80 placeholder:text-white/25 resize-none focus:outline-none px-2 py-2 max-h-[200px]"
           />
           {showStop ? (
             <button
@@ -273,7 +273,7 @@ export default function ChatInput({
             </RotatingCardsButton>
           )}
         </div>
-        <p className="text-xs text-white/50 text-center mt-2">
+        <p className="text-xs text-white/30 text-center mt-2">
           Press Enter to send, Shift+Enter for new line. Drag & drop or attach files/photos.
         </p>
       </div>
