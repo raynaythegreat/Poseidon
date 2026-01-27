@@ -88,14 +88,14 @@ export default function ChatInput({
   const showStop = Boolean(loading);
 
   return (
-    <div className="border-t border-line bg-surface/85 px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-xl">
+    <div className="border-t border-white/10 bg-white/5 px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto">
         {attachments.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {attachments.map((attachment) => (
               <div
                 key={attachment.id}
-                className="flex items-center gap-2 max-w-full rounded-none border border-line/60 bg-surface-muted/60 px-2 py-1.5"
+                className="flex items-center gap-2 max-w-full rounded-xl border border-white/10 bg-white/5 px-2 py-1.5"
               >
                 {attachment.kind === "image" && attachment.previewUrl ? (
                   <Image
@@ -108,17 +108,17 @@ export default function ChatInput({
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-sm bg-surface-muted border border-line-strong/70 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 11.625h4.5m-4.5 2.25h4.5m2.25-9H5.625c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                   </div>
                 )}
 
                 <div className="min-w-0">
-                  <div className="text-xs font-medium text-ink truncate max-w-[14rem]">
+                  <div className="text-xs font-medium text-white/90 truncate max-w-[14rem]">
                     {attachment.name}
                   </div>
-                  <div className="text-[11px] text-ink-muted">
+                  <div className="text-[11px] text-white/60">
                     {attachment.kind === "image" ? "Image" : "File"} • {(attachment.size / 1024).toFixed(0)} KB
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export default function ChatInput({
                 <button
                   type="button"
                   onClick={() => onRemoveAttachment(attachment.id)}
-                  className="ml-1 w-7 h-7 rounded-sm hover:bg-surface-muted/80 dark:hover:bg-surface-strong/50 flex items-center justify-center text-ink-muted hover:text-ink  transition-colors"
+                  className="ml-1 w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white/80 transition-colors"
                   aria-label={`Remove ${attachment.name}`}
                   disabled={disabled}
                 >
@@ -146,7 +146,7 @@ export default function ChatInput({
         )}
 
         <div
-          className="flex items-end gap-2 bg-surface-muted/70 rounded-none border-2 border-line p-2 focus-within:ring-2 focus-within:ring-accent-500/30 focus-within:border-accent-500 transition-all"
+          className="flex items-end gap-2 bg-white/10 rounded-2xl border border-white/10 p-2 focus-within:ring-2 focus-within:ring-cyan-500/30 focus-within:border-cyan-500/50 transition-all"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             e.preventDefault();
@@ -175,7 +175,7 @@ export default function ChatInput({
                 setShowAttachmentMenu((prev) => !prev);
               }}
               disabled={disabled}
-              className="flex-shrink-0 w-10 h-10 rounded-none bg-surface-muted border border-line-strong text-ink-muted hover:bg-surface-muted/70 dark:hover:bg-surface-strong/40 hover:text-ink hover:border-accent-500/60 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+              className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center"
               aria-label="Attach files or generate images"
               aria-haspopup="menu"
               aria-expanded={showAttachmentMenu}
@@ -234,14 +234,14 @@ export default function ChatInput({
             placeholder={placeholder}
             disabled={Boolean(disabled && !loading)}
             rows={1}
-            className="flex-1 bg-transparent text-base md:text-sm text-ink placeholder:text-ink-subtle resize-none focus:outline-none px-2 py-2 max-h-[200px]"
+            className="flex-1 bg-transparent text-base md:text-sm text-white placeholder:text-white/40 resize-none focus:outline-none px-2 py-2 max-h-[200px]"
           />
           {showStop ? (
             <button
               type="button"
               onClick={onStop}
               disabled={!onStop}
-              className="flex-shrink-0 w-10 h-10 rounded-none bg-red-500 border border-red-600 flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 transition-all shadow-none"
+              className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/80 border border-red-500/50 flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-500 transition-all shadow-none"
               aria-label="Stop generating"
               title="Stop generating (Esc)"
             >
@@ -253,7 +253,7 @@ export default function ChatInput({
             <RotatingCardsButton
               onClick={onSubmit}
               disabled={disabled || (!value.trim() && attachments.length === 0)}
-              className="flex-shrink-0 w-10 h-10 rounded-none px-0 flex items-center justify-center"
+              className="flex-shrink-0 w-10 h-10 rounded-xl px-0 flex items-center justify-center"
               aria-label="Send message"
             >
               <svg
@@ -273,7 +273,7 @@ export default function ChatInput({
             </RotatingCardsButton>
           )}
         </div>
-        <p className="text-xs text-ink-subtle text-center mt-2">
+        <p className="text-xs text-white/50 text-center mt-2">
           Press Enter to send, Shift+Enter for new line. Drag & drop or attach files/photos.
         </p>
       </div>
