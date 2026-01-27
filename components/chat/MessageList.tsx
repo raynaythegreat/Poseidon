@@ -34,10 +34,10 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
       className={`flex gap-3 sm:gap-4 ${message.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
     >
       <div
-        className={`max-w-[96%] sm:max-w-[80%] rounded-none px-3 py-2 sm:px-4 sm:py-3 ${
+        className={`max-w-[96%] sm:max-w-[80%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
           message.role === "user"
-            ? "gradient-vibrant text-white shadow-none font-medium"
-            : "card text-ink"
+            ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 text-white/90 font-medium backdrop-blur-sm"
+            : "bg-white/5 border border-white/10 text-white/90 backdrop-blur-sm"
         }`}
       >
         {message.role === "user" ? (
@@ -113,14 +113,14 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
                 {message.attachments.map((attachment) => (
                   <div
                     key={attachment.id}
-                    className="flex items-center gap-3 p-2 rounded-sm border border-line/50 bg-surface-muted/60 text-xs"
+                    className="flex items-center gap-3 p-2 rounded-lg border border-white/10 bg-white/5 text-xs"
                   >
-                    <svg className="w-4 h-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 11.625h4.5m-4.5 2.25h4.5m2.25-9H5.625c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                     <div className="min-w-0">
-                      <div className="text-ink truncate">{attachment.name}</div>
-                      <div className="text-ink-muted">
+                      <div className="text-white/90 truncate">{attachment.name}</div>
+                      <div className="text-white/60">
                         {attachment.kind === "image" ? "Image" : "File"} • {formatBytes(attachment.size)}
                       </div>
                     </div>
@@ -236,19 +236,19 @@ export default function MessageList({
                 key={template.title}
                 type="button"
                 onClick={() => onTemplateSelect?.(template.prompt)}
-                className="group relative px-4 py-4 text-left card-hover border-2 border-line/50 hover:border-accent-500/70 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="group relative px-4 py-4 text-left bg-white/5 border border-white/10 hover:border-cyan-500/50 rounded-xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed backdrop-blur-sm"
                 disabled={!onTemplateSelect}
                 title={template.prompt}
               >
                 <div className="flex items-start gap-3 mb-2">
                   <span className="text-2xl flex-shrink-0">{template.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-ink group-hover:gradient-text transition-colors">
+                    <div className="text-sm font-bold text-white/90 group-hover:text-white transition-colors">
                       {template.title}
                     </div>
                   </div>
                 </div>
-                <div className="text-xs text-ink-muted leading-relaxed pl-11">
+                <div className="text-xs text-white/60 leading-relaxed pl-11">
                   {template.description}
                 </div>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -272,9 +272,9 @@ export default function MessageList({
         ))}
         {isLoading && (
           <div className="flex gap-3 justify-start animate-in fade-in">
-            <div className="max-w-[80%] rounded-none px-4 py-3 card">
+            <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-white/5 border border-white/10 backdrop-blur-sm">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-accent-500 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" />
                 <div className="w-2 h-2 bg-accent-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
                 <div className="w-2 h-2 bg-accent-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
