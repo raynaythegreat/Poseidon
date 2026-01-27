@@ -34,10 +34,10 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
       className={`flex gap-3 sm:gap-4 ${message.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
     >
       <div
-        className={`max-w-[96%] sm:max-w-[80%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
+        className={`max-w-[90%] rounded-2xl px-4 py-3 ${
           message.role === "user"
-            ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 text-white/90 font-medium backdrop-blur-sm"
-            : "bg-white/5 border border-white/10 text-white/90 backdrop-blur-sm"
+            ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 text-white/90 ml-auto"
+            : "bg-white/5 border border-white/10 text-white/90"
         }`}
       >
         {message.role === "user" ? (
@@ -236,7 +236,7 @@ export default function MessageList({
                 key={template.title}
                 type="button"
                 onClick={() => onTemplateSelect?.(template.prompt)}
-                className="group relative px-4 py-4 text-left bg-white/5 border border-white/10 hover:border-cyan-500/50 rounded-xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed backdrop-blur-sm"
+                className="group relative px-4 py-4 text-left bg-white/5 border border-white/10 hover:border-pink-500/50 rounded-2xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed backdrop-blur-sm"
                 disabled={!onTemplateSelect}
                 title={template.prompt}
               >
@@ -252,7 +252,7 @@ export default function MessageList({
                   {template.description}
                 </div>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-4 h-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </div>
@@ -274,9 +274,9 @@ export default function MessageList({
           <div className="flex gap-3 justify-start animate-in fade-in">
             <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-white/5 border border-white/10 backdrop-blur-sm">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-accent-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
-                <div className="w-2 h-2 bg-accent-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
             </div>
           </div>
