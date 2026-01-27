@@ -37,16 +37,16 @@ export default function PreviewPanel({
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/5">
-        <div className="text-xs font-medium text-white/30 uppercase tracking-wider mb-1">
+      <div className="px-4 py-3 border-b border-white/[0.08]">
+        <div className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1">
           Inspector
         </div>
         {selectedFile && (
           <div className="flex items-center justify-between">
-            <div className="text-sm text-white/50 truncate flex-1" title={selectedFile}>
+            <div className="text-sm text-white/60 truncate flex-1" title={selectedFile}>
               {selectedFile.split("/").pop()}
             </div>
-            <div className="text-xs text-white/30 ml-2">
+            <div className="text-xs text-white/40 ml-2">
               {getLanguageFromPath(selectedFile)}
             </div>
           </div>
@@ -54,17 +54,17 @@ export default function PreviewPanel({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-[#09090b]">
+      <div className="flex-1 overflow-y-auto bg-[#050505]">
         {!selectedFile ? (
-          <div className="h-full flex items-center justify-center text-sm text-white/25">
+          <div className="h-full flex items-center justify-center text-sm text-white/40">
             Select a file to preview
           </div>
         ) : fileContent ? (
-          <pre className="p-4 text-sm text-white/50 font-mono whitespace-pre-wrap">
+          <pre className="p-4 text-sm text-white/60 font-mono whitespace-pre-wrap">
             {fileContent}
           </pre>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-white/25">
+          <div className="h-full flex flex-col items-center justify-center text-white/40">
             <svg className="w-12 h-12 mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -75,8 +75,8 @@ export default function PreviewPanel({
 
       {/* Footer - File Stats */}
       {selectedFile && (
-        <div className="px-4 py-2 border-t border-white/5">
-          <div className="text-xs text-white/25">
+        <div className="px-4 py-2 border-t border-white/[0.08]">
+          <div className="text-xs text-white/40">
             {fileContent ? `${fileContent.split("\n").length} lines` : "Binary file"}
           </div>
         </div>

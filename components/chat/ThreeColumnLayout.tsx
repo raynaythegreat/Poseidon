@@ -17,15 +17,15 @@ export default function ThreeColumnLayout({
   const [rightCollapsed, setRightCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#09090b] text-white relative">
+    <div className="flex h-screen bg-black text-white relative">
       {/* Left Panel - File Tree */}
       {!leftCollapsed && (
-        <div className="w-52 border-r border-white/5 flex-shrink-0 overflow-y-auto bg-[#0a0a0a]">
+        <div className="w-64 border-r border-white/[0.08] flex-shrink-0 overflow-y-auto bg-[#050505]">
           {leftPanel}
         </div>
       )}
       {leftCollapsed && (
-        <div className="w-12 border-r border-white/5 flex-shrink-0 flex flex-col items-center py-4 gap-4 bg-[#0a0a0a]">
+        <div className="w-12 border-r border-white/[0.08] flex-shrink-0 flex flex-col items-center py-4 gap-4 bg-[#050505]">
           {/* Collapsed state icons */}
         </div>
       )}
@@ -33,7 +33,7 @@ export default function ThreeColumnLayout({
       {/* Left Collapse Button */}
       <button
         onClick={() => setLeftCollapsed(!leftCollapsed)}
-        className="w-6 h-6 flex items-center justify-center hover:bg-white/[0.02] border-r border-white/5 flex-shrink-0 transition-colors"
+        className="w-6 h-6 flex items-center justify-center hover:bg-white/[0.02] border-r border-white/[0.08] flex-shrink-0 transition-colors"
       >
         <svg className="w-3 h-3 text-white/20 hover:text-white/40 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {leftCollapsed ? (
@@ -45,14 +45,14 @@ export default function ThreeColumnLayout({
       </button>
 
       {/* Center Panel - Chat */}
-      <div className="flex-1 overflow-hidden flex flex-col bg-[#09090b]">
+      <div className="flex-1 overflow-hidden flex flex-col bg-black">
         {centerPanel}
       </div>
 
       {/* Right Collapse Button */}
       <button
         onClick={() => setRightCollapsed(!rightCollapsed)}
-        className="w-6 h-6 flex items-center justify-center hover:bg-white/[0.02] border-l border-white/5 flex-shrink-0 transition-colors"
+        className="w-6 h-6 flex items-center justify-center hover:bg-white/[0.02] border-l border-white/[0.08] flex-shrink-0 transition-colors"
       >
         <svg className="w-3 h-3 text-white/20 hover:text-white/40 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {rightCollapsed ? (
@@ -65,7 +65,7 @@ export default function ThreeColumnLayout({
 
       {/* Right Panel - Preview/Inspector */}
       {!rightCollapsed && (
-        <div className="w-72 border-l border-white/5 flex-shrink-0 overflow-y-auto bg-[#0a0a0a]">
+        <div className="w-80 border-l border-white/[0.08] flex-shrink-0 overflow-y-auto bg-[#050505]">
           {rightPanel}
         </div>
       )}

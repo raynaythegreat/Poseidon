@@ -34,10 +34,10 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
       className={`flex gap-3 sm:gap-4 ${message.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
     >
       <div
-        className={`max-w-[90%] rounded-2xl px-4 py-3 ${
+        className={`max-w-[85%] rounded-2xl px-4 py-3 ${
           message.role === "user"
-            ? "bg-gradient-to-r from-pink-500/15 to-purple-500/15 border border-pink-500/20 text-white/80 ml-auto"
-            : "bg-white/[0.02] border border-white/5 text-white/70"
+            ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white ml-auto"
+            : "bg-[#0a0a0a] border border-white/[0.08] text-white/70"
         }`}
       >
         {message.role === "user" ? (
