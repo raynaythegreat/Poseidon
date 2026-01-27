@@ -4347,92 +4347,30 @@ export default function ChatInterface() {
           ? createPortal(modelDropdown, document.body)
           : modelDropdown)}
 
-      {!providerConfigured && status && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          {modelInfo.name} needs a {modelInfo.provider.toUpperCase()} API key.
-          Set it in your hosting environment variables (or{" "}
-          <code className="px-1 py-0.5 bg-amber-100/60 rounded">
-            .env.local
-          </code>{" "}
-          locally) to start chatting.
-        </div>
-      )}
-
-      {ollamaLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading Ollama models...
-        </div>
-      )}
-
-      {groqLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading Groq models...
-        </div>
-      )}
-
-      {openrouterLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading OpenRouter models...
-        </div>
-      )}
-
-      {fireworksLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading Fireworks models...
-        </div>
-      )}
-
-      {geminiLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading Gemini models...
-        </div>
-      )}
-
-      {openaiLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading OpenAI models...
-        </div>
-      )}
-
-      {claudeLoading && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-line bg-surface-muted/70 text-ink text-xs sm:text-sm">
-          Loading Claude models...
-        </div>
-      )}
-
-      {groqError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          Groq models unavailable: {groqError}
-        </div>
-      )}
-
-      {openrouterError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          OpenRouter free models unavailable: {openrouterError}
-        </div>
-      )}
-
-      {fireworksError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          Fireworks models unavailable: {fireworksError}
-        </div>
-      )}
-
-      {geminiError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          Gemini models unavailable: {geminiError}
-        </div>
-      )}
-
-      {openaiError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          OpenAI models unavailable: {openaiError}
-        </div>
-      )}
-
-      {claudeError && (
-        <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-amber-200 bg-amber-50 text-amber-800 text-xs sm:text-sm">
-          Claude models unavailable: {claudeError}
+      {/* Unified Status Bar */}
+      {(ollamaLoading || groqLoading || openrouterLoading || fireworksLoading ||
+        geminiLoading || openaiLoading || claudeLoading ||
+        ollamaError || groqError || openrouterError || fireworksError ||
+        geminiError || openaiError || claudeError ||
+        (!providerConfigured && status)) && (
+        <div className="px-4 py-2 bg-white/5 border-b border-white/10">
+          <div className="max-w-4xl mx-auto text-xs text-white/70 text-center">
+            {ollamaLoading && "Loading Ollama models..."}
+            {groqLoading && "Loading Groq models..."}
+            {openrouterLoading && "Loading OpenRouter models..."}
+            {fireworksLoading && "Loading Fireworks models..."}
+            {geminiLoading && "Loading Gemini models..."}
+            {openaiLoading && "Loading OpenAI models..."}
+            {claudeLoading && "Loading Claude models..."}
+            {ollamaError && `Ollama: ${ollamaError}`}
+            {groqError && `Groq: ${groqError}`}
+            {openrouterError && `OpenRouter: ${openrouterError}`}
+            {fireworksError && `Fireworks: ${fireworksError}`}
+            {geminiError && `Gemini: ${geminiError}`}
+            {openaiError && `OpenAI: ${openaiError}`}
+            {claudeError && `Claude: ${claudeError}`}
+            {!providerConfigured && status && `${modelInfo.name} needs a ${modelInfo.provider.toUpperCase()} API key`}
+          </div>
         </div>
       )}
 
