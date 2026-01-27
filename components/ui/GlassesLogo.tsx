@@ -12,30 +12,47 @@ export default function GlassesLogo({ className }: GlassesLogoProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      {/* Trident shaft */}
       <path
-        d="M14 54V26C14 15.4 22.4 7 33 7h-2C20.4 7 12 15.4 12 26v28"
+        d="M32 8V56"
         stroke="currentColor"
-        strokeWidth="4"
+        strokeWidth="5"
         strokeLinecap="round"
       />
+      {/* Crossbar */}
       <path
-        d="M50 54V26C50 15.4 41.6 7 31 7h2C43.6 7 52 15.4 52 26v28"
+        d="M20 24H44"
         stroke="currentColor"
-        strokeWidth="4"
+        strokeWidth="5"
         strokeLinecap="round"
       />
+      {/* Left prong */}
       <path
-        d="M18 54V24C18 17.4 23.4 12 30 12h4c6.6 0 12 5.4 12 12v30"
+        d="M20 24V12C20 8 24 4 32 4"
         stroke="currentColor"
-        strokeWidth="4"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path d="M32 16V54" stroke="currentColor" strokeWidth="4" />
-      <path d="M22 28V52" stroke="currentColor" strokeWidth="3" />
-      <path d="M27 28V52" stroke="currentColor" strokeWidth="3" />
-      <path d="M37 28V52" stroke="currentColor" strokeWidth="3" />
-      <path d="M42 28V52" stroke="currentColor" strokeWidth="3" />
-      <path d="M22 28H42" stroke="currentColor" strokeWidth="3" />
-      <path d="M24 22H40" stroke="currentColor" strokeWidth="3" />
+      {/* Center prong */}
+      <path
+        d="M32 24V4"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      {/* Right prong */}
+      <path
+        d="M44 24V12C44 8 40 4 32 4"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Decorative dots on prongs */}
+      <circle cx="32" cy="8" r="2.5" fill="currentColor" />
+      <circle cx="20" cy="14" r="2.5" fill="currentColor" />
+      <circle cx="44" cy="14" r="2.5" fill="currentColor" />
     </svg>
   );
 }
