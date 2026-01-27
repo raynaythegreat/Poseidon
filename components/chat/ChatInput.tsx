@@ -104,10 +104,10 @@ export default function ChatInput({
                     width={40}
                     height={40}
                     unoptimized
-                    className="w-10 h-10 rounded-sm object-cover border border-line-strong/70"
+                    className="w-10 h-10 rounded-xl object-cover border border-white/20"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-sm bg-surface-muted border border-line-strong/70 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/20 flex items-center justify-center">
                     <svg className="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 11.625h4.5m-4.5 2.25h4.5m2.25-9H5.625c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
@@ -146,7 +146,7 @@ export default function ChatInput({
         )}
 
         <div
-          className="flex items-end gap-2 bg-white/10 rounded-2xl border border-white/10 p-2 focus-within:ring-2 focus-within:ring-cyan-500/30 focus-within:border-cyan-500/50 transition-all"
+          className="flex items-end gap-2 bg-white/10 rounded-2xl border border-white/10 p-2 focus-within:ring-2 focus-within:ring-pink-500/30 focus-within:border-pink-500/50 transition-all"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             e.preventDefault();
@@ -187,12 +187,12 @@ export default function ChatInput({
             {showAttachmentMenu && (
               <div
                 ref={attachmentMenuRef}
-                className="absolute bottom-full left-0 mb-2 w-44 rounded-none border border-line bg-surface shadow-none backdrop-blur"
+                className="absolute bottom-full left-0 mb-2 w-44 rounded-xl border border-white/10 bg-white/5 shadow-none backdrop-blur"
                 role="menu"
               >
                 <button
                   type="button"
-                  className="w-full px-3 py-2 text-left text-xs font-medium text-ink-muted hover:bg-surface-muted/70 dark:hover:bg-surface-strong/40 hover:text-ink  rounded-t-xl transition-colors"
+                  className="w-full px-3 py-2 text-left text-xs font-medium text-white/60 hover:bg-white/10 hover:text-white rounded-t-xl transition-colors"
                   onClick={() => {
                     setShowAttachmentMenu(false);
                     fileInputRef.current?.click();
@@ -202,7 +202,7 @@ export default function ChatInput({
                 </button>
                 <button
                   type="button"
-                  className="w-full px-3 py-2 text-left text-xs font-medium text-ink-muted hover:bg-surface-muted/70 dark:hover:bg-surface-strong/40 hover:text-ink  disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full px-3 py-2 text-left text-xs font-medium text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   onClick={() => {
                     setShowAttachmentMenu(false);
                     onOpenImageGenerator?.();
@@ -213,7 +213,7 @@ export default function ChatInput({
                 </button>
                 <button
                   type="button"
-                  className="w-full px-3 py-2 text-left text-xs font-medium text-ink-muted hover:bg-surface-muted/70 dark:hover:bg-surface-strong/40 hover:text-ink  rounded-b-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full px-3 py-2 text-left text-xs font-medium text-white/60 hover:bg-white/10 hover:text-white rounded-b-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   onClick={() => {
                     setShowAttachmentMenu(false);
                     onOpenImageHistory?.();
