@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useRef } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -70,6 +70,8 @@ const mobileNavItems = [
 
 export default function DashboardLayout({ children, activeTab, onTabChange }: DashboardLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Load saved state from localStorage
   useEffect(() => {
@@ -84,18 +86,36 @@ export default function DashboardLayout({ children, activeTab, onTabChange }: Da
     localStorage.setItem("poseidon-sidebar-collapsed", String(isSidebarCollapsed));
   }, [isSidebarCollapsed]);
 
+  // Handle mouse enter on collapsed sidebar
+  const handleMouseEnter = () => {
+    if (isSidebarCollapsed) {
+      setIsSidebarHovered(true);
+    }
+  };
+
+  // Handle mouse leave from sidebar
+  const handleMouseLeave = () => {
+    setIsSidebarHovered(false);
+  };
+
+  // Effective collapsed state: collapsed unless hovered
+  const isEffectivelyCollapsed = isSidebarCollapsed && !isSidebarHovered;
+
   return (
     <div className="flex h-screen supports-[height:100dvh]:h-dvh">
-      {/* Sidebar - Collapsible */}
+      {/* Sidebar - Collapsible with hover-to-expand */}
       <div
+        ref={sidebarRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={`hidden md:flex flex-shrink-0 transition-[width] duration-300 ease-in-out ${
-          isSidebarCollapsed ? "w-16" : "w-64"
+          isEffectivelyCollapsed ? "w-16" : "w-64"
         }`}
       >
         <Sidebar
           activeTab={activeTab}
           onTabChange={onTabChange}
-          isCollapsed={isSidebarCollapsed}
+          isCollapsed={isEffectivelyCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
       </div>
