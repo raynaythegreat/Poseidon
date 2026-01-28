@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useUserSettings } from "@/contexts/UserSettingsContext";
 import GlassesLogo from "@/components/ui/GlassesLogo";
 import ProviderCard from "@/components/ui/ProviderCard";
 import RotatingCardsButton from "@/components/ui/RotatingCardsButton";
@@ -47,7 +48,11 @@ interface Status {
 
 export default function SettingsPage({ onLogout }: SettingsPageProps) {
   const { theme, toggleTheme } = useTheme();
+  const { settings, updateUsername, updateEmail } = useUserSettings();
   const [status, setStatus] = useState<Status | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileUsername, setProfileUsername] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [groqSyncing, setGroqSyncing] = useState(false);
   const [groqSyncMessage, setGroqSyncMessage] = useState<{
@@ -1003,6 +1008,88 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+
+        {/* Profile */}
+        <section>
+          <h3 className="text-lg font-semibold text-ink mb-4">
+            Profile
+          </h3>
+          <div className="card rounded-none p-4">
+            {!isEditingProfile ? (
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-ink">
+                    {settings.username}
+                  </h4>
+                  <p className="text-sm text-ink-muted">
+                    {settings.email || "No email set"}
+                  </p>
+                </div>
+                <RotatingCardsButton
+                  onClick={() => {
+                    setIsEditingProfile(true);
+                    setProfileUsername(settings.username);
+                    setProfileEmail(settings.email || "");
+                  }}
+                  className="px-4 py-2 rounded-none text-sm"
+                  variant="secondary"
+                >
+                  Edit
+                </RotatingCardsButton>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-ink mb-1">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={profileUsername}
+                    onChange={(e) => setProfileUsername(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-muted border border-line rounded-sm text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your username"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-ink mb-1">
+                    Email (optional)
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={profileEmail}
+                    onChange={(e) => setProfileEmail(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-muted border border-line rounded-sm text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <RotatingCardsButton
+                    onClick={() => {
+                      updateUsername(profileUsername);
+                      if (profileEmail) updateEmail(profileEmail);
+                      setIsEditingProfile(false);
+                    }}
+                    disabled={!profileUsername.trim()}
+                    className="px-4 py-2 rounded-none text-sm"
+                    variant="gold"
+                  >
+                    Save
+                  </RotatingCardsButton>
+                  <RotatingCardsButton
+                    onClick={() => setIsEditingProfile(false)}
+                    className="px-4 py-2 rounded-none text-sm"
+                    variant="secondary"
+                  >
+                    Cancel
+                  </RotatingCardsButton>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
