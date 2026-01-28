@@ -4,22 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
-import { useChatHistory } from "@/contexts/ChatHistoryContext";
-import ChatHeaderBubble from "./ChatHeaderBubble";
 import MessageList from "./MessageList";
-import ApiUsageDisplay from "./ApiUsageDisplay";
 import RepoDropdown from "./RepoDropdown";
 import ModelDropdown from "./ModelDropdown";
-import RepoSelector from "./RepoSelector";
 import type { Provider } from "@/contexts/ApiUsageContext";
-
-const navItems = [
-  { label: "Chat", id: "chat" },
-  { label: "Repos", id: "repos" },
-  { label: "Deploy", id: "deploy" },
-  { label: "History", id: "history" },
-  { label: "Settings", id: "settings" },
-];
 
 interface Repository {
   id: number;
@@ -47,7 +35,7 @@ export default function SimpleChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [repos, setRepos] = useState<Repository[]>([]);
-  const [models, setModels] = useState<ModelOption[]>([]);
+  const [models] = useState<ModelOption[]>([]);
   const [modelInfo, setModelInfo] = useState<{ name: string; provider: Provider }>({ name: "Claude", provider: "claude" });
 
   const router = useRouter();
@@ -116,15 +104,6 @@ export default function SimpleChatPage() {
     }
   };
 
-  const handleNavClick = (tabId: string) => {
-    router.push(`/?tab=${tabId}`);
-  };
-
-  const handleNewChat = () => {
-    setMessages([]);
-    setInput("");
-  };
-
   const handleRepoSelect = (repo: Repository) => {
     setSelectedRepo(repo);
   };
@@ -138,57 +117,20 @@ export default function SimpleChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col">
-      {/* Minimal Top Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-900">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => router.push("/")}
-          >
-            <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-              <svg viewBox="0 0 100 100" fill="none" className="w-5 h-5 text-white dark:text-black">
-                <path d="M50 15 L50 65" stroke="currentColor" strokeWidth="6" strokeLinecap="square"/>
-                <path d="M50 30 L28 15 M50 45 L35 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
-                <path d="M50 30 L72 15 M50 45 L65 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
-              </svg>
-            </div>
-            <span className="font-semibold text-gray-900 dark:text-white">Poseidon</span>
-          </div>
-
-          {/* Navigation Links */}
-          <div className="flex items-center gap-6">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          {/* API Usage Display */}
-          <ApiUsageDisplay currentProvider={modelInfo.provider} compact />
-        </div>
-      </nav>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col px-6 pt-32 pb-6 max-w-4xl mx-auto w-full">
+    <div className="h-full flex flex-col bg-background">
+      <div className="flex-1 flex flex-col px-4 sm:px-6 py-6 max-w-4xl mx-auto w-full min-h-0">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto mb-6">
+        <div className="flex-1 overflow-y-auto mb-6 min-h-0">
           {messages.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-3xl font-bold text-ink mb-4">
                 Start building, {settings.username || "Developer"}
               </h2>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-ink-muted">
                 Describe what you want to create or ask a question to get started.
               </p>
             </motion.div>
@@ -209,7 +151,7 @@ export default function SimpleChatPage() {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-2xl">
+          <div className="relative bg-surface/90 rounded-2xl border border-line/60 overflow-hidden shadow-sm backdrop-blur-xl">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -220,7 +162,7 @@ export default function SimpleChatPage() {
                 }
               }}
               placeholder="Describe what you want to build or ask a question..."
-              className="w-full px-6 py-5 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none resize-none text-lg min-h-[120px]"
+              className="w-full px-6 py-5 bg-transparent text-ink placeholder:text-ink-subtle focus:outline-none resize-none text-lg min-h-[120px]"
               rows={4}
               disabled={isLoading}
             />
@@ -252,7 +194,7 @@ export default function SimpleChatPage() {
               {isLoading ? (
                 <button
                   disabled
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-gray-400 text-white font-medium cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-surface-strong text-ink-muted font-medium cursor-not-allowed"
                 >
                   <span>Sending...</span>
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -264,7 +206,7 @@ export default function SimpleChatPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={!input.trim()}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-black dark:bg-white text-white dark:text-black font-medium transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 rounded-lg gradient-sunset text-white font-medium transition-opacity hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed ring-1 ring-white/20 dark:ring-white/10"
                 >
                   <span>Send</span>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

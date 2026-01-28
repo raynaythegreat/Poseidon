@@ -4,18 +4,21 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RepoDropdown from "./RepoDropdown";
 import ModelDropdown from "./ModelDropdown";
+import type { Provider } from "@/contexts/ApiUsageContext";
 
 interface Repository {
   id: number;
   name: string;
   full_name: string;
   description: string | null;
+  default_branch?: string;
 }
 
 interface ModelOption {
   id: string;
   name: string;
-  provider: string;
+  provider: Provider;
+  description?: string;
 }
 
 interface LovableStyleChatInputProps {
@@ -32,7 +35,7 @@ interface LovableStyleChatInputProps {
   onRepoSelect?: (repo: Repository | null) => void;
   onCreateRepo?: () => void;
   // Model selection props
-  modelInfo?: { name: string; provider: string };
+  modelInfo?: { name: string; provider: Provider };
   models?: ModelOption[];
   onModelSelect?: (model: ModelOption) => void;
   // Chat mode for brainstorm button visibility
