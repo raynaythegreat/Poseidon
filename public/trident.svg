@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- App icon + favicon source (opaque background so iconutil can generate .icns) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- App icon + favicon source - Bold Greek Mythology Design -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#0D2137"/>
@@ -7,20 +7,48 @@
     </linearGradient>
   </defs>
 
-  <rect x="6" y="6" width="88" height="88" rx="22" fill="url(#bg)"/>
-  <rect x="6" y="6" width="88" height="88" rx="22" fill="none" stroke="#D4AF37" stroke-width="2"/>
+  <!-- Background with rounded corners -->
+  <rect x="3" y="3" width="114" height="114" rx="24" fill="url(#bg)"/>
+  <rect x="3" y="3" width="114" height="114" rx="24" fill="none" stroke="#D4AF37" stroke-width="2"/>
 
-  <!-- Poseidon's trident -->
-  <path d="M50 84V28" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
-  <path d="M50 28V14" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
-  <path d="M50 32C46 24 42 19 36 16V14" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M50 32C54 24 58 19 64 16V14" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Circular medallion border - Greek key inspired -->
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#F5F5F5" stroke-width="3"/>
+  <circle cx="60" cy="60" r="48" fill="none" stroke="#F5F5F5" stroke-width="1.5" opacity="0.6"/>
 
-  <path d="M50 8L44 18L50 15L56 18Z" fill="#D4AF37"/>
-  <path d="M36 10L32 18L36 16L40 18Z" fill="#D4AF37"/>
-  <path d="M64 10L60 18L64 16L68 18Z" fill="#D4AF37"/>
+  <!-- Decorative wave elements - left side -->
+  <path d="M12 60 Q 8 52 12 44 Q 16 52 12 60 Z" fill="#F5F5F5" opacity="0.8"/>
+  <path d="M12 68 Q 8 76 12 84 Q 16 76 12 68 Z" fill="#F5F5F5" opacity="0.8"/>
 
-  <path d="M36 20L29 16" stroke="#F5F5F5" stroke-width="5" stroke-linecap="round"/>
-  <path d="M64 20L71 16" stroke="#F5F5F5" stroke-width="5" stroke-linecap="round"/>
-  <path d="M42 84H58" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
+  <!-- Decorative wave elements - right side -->
+  <path d="M108 60 Q 112 52 108 44 Q 104 52 108 60 Z" fill="#F5F5F5" opacity="0.8"/>
+  <path d="M108 68 Q 112 76 108 84 Q 104 76 108 68 Z" fill="#F5F5F5" opacity="0.8"/>
+
+  <!-- Main trident shaft - filled, not stroked -->
+  <rect x="55" y="38" width="10" height="54" rx="1" fill="#F5F5F5"/>
+
+  <!-- Pommel - decorative base -->
+  <path d="M 46 92 L 60 86 L 74 92 L 74 98 L 46 98 Z" fill="#F5F5F5"/>
+
+  <!-- Center prong - bold filled shape -->
+  <path d="M 55 38 L 55 16 L 60 8 L 65 16 L 65 38 Z" fill="#F5F5F5"/>
+
+  <!-- Left prong - curved outward with ornate barb -->
+  <path d="M 55 32 Q 50 24 42 18 L 40 12 L 46 14 Q 52 18 56 26 Z" fill="#F5F5F5"/>
+  <!-- Left barb - decorative flourish -->
+  <path d="M 42 20 Q 32 18 26 22 L 24 20 Q 30 14 42 16 Z" fill="#F5F5F5"/>
+
+  <!-- Right prong - curved outward with ornate barb -->
+  <path d="M 65 32 Q 70 24 78 18 L 80 12 L 74 14 Q 68 18 64 26 Z" fill="#F5F5F5"/>
+  <!-- Right barb - decorative flourish -->
+  <path d="M 78 20 Q 88 18 94 22 L 96 20 Q 90 14 78 16 Z" fill="#F5F5F5"/>
+
+  <!-- Spear tips - sharp geometric points in gold -->
+  <path d="M 60 6 L 56 14 L 60 12 L 64 14 Z" fill="#D4AF37"/>
+  <path d="M 42 10 L 39 16 L 42 14 L 46 16 Z" fill="#D4AF37"/>
+  <path d="M 78 10 L 74 16 L 78 14 L 81 16 Z" fill="#D4AF37"/>
+
+  <!-- Decorative dots - Greek inspired -->
+  <circle cx="60" cy="48" r="2" fill="#D4AF37"/>
+  <circle cx="60" cy="56" r="1.5" fill="#D4AF37"/>
+  <circle cx="60" cy="63" r="1" fill="#D4AF37"/>
 </svg>
