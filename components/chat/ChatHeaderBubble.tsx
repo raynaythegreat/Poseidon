@@ -4,6 +4,7 @@ import { useState } from "react";
 import ApiUsageDisplay from "./ApiUsageDisplay";
 import RepoDropdown from "./RepoDropdown";
 import ModelDropdown from "./ModelDropdown";
+import type { Provider } from "@/contexts/ApiUsageContext";
 
 interface Repository {
   id: number;
@@ -28,7 +29,7 @@ interface ChatHeaderBubbleProps {
   onCreateRepo?: () => void;
   onNewChat: () => void;
   onMenuClick: () => void;
-  currentProvider?: string;
+  currentProvider?: Provider;
 }
 
 export default function ChatHeaderBubble({

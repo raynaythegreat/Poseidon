@@ -11,6 +11,7 @@ import ApiUsageDisplay from "./ApiUsageDisplay";
 import RepoDropdown from "./RepoDropdown";
 import ModelDropdown from "./ModelDropdown";
 import RepoSelector from "./RepoSelector";
+import type { Provider } from "@/contexts/ApiUsageContext";
 
 const navItems = [
   { label: "Chat", id: "chat" },
@@ -31,7 +32,7 @@ interface Repository {
 interface ModelOption {
   id: string;
   name: string;
-  provider: string;
+  provider: Provider;
 }
 
 interface ChatMessage {
@@ -46,7 +47,7 @@ export default function SimpleChatPage() {
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [repos, setRepos] = useState<Repository[]>([]);
   const [models, setModels] = useState<ModelOption[]>([]);
-  const [modelInfo, setModelInfo] = useState({ name: "Claude", provider: "claude" });
+  const [modelInfo, setModelInfo] = useState<{ name: string; provider: Provider }>({ name: "Claude", provider: "claude" });
 
   const router = useRouter();
   const { settings } = useUserSettings();
