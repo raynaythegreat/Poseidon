@@ -95,7 +95,7 @@ body::after {
   .glass {
     @apply bg-surface/80 backdrop-blur-md border border-line/70;
   }
-  
+
   .glass-card {
     @apply bg-surface border border-line shadow-sm;
   }
@@ -118,6 +118,10 @@ body::after {
 
   .gradient-vibrant {
     @apply bg-gradient-to-r from-cyber-500 to-accent-500;
+  }
+
+  .gradient-lovable {
+    @apply bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500;
   }
 
   .animate-gradient {
@@ -173,9 +177,10 @@ body::after {
   @apply text-ink max-w-none;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - more refined */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -188,4 +193,21 @@ body::after {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-cyber-500;
+}
+
+/* Refined shadows and transitions */
+* {
+  @apply transition-colors duration-150;
+}
+
+/* Improved focus states */
+input:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-background;
+}
+
+/* Smooth animations */
+.smooth-transition {
+  @apply transition-all duration-200 ease-in-out;
 }
