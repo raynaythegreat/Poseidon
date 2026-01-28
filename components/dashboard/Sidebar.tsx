@@ -21,7 +21,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "chat",
-    label: "AI Chat",
+    label: "Chat",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "repos",
-    label: "GitHub Repos",
+    label: "Repos",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -39,7 +39,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "deploy",
-    label: "Deployments",
+    label: "Deploy",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
@@ -48,7 +48,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "history",
-    label: "Chat History",
+    label: "History",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -76,15 +76,15 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r border-line/60 bg-surface/90 backdrop-blur-xl">
+    <aside className="hidden md:flex flex-col w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-black">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-line/60">
-        <div className="w-12 h-12 rounded-none gradient-sunset flex items-center justify-center shadow-none animate-gradient ring-1 ring-white/40 dark:ring-white/10">
-          <TridentLogo className="w-7 h-7 text-white" />
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+        <div className="w-10 h-10 bg-black dark:bg-white rounded-lg flex items-center justify-center">
+          <TridentLogo className="w-6 h-6 text-white dark:text-black" />
         </div>
         <div>
-          <h1 className="font-display font-semibold text-lg gradient-text tracking-wide">Poseidon</h1>
-          <p className="text-xs text-ink-muted font-medium">AI Dev Command</p>
+          <h1 className="font-semibold text-lg text-gray-900 dark:text-white">Poseidon</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400">AI Dev Command</p>
         </div>
       </div>
 
@@ -94,25 +94,23 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-none text-sm font-semibold transition-all ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
               activeTab === item.id
-                ? "gradient-vibrant text-white shadow-none ring-1 ring-white/30 hover:shadow-2xl hover:-translate-y-0.5"
-                : "text-ink hover:bg-surface-muted/60 dark:hover:bg-surface-strong/70 hover:text-ink "
+                ? "bg-black dark:bg-white text-white dark:text-black"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900"
             }`}
           >
-            <span className={activeTab === item.id ? "drop-shadow-sm" : ""}>
-              {item.icon}
-            </span>
+            {item.icon}
             {item.label}
           </button>
         ))}
       </nav>
 
       {/* Theme Toggle & Version */}
-      <div className="p-4 border-t border-line">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-none text-sm font-semibold text-ink hover:bg-surface-muted/60 dark:hover:bg-surface-strong/70 hover:text-ink  transition-all"
+          className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
         >
           <span className="flex items-center gap-3">
             {theme === "dark" ? (
@@ -124,11 +122,11 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
               </svg>
             )}
-            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+            {theme === "dark" ? "Light" : "Dark"}
           </span>
         </button>
-        <div className="mt-2 px-4 text-xs text-ink-muted font-medium">
-          v1.0.0 ✨
+        <div className="mt-2 px-4 text-xs text-gray-400 dark:text-gray-600">
+          v1.0.0
         </div>
       </div>
     </aside>
