@@ -4208,10 +4208,9 @@ export default function ChatInterface() {
 
   // Get all models as a flat list for the dropdown
   const getAllModels = (): ModelOption[] => {
-    const groups = getModelGroups();
     const allModels: ModelOption[] = [];
-    for (const group in groups) {
-      allModels.push(...groups[group]);
+    for (const group in modelGroups) {
+      allModels.push(...modelGroups[group]);
     }
     return allModels;
   };
