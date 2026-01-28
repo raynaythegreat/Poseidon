@@ -32,7 +32,7 @@ export default function LovableLandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col overflow-y-auto">
       {/* Minimal Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-900">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -67,7 +67,7 @@ export default function LovableLandingPage() {
       </nav>
 
       {/* Hero Section - Lovable.dev Style */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-20">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-32 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
