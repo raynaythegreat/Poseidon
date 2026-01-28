@@ -36,8 +36,8 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
       <div
         className={`max-w-[85%] rounded-2xl px-4 py-3 ${
           message.role === "user"
-            ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white ml-auto"
-            : "bg-[#0a0a0a] border border-white/[0.08] text-white/70"
+            ? "bg-gradient-to-r from-poseidon-gold to-poseidon-teal-light text-poseidon-deep-blue ml-auto"
+            : "bg-poseidon-ocean border border-poseidon-teal/20 text-poseidon-pearl/80"
         }`}
       >
         {message.role === "user" ? (
@@ -236,19 +236,19 @@ export default function MessageList({
                 key={template.title}
                 type="button"
                 onClick={() => onTemplateSelect?.(template.prompt)}
-                className="group relative px-4 py-4 text-left bg-white/5 border border-white/10 hover:border-pink-500/50 rounded-2xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed backdrop-blur-sm"
+                className="group relative px-4 py-4 text-left bg-poseidon-ocean/50 border border-poseidon-teal/20 hover:border-poseidon-gold/50 rounded-2xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed backdrop-blur-sm"
                 disabled={!onTemplateSelect}
                 title={template.prompt}
               >
                 <div className="flex items-start gap-3 mb-2">
                   <span className="text-2xl flex-shrink-0">{template.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-white/90 group-hover:text-white transition-colors">
+                    <div className="text-sm font-bold text-poseidon-pearl/90 group-hover:text-poseidon-gold transition-colors">
                       {template.title}
                     </div>
                   </div>
                 </div>
-                <div className="text-xs text-white/60 leading-relaxed pl-11">
+                <div className="text-xs text-poseidon-pearl/60 leading-relaxed pl-11">
                   {template.description}
                 </div>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -272,11 +272,11 @@ export default function MessageList({
         ))}
         {isLoading && (
           <div className="flex gap-3 justify-start animate-in fade-in">
-            <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-poseidon-ocean/50 border border-poseidon-teal/20 backdrop-blur-sm">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                <div className="w-2 h-2 bg-poseidon-gold rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-poseidon-teal-light rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                <div className="w-2 h-2 bg-poseidon-teal-light rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
             </div>
           </div>

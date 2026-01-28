@@ -10,6 +10,28 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Poseidon Aegean Divine Theme
+        poseidon: {
+          gold: "#D4AF37",
+          "gold-light": "#F4C430",
+          "gold-bright": "#FFD700",
+          "gold-dark": "#B8960C",
+          teal: "#006666",
+          "teal-mid": "#008B8B",
+          "teal-light": "#20B2AA",
+          "teal-dark": "#004D4D",
+          pearl: "#F5F5F5",
+          "pearl-warm": "#FFFAFA",
+          "pearl-ivory": "#FFFFF0",
+          "sea": "#2E8B57",
+          "sea-light": "#3CB371",
+          "sea-bright": "#66CDAA",
+          coral: "#FF6B6B",
+          "coral-light": "#FF8A8A",
+          "ocean": "#0D2137",
+          "deep-blue": "#0A1628",
+          "abyss": "#050D14",
+        },
         background: "rgb(var(--background) / <alpha-value>)",
         foreground: "rgb(var(--foreground) / <alpha-value>)",
         surface: "rgb(var(--surface) / <alpha-value>)",
@@ -99,6 +121,12 @@ const config: Config = {
       },
       backgroundImage: {
         "cyber-grid": "linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px)",
+        "poseidon-primary": "linear-gradient(135deg, #D4AF37, #008B8B, #20B2AA)",
+        "poseidon-surface": "linear-gradient(180deg, #0A1628, #0D2137)",
+        "poseidon-accent": "linear-gradient(135deg, #FF6B6B, #FFD700)",
+        "poseidon-gold": "linear-gradient(135deg, #D4AF37, #FFD700)",
+        "poseidon-ocean": "linear-gradient(180deg, #0A1628, #050D14)",
+        "poseidon-wave": "radial-gradient(ellipse at top, rgba(32, 178, 170, 0.1), transparent 70%)",
       },
       fontFamily: {
         mono: ['"Courier New"', 'Courier', 'monospace'],
