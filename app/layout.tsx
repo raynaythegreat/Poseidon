@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "Poseidon is a cyber-styled AI command center for planning, building, and deploying web applications with confidence.",
   icons: {
-    icon: '/favicon.ico',
+    icon: [{ url: "/trident.svg", type: "image/svg+xml" }],
   },
 };
 

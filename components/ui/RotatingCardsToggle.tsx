@@ -92,13 +92,13 @@ export default function RotatingCardsToggle({
             absolute top-1 w-6 h-6 rounded-full
             transition-all duration-300 ease-in-out
             shadow-md
-            ${checked ? "left-7 bg-white" : "left-1 bg-surface"}
-            ${checked ? "shadow-lg shadow-white/50" : ""}
+            ${checked ? "left-7 bg-poseidon-gold" : "left-1 bg-surface"}
+            ${checked ? "shadow-lg shadow-poseidon-gold/40" : ""}
           `}
         >
           {/* Glow effect when checked */}
           {checked && (
-            <div className="absolute inset-0 rounded-full bg-white/50 animate-pulse" />
+            <div className="absolute inset-0 rounded-full bg-poseidon-gold/40 animate-pulse" />
           )}
         </div>
       </button>

@@ -36,8 +36,8 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
       <div
         className={`max-w-[85%] rounded-2xl px-4 py-3 ${
           message.role === "user"
-            ? "bg-black dark:bg-white text-white dark:text-black ml-auto"
-            : "bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white"
+            ? "gradient-sunset text-white ml-auto ring-1 ring-white/20 dark:ring-white/10"
+            : "bg-surface/85 border border-line/60 text-ink backdrop-blur"
         }`}
       >
         {message.role === "user" ? (

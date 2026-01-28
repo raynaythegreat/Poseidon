@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
+import TridentLogo from "@/components/ui/TridentLogo";
 
 const navItems = [
   { label: "Chat", id: "chat" },
@@ -42,11 +43,7 @@ export default function LovableLandingPage() {
             onClick={() => router.push("/")}
           >
             <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-              <svg viewBox="0 0 100 100" fill="none" className="w-5 h-5 text-white dark:text-black">
-                <path d="M50 15 L50 65" stroke="currentColor" strokeWidth="6" strokeLinecap="square"/>
-                <path d="M50 30 L28 15 M50 45 L35 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
-                <path d="M50 30 L72 15 M50 45 L65 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
-              </svg>
+              <TridentLogo className="w-5 h-5 text-white dark:text-black" />
             </div>
             <span className="font-semibold text-gray-900 dark:text-white">Poseidon</span>
           </div>

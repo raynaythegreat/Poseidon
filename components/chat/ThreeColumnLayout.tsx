@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import TridentLogo from "@/components/ui/TridentLogo";
 
 interface ThreeColumnLayoutProps {
   leftPanel: React.ReactNode;
@@ -72,11 +73,7 @@ export default function ThreeColumnLayout({
       {leftCollapsed && (
         <div className="w-12 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black transition-all duration-300 ease-out">
           {/* Collapsed state - trident icon */}
-          <svg className="w-6 h-6 text-gray-400 dark:text-gray-600" viewBox="0 0 100 100" fill="currentColor">
-            <path d="M50 15 L50 65" stroke="currentColor" strokeWidth="6" strokeLinecap="square"/>
-            <path d="M50 30 L28 15 M50 45 L35 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
-            <path d="M50 30 L72 15 M50 45 L65 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
-          </svg>
+          <TridentLogo className="w-6 h-6 text-ink-subtle" />
         </div>
       )}
 

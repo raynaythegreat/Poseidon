@@ -37,10 +37,10 @@ const statusConfig = {
     label: "Error",
   },
   loading: {
-    bg: "bg-gray-100 dark:bg-gray-500/10",
-    text: "text-gray-600 dark:text-gray-400",
-    border: "border-gray-200 dark:border-gray-500/20",
-    dot: "bg-gray-500 animate-pulse",
+    bg: "bg-surface-muted/60",
+    text: "text-ink-muted",
+    border: "border-line/60",
+    dot: "bg-poseidon-teal-light animate-pulse",
     label: "Checking",
   },
 };
@@ -132,7 +132,7 @@ export default function ProviderCard({
               <div className={`
                 absolute -top-1 -right-1 w-4 h-4 rounded-full
                 ${config.dot}
-                border-2 border-white dark:border-surface
+                border-2 border-background
               `} />
             </div>
 

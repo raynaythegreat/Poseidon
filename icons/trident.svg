@@ -1,15 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- Trident design - central prong and two side prongs with barbs -->
-  <!-- Main shaft -->
-  <path d="M50 10 L50 65" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-  <!-- Left prong with barb -->
-  <path d="M50 30 L30 15 M50 45 L35 35" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Right prong with barb -->
-  <path d="M50 30 L70 15 M50 45 L65 35" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Center decorative element -->
-  <circle cx="50" cy="55" r="4" fill="currentColor"/>
-  <!-- Bottom crossbar -->
-  <path d="M40 75 L60 75" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-  <!-- Bottom tines -->
-  <path d="M45 75 L40 90 M50 75 L50 92 M55 75 L60 90" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <!-- Poseidon's trident mark (match TridentLogo component) -->
+  <!-- Shaft -->
+  <path d="M50 90V26" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Prongs -->
+  <path d="M50 26V12" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+  <path d="M50 30C46 22 42 17 36 14V12" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 30C54 22 58 17 64 14V12" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Spear tips -->
+  <path d="M50 6L44 16L50 13L56 16Z" fill="currentColor"/>
+  <path d="M36 8L32 16L36 14L40 16Z" fill="currentColor"/>
+  <path d="M64 8L60 16L64 14L68 16Z" fill="currentColor"/>
+
+  <!-- Side barbs -->
+  <path d="M36 18L28 14" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <path d="M64 18L72 14" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Pommel -->
+  <path d="M40 90H60" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
 </svg>
