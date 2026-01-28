@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import ChatInterface from "@/components/chat/ChatInterface";
+import SimpleChatPage from "@/components/chat/SimpleChatPage";
 import HistoryPage from "@/components/chat/HistoryPage";
 import ReposPage from "@/components/github/ReposPage";
 import DeploymentsPage from "@/components/deploy/DeploymentsPage";
@@ -117,7 +117,7 @@ export default function MainPage() {
       case "home":
         return <HomePage />;
       case "chat":
-        return <ChatInterface />;
+        return <SimpleChatPage />;
       case "history":
         return <HistoryPage onResumeChat={handleResumeChat} onNewChat={handleNewChat} />;
       case "repos":
