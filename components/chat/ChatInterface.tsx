@@ -1439,6 +1439,7 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [showProceedButton, setShowProceedButton] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
+  const [repos, setRepos] = useState<Repository[]>([]);
   const [repoContext, setRepoContext] = useState<RepoContextData | null>(null);
   const [loadingContext, setLoadingContext] = useState(false);
   const [selectedModel, setSelectedModel] = useState(
@@ -1540,6 +1541,22 @@ export default function ChatInterface() {
     window.addEventListener("customProviderUpdated", handler);
     return () => window.removeEventListener("customProviderUpdated", handler);
   }, [loadCustomModels]);
+
+  // Load repos from GitHub
+  useEffect(() => {
+    const loadRepos = async () => {
+      try {
+        const response = await fetch("/api/github/repos");
+        if (response.ok) {
+          const data = await response.json();
+          setRepos(data.repos || []);
+        }
+      } catch (error) {
+        console.error("Failed to load repos:", error);
+      }
+    };
+    loadRepos();
+  }, []);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const deployAbortControllerRef = useRef<AbortController | null>(null);
@@ -4174,6 +4191,31 @@ export default function ChatInterface() {
     setPendingRepoChangesRepoFullName(null);
   };
 
+  // Handler for repo selection
+  const handleRepoSelect = (repo: Repository) => {
+    setSelectedRepo(repo);
+  };
+
+  // Handler for model selection
+  const handleModelSelect = (model: ModelOption) => {
+    setSelectedModel(model.id);
+  };
+
+  // Handler for creating a new repo - navigate to repos page
+  const handleCreateRepo = () => {
+    window.location.href = "/?tab=repos";
+  };
+
+  // Get all models as a flat list for the dropdown
+  const getAllModels = (): ModelOption[] => {
+    const groups = getModelGroups();
+    const allModels: ModelOption[] = [];
+    for (const group in groups) {
+      allModels.push(...groups[group]);
+    }
+    return allModels;
+  };
+
   const modelInfo = selectedModelInfo;
   const providerConfigured =
     modelInfo.provider === "ollama"
@@ -4367,10 +4409,15 @@ export default function ChatInterface() {
           {/* Header Bubble - Integrated into chat flow like lovable.dev */}
           <ChatHeaderBubble
             selectedRepo={selectedRepo}
+            repos={repos}
             modelInfo={modelInfo}
-            onModelClick={() => setShowModelDropdown(!showModelDropdown)}
+            models={getAllModels()}
+            onRepoSelect={handleRepoSelect}
+            onModelSelect={handleModelSelect}
+            onCreateRepo={handleCreateRepo}
             onNewChat={handleNewChat}
             onMenuClick={() => setShowFloatingControls(!showFloatingControls)}
+            currentProvider={selectedModelInfo.provider}
           />
 
           {/* Status bar */}
@@ -4614,8 +4661,6 @@ export default function ChatInterface() {
         fallbackNotice={fallbackNotice}
         onDismissFallback={() => setFallbackNotice(null)}
       />
-
-      <ApiUsageDisplay currentProvider={selectedModelInfo.provider} />
     </>
   );
 }

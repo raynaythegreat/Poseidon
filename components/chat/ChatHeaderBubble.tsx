@@ -2,11 +2,30 @@
 
 import { useState } from "react";
 import ApiUsageDisplay from "./ApiUsageDisplay";
+import RepoDropdown from "./RepoDropdown";
+import ModelDropdown from "./ModelDropdown";
+
+interface Repository {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string | null;
+}
+
+interface ModelOption {
+  id: string;
+  name: string;
+  provider: string;
+}
 
 interface ChatHeaderBubbleProps {
-  selectedRepo: { id: number; name: string; full_name: string } | null;
+  selectedRepo: Repository | null;
+  repos?: Repository[];
   modelInfo: { name: string; provider: string };
-  onModelClick: () => void;
+  models?: ModelOption[];
+  onRepoSelect?: (repo: Repository) => void;
+  onModelSelect?: (model: ModelOption) => void;
+  onCreateRepo?: () => void;
   onNewChat: () => void;
   onMenuClick: () => void;
   currentProvider?: string;
@@ -14,8 +33,12 @@ interface ChatHeaderBubbleProps {
 
 export default function ChatHeaderBubble({
   selectedRepo,
+  repos = [],
   modelInfo,
-  onModelClick,
+  models = [],
+  onRepoSelect,
+  onModelSelect,
+  onCreateRepo,
   onNewChat,
   onMenuClick,
   currentProvider,
@@ -38,24 +61,37 @@ export default function ChatHeaderBubble({
           {/* Separator */}
           <div className="w-px h-4 bg-white/10" />
 
-          {/* Model Selector */}
-          <button
-            onClick={onModelClick}
-            className="text-sm text-white/50 hover:text-white/80 transition-colors flex items-center gap-1.5"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            {modelInfo.name}
-          </button>
-
-          {/* Repo name if selected */}
-          {selectedRepo && (
-            <>
-              <div className="w-px h-4 bg-white/10" />
-              <span className="text-sm text-white/50">{selectedRepo.name}</span>
-            </>
+          {/* Model Selector - Show dropdown if handler provided, otherwise show text */}
+          {onModelSelect && models.length > 0 ? (
+            <ModelDropdown
+              modelInfo={modelInfo}
+              models={models}
+              onSelect={onModelSelect}
+              darkTheme
+              compact
+            />
+          ) : (
+            <div className="text-sm text-white/50 hover:text-white/80 transition-colors flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {modelInfo.name}
+            </div>
           )}
+
+          {/* Repo Selector - Show dropdown if handler provided, otherwise show text */}
+          {onRepoSelect && onCreateRepo ? (
+            <RepoDropdown
+              selectedRepo={selectedRepo}
+              repos={repos}
+              onSelect={onRepoSelect}
+              onCreateRepo={onCreateRepo}
+              darkTheme
+              compact
+            />
+          ) : selectedRepo ? (
+            <span className="text-sm text-white/50">{selectedRepo.name}</span>
+          ) : null}
         </div>
 
         {/* Right: Actions */}
