@@ -69,7 +69,7 @@ const mobileNavItems = [
 ];
 
 export default function DashboardLayout({ children, activeTab, onTabChange }: DashboardLayoutProps) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 

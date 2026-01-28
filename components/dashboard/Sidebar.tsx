@@ -85,8 +85,8 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
           isCollapsed ? "justify-center px-2 py-4" : "gap-3 px-6 py-5"
         }`}
       >
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center gradient-sunset shadow-sm ring-1 ring-white/20 dark:ring-white/10">
-          <TridentLogo className="w-6 h-6 text-white" />
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-neutral-900 dark:bg-neutral-100 shadow-sm ring-1 ring-white/20 dark:ring-white/10">
+          <TridentLogo className="w-6 h-6 text-white dark:text-black" />
         </div>
         {!isCollapsed && (
           <div>
@@ -107,7 +107,7 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
               isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
             } ${
               activeTab === item.id
-                ? "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25"
+                ? "bg-neutral-900/10 dark:bg-neutral-100/10 text-ink ring-1 ring-neutral-900/25 dark:ring-neutral-100/25"
                 : "text-ink-muted hover:bg-surface-muted/60 hover:text-ink"
             }`}
           >
