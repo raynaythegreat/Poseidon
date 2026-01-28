@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import GlassesLogo from "@/components/ui/GlassesLogo";
+import TridentLogo from "@/components/ui/TridentLogo";
 
 interface NavItem {
   id: string;
@@ -80,7 +80,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-line/60">
         <div className="w-12 h-12 rounded-none gradient-sunset flex items-center justify-center shadow-none animate-gradient ring-1 ring-white/40 dark:ring-white/10">
-          <GlassesLogo className="w-7 h-7 text-white" />
+          <TridentLogo className="w-7 h-7 text-white" />
         </div>
         <div>
           <h1 className="font-display font-semibold text-lg gradient-text tracking-wide">Poseidon</h1>

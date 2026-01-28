@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
-import GlassesLogo from "@/components/ui/GlassesLogo";
+import TridentLogo from "@/components/ui/TridentLogo";
 import ProviderCard from "@/components/ui/ProviderCard";
 import RotatingCardsButton from "@/components/ui/RotatingCardsButton";
 import RotatingCardsToggle from "@/components/ui/RotatingCardsToggle";
@@ -1151,7 +1151,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
           <div className="card rounded-none p-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-none bg-surface-muted/70 border border-line/60 flex items-center justify-center shadow-md">
-                <GlassesLogo className="w-7 h-7 text-ink" />
+                <TridentLogo className="w-7 h-7 text-ink" />
               </div>
               <div>
                 <h4 className="font-semibold text-ink">

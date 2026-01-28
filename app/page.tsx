@@ -9,7 +9,7 @@ import DeploymentsPage from "@/components/deploy/DeploymentsPage";
 import SettingsPage from "@/components/settings/SettingsPage";
 import LoginPage from "@/components/auth/LoginPage";
 import HomePage from "@/components/home/HomePage";
-import GlassesLogo from "@/components/ui/GlassesLogo";
+import TridentLogo from "@/components/ui/TridentLogo";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 
 export default function MainPage() {
@@ -127,7 +127,7 @@ export default function MainPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-2xl gradient-sunset flex items-center justify-center shadow-xl animate-gradient ring-1 ring-white/40 dark:ring-white/10">
-            <GlassesLogo className="w-9 h-9 text-white" />
+            <TridentLogo className="w-9 h-9 text-white" />
           </div>
           <div className="flex items-center gap-2 text-ink-muted">
             <svg className="animate-spin h-5 w-5 text-gold-500" viewBox="0 0 24 24">
