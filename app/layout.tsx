@@ -7,6 +7,7 @@ import { DeploymentProvider } from "@/contexts/DeploymentContext";
 import { ImageHistoryProvider } from "@/contexts/ImageHistoryContext";
 import { UserSettingsProvider } from "@/contexts/UserSettingsContext";
 import { ProjectsProvider } from "@/contexts/ProjectsContext";
+import ProjectSyncProvider from "@/components/ProjectSyncProvider";
 
 export const metadata: Metadata = {
   title: "Poseidon - AI Dev Command Center",
@@ -39,6 +40,7 @@ export default function RootLayout({
                 <ImageHistoryProvider>
                   <DeploymentProvider>
                     <ProjectsProvider>
+                      <ProjectSyncProvider />
                       {children}
                     </ProjectsProvider>
                   </DeploymentProvider>
