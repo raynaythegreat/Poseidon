@@ -103,7 +103,7 @@ interface CustomProviderConfig {
 interface ModelOption {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   provider: ModelProvider;
   kind?: "model" | "suggestion";
   pullCommand?: string;

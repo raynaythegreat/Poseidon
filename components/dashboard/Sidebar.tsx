@@ -78,43 +78,55 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-black">
+    <aside className="hidden md:flex flex-col w-full border-r border-line/60 bg-surface/90 backdrop-blur-xl">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-800">
-        <div className="w-10 h-10 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-          <TridentLogo className="w-6 h-6 text-white dark:text-black" />
+      <div
+        className={`flex items-center border-b border-line/60 ${
+          isCollapsed ? "justify-center px-2 py-4" : "gap-3 px-6 py-5"
+        }`}
+      >
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center gradient-sunset shadow-sm ring-1 ring-white/20 dark:ring-white/10">
+          <TridentLogo className="w-6 h-6 text-white" />
         </div>
-        <div>
-          <h1 className="font-semibold text-lg text-gray-900 dark:text-white">Poseidon</h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400">AI Dev Command</p>
-        </div>
+        {!isCollapsed && (
+          <div>
+            <h1 className="font-semibold text-lg text-ink">Poseidon</h1>
+            <p className="text-xs text-ink-muted">AI Dev Command</p>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+      <nav className={`flex-1 overflow-y-auto ${isCollapsed ? "py-4 px-2" : "py-4 px-3"} space-y-1`}>
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+            title={isCollapsed ? item.label : undefined}
+            className={`w-full flex items-center rounded-lg text-sm font-medium transition-colors ${
+              isCollapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"
+            } ${
               activeTab === item.id
-                ? "bg-black dark:bg-white text-white dark:text-black"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900"
+                ? "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25"
+                : "text-ink-muted hover:bg-surface-muted/60 hover:text-ink"
             }`}
           >
             {item.icon}
-            {item.label}
+            {!isCollapsed && item.label}
           </button>
         ))}
       </nav>
 
       {/* Theme Toggle, Collapse & Version */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+      <div className={`border-t border-line/60 ${isCollapsed ? "p-2" : "p-4"} space-y-2`}>
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
+          title={isCollapsed ? (theme === "dark" ? "Switch to Light" : "Switch to Dark") : undefined}
+          className={`w-full flex items-center rounded-lg text-sm font-medium text-ink-muted hover:bg-surface-muted/60 hover:text-ink transition-colors ${
+            isCollapsed ? "justify-center px-3 py-3" : "justify-between px-4 py-3"
+          }`}
         >
-          <span className="flex items-center gap-3">
+          <span className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
             {theme === "dark" ? (
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
@@ -124,15 +136,17 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
               </svg>
             )}
-            {theme === "dark" ? "Light" : "Dark"}
+            {!isCollapsed && (theme === "dark" ? "Light" : "Dark")}
           </span>
         </button>
         <button
           onClick={onToggleCollapse}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          className={`w-full flex items-center rounded-lg text-sm font-medium text-ink-muted hover:bg-surface-muted/60 hover:text-ink transition-colors ${
+            isCollapsed ? "justify-center px-3 py-3" : "justify-between px-4 py-3"
+          }`}
         >
-          <span className="flex items-center gap-3">
+          <span className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
             <svg
               className={`w-5 h-5 transition-transform duration-200 ${
                 isCollapsed ? "rotate-180" : "rotate-0"
@@ -144,12 +158,14 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
-            {isCollapsed ? "Expand" : "Collapse"}
+            {!isCollapsed && "Collapse"}
           </span>
         </button>
-        <div className="px-4 text-xs text-gray-400 dark:text-gray-600 text-center">
+        {!isCollapsed && (
+          <div className="px-4 text-xs text-ink-subtle text-center">
           v1.0.0
-        </div>
+          </div>
+        )}
       </div>
     </aside>
   );

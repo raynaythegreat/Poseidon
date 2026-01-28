@@ -87,34 +87,18 @@ export default function DashboardLayout({ children, activeTab, onTabChange }: Da
   return (
     <div className="flex h-screen supports-[height:100dvh]:h-dvh">
       {/* Sidebar - Collapsible */}
-      {!isSidebarCollapsed && (
-        <div className="hidden md:flex w-64 flex-shrink-0 transition-all duration-300 ease-in-out">
-          <Sidebar
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          />
-        </div>
-      )}
-
-      {/* Collapse Toggle Button - Show when sidebar is collapsed */}
-      {isSidebarCollapsed && (
-        <button
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className="hidden md:flex flex-col items-center justify-center w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 transition-all duration-200 group"
-          title="Expand Sidebar"
-        >
-          <svg
-            className="w-4 h-4 text-gray-400 dark:text-gray-600 transition-transform duration-200 rotate-180"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      )}
+      <div
+        className={`hidden md:flex flex-shrink-0 transition-[width] duration-300 ease-in-out ${
+          isSidebarCollapsed ? "w-16" : "w-64"
+        }`}
+      >
+        <Sidebar
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
@@ -128,7 +112,7 @@ export default function DashboardLayout({ children, activeTab, onTabChange }: Da
         {/* Mobile Bottom Navigation */}
         <nav
           id="mobile-nav"
-          className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 z-50 pb-[env(safe-area-inset-bottom)]"
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 border-t border-line/60 z-50 pb-[env(safe-area-inset-bottom)] backdrop-blur"
         >
           <div className="flex items-center justify-around h-16 px-2">
             {mobileNavItems.map((item) => (
@@ -137,11 +121,11 @@ export default function DashboardLayout({ children, activeTab, onTabChange }: Da
                 onClick={() => onTabChange(item.id)}
                 className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-colors ${
                   activeTab === item.id
-                    ? "text-black dark:text-white"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "text-ink"
+                    : "text-ink-muted"
                 }`}
               >
-                <span className={activeTab === item.id ? "text-black dark:text-white" : ""}>
+                <span className={activeTab === item.id ? "text-ink" : ""}>
                   {item.icon}
                 </span>
                 <span className="text-[10px] mt-1 font-medium">{item.label}</span>
