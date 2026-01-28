@@ -146,6 +146,12 @@ export default function MainPage() {
     return <LoginPage onLogin={handleLogin} />;
   }
 
+  // For home tab, render HomePage directly without DashboardLayout wrapper
+  // This allows the lovable.dev-style landing page to take full viewport with its own navigation
+  if (activeTab === "home") {
+    return <HomePage />;
+  }
+
   // For chat tab, render ChatInterface directly without DashboardLayout wrapper
   // This allows the ThreeColumnLayout to take full viewport
   if (activeTab === "chat") {
