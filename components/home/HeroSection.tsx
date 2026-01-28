@@ -24,7 +24,7 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
-          Let's build something, {settings.username}
+          Let&apos;s build something, {settings.username}
         </h1>
 
         {/* Input field */}
