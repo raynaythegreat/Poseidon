@@ -5,6 +5,8 @@ import { ChatHistoryProvider } from "@/contexts/ChatHistoryContext";
 import { ApiUsageProvider } from "@/contexts/ApiUsageContext";
 import { DeploymentProvider } from "@/contexts/DeploymentContext";
 import { ImageHistoryProvider } from "@/contexts/ImageHistoryContext";
+import { UserSettingsProvider } from "@/contexts/UserSettingsContext";
+import { ProjectsProvider } from "@/contexts/ProjectsContext";
 
 export const metadata: Metadata = {
   title: "Poseidon - AI Dev Command Center",
@@ -31,13 +33,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased overflow-x-hidden">
         <ThemeProvider>
-          <ChatHistoryProvider>
-            <ApiUsageProvider>
-              <ImageHistoryProvider>
-                <DeploymentProvider>{children}</DeploymentProvider>
-              </ImageHistoryProvider>
-            </ApiUsageProvider>
-          </ChatHistoryProvider>
+          <UserSettingsProvider>
+            <ChatHistoryProvider>
+              <ApiUsageProvider>
+                <ImageHistoryProvider>
+                  <DeploymentProvider>
+                    <ProjectsProvider>
+                      {children}
+                    </ProjectsProvider>
+                  </DeploymentProvider>
+                </ImageHistoryProvider>
+              </ApiUsageProvider>
+            </ChatHistoryProvider>
+          </UserSettingsProvider>
         </ThemeProvider>
       </body>
     </html>
