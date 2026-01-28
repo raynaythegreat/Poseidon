@@ -8,11 +8,12 @@ import ReposPage from "@/components/github/ReposPage";
 import DeploymentsPage from "@/components/deploy/DeploymentsPage";
 import SettingsPage from "@/components/settings/SettingsPage";
 import LoginPage from "@/components/auth/LoginPage";
+import HomePage from "@/components/home/HomePage";
 import GlassesLogo from "@/components/ui/GlassesLogo";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 
-export default function HomePage() {
-  const [activeTab, setActiveTab] = useState("chat");
+export default function MainPage() {
+  const [activeTab, setActiveTab] = useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { loadSession, clearCurrentSession } = useChatHistory();
@@ -92,8 +93,8 @@ export default function HomePage() {
   };
 
   const handleResumeChat = (sessionId: string) => {
-    loadSession(sessionId);
     setActiveTab("chat");
+    // The ChatInterface will load the session
   };
 
   const handleNewChat = () => {
@@ -103,6 +104,8 @@ export default function HomePage() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "home":
+        return <HomePage />;
       case "chat":
         return <ChatInterface />;
       case "history":
@@ -114,7 +117,7 @@ export default function HomePage() {
       case "settings":
         return <SettingsPage onLogout={handleLogout} />;
       default:
-        return <ChatInterface />;
+        return <HomePage />;
     }
   };
 
