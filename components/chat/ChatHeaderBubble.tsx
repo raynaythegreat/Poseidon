@@ -17,13 +17,14 @@ interface Repository {
 interface ModelOption {
   id: string;
   name: string;
-  provider: string;
+  provider: Provider;
+  description?: string;
 }
 
 interface ChatHeaderBubbleProps {
   selectedRepo: Repository | null;
   repos?: Repository[];
-  modelInfo: { name: string; provider: string };
+  modelInfo: { name: string; provider: Provider };
   models?: ModelOption[];
   onRepoSelect?: (repo: Repository) => void;
   onModelSelect?: (model: ModelOption) => void;

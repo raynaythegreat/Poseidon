@@ -33,6 +33,7 @@ interface ModelOption {
   id: string;
   name: string;
   provider: Provider;
+  description?: string;
 }
 
 interface ChatMessage {

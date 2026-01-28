@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import type { Provider } from "@/contexts/ApiUsageContext";
 
 interface ModelOption {
   id: string;
   name: string;
-  provider: string;
+  provider: Provider;
+  description?: string;
 }
 
 interface ModelDropdownProps {
-  modelInfo: { name: string; provider: string };
+  modelInfo: { name: string; provider: Provider };
   models: ModelOption[];
   onSelect: (model: ModelOption) => void;
   darkTheme?: boolean;

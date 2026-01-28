@@ -5,41 +5,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Light theme - Lovable.dev style minimal white */
-  --background: 255 255 255;
-  --foreground: 9 9 11;
-  --surface: 255 255 255;
-  --surface-muted: 249 250 251;
-  --surface-strong: 244 244 245;
-  --ink: 9 9 11;
-  --ink-muted: 113 113 122;
-  --ink-subtle: 161 161 170;
-  --line: 228 228 231;
-  --line-strong: 212 212 216;
-  --neon-primary: 0 0 0;
-  --neon-secondary: 59 130 246;
-  --grid-color: 228 228 231;
-  --bg-spot-1: 249 250 251;
-  --bg-spot-2: 244 244 245;
+  /* Light theme - Poseidon Aegean (pearl + ocean ink + teal/gold accents) */
+  --background: 245 245 245; /* poseidon.pearl */
+  --foreground: 10 22 40; /* poseidon.deep-blue */
+  --surface: 255 250 250; /* poseidon.pearl-warm */
+  --surface-muted: 245 245 245; /* poseidon.pearl */
+  --surface-strong: 255 255 240; /* poseidon.pearl-ivory */
+  --ink: 10 22 40; /* poseidon.deep-blue */
+  --ink-muted: 51 65 85; /* slate-700-ish */
+  --ink-subtle: 100 116 139; /* slate-500-ish */
+  --line: 203 213 225; /* slate-300-ish */
+  --line-strong: 148 163 184; /* slate-400-ish */
+  --neon-primary: 0 139 139; /* poseidon.teal-mid */
+  --neon-secondary: 212 175 55; /* poseidon.gold */
+  --grid-color: 203 213 225;
+  --bg-spot-1: 255 255 240;
+  --bg-spot-2: 245 245 245;
 }
 
 .dark {
-  /* Dark theme - Lovable.dev style minimal black */
-  --background: 0 0 0;
-  --foreground: 250 250 250;
-  --surface: 0 0 0;
-  --surface-muted: 24 24 27;
-  --surface-strong: 39 39 42;
-  --ink: 250 250 250;
-  --ink-muted: 161 161 170;
-  --ink-subtle: 113 113 122;
-  --line: 39 39 42;
-  --line-strong: 63 63 70;
-  --neon-primary: 255 255 255;
-  --neon-secondary: 59 130 246;
-  --grid-color: 39 39 42;
-  --bg-spot-1: 24 24 27;
-  --bg-spot-2: 39 39 42;
+  /* Dark theme - Poseidon Aegean (abyss + ocean surfaces + gold/teal accents) */
+  --background: 5 13 20; /* poseidon.abyss */
+  --foreground: 245 245 245; /* poseidon.pearl */
+  --surface: 13 33 55; /* poseidon.ocean */
+  --surface-muted: 10 22 40; /* poseidon.deep-blue */
+  --surface-strong: 20 42 69; /* slightly brighter ocean */
+  --ink: 245 245 245; /* poseidon.pearl */
+  --ink-muted: 148 163 184; /* slate-400-ish */
+  --ink-subtle: 100 116 139; /* slate-500-ish */
+  --line: 26 52 74; /* ocean line */
+  --line-strong: 38 75 106; /* stronger ocean line */
+  --neon-primary: 212 175 55; /* poseidon.gold */
+  --neon-secondary: 32 178 170; /* poseidon.teal-light */
+  --grid-color: 26 52 74;
+  --bg-spot-1: 10 22 40;
+  --bg-spot-2: 13 33 55;
 }
 
 body {
@@ -75,7 +75,7 @@ body::after {
   }
 
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-gold-500 text-black font-medium shadow-sm transition-colors hover:bg-gold-600 focus:outline-none focus:ring-2 focus:ring-gold-500/40 disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-poseidon-gold text-black font-medium shadow-sm transition-colors hover:bg-poseidon-gold-dark focus:outline-none focus:ring-2 focus:ring-poseidon-gold/40 disabled:opacity-60 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
@@ -93,7 +93,7 @@ body::after {
   }
 
   .glass-input {
-    @apply bg-surface-muted border border-line text-ink placeholder:text-ink-subtle focus:ring-cyber-500;
+    @apply bg-surface-muted border border-line text-ink placeholder:text-ink-subtle focus:ring-poseidon-teal-light;
   }
 
   .text-glow {
@@ -101,11 +101,11 @@ body::after {
   }
 
   .gradient-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-cyber-500 via-accent-400 to-gold-500;
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-poseidon-gold via-poseidon-teal-light to-poseidon-teal-mid;
   }
 
   .gradient-sunset {
-    @apply bg-gradient-to-br from-gold-500 via-cyber-500 to-accent-500;
+    @apply bg-gradient-to-br from-poseidon-gold via-poseidon-teal-light to-poseidon-ocean;
   }
 
   .gradient-vibrant {
@@ -184,7 +184,7 @@ body::after {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-cyber-500;
+  @apply bg-poseidon-teal-light;
 }
 
 /* Refined shadows and transitions */
@@ -196,7 +196,7 @@ body::after {
 input:focus,
 textarea:focus,
 select:focus {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-background;
+  @apply outline-none ring-2 ring-poseidon-teal-light ring-offset-2 ring-offset-background;
 }
 
 /* Smooth animations */
