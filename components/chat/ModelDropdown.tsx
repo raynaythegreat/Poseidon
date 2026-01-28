@@ -22,7 +22,7 @@ export default function ModelDropdown({
   modelInfo,
   models,
   onSelect,
-  darkTheme = true,
+  darkTheme: _darkTheme = true,
   compact = false,
 }: ModelDropdownProps) {
   const [showMenu, setShowMenu] = useState(false);
@@ -39,25 +39,13 @@ export default function ModelDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const buttonBg = darkTheme
-    ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white/90"
-    : "bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-gray-300";
+  const buttonBg =
+    "bg-surface-muted/60 hover:bg-surface-muted/80 text-ink-muted hover:text-ink border border-line/60";
 
-  const menuBg = darkTheme
-    ? "bg-black border-white/[0.08]"
-    : "bg-white dark:bg-black border-gray-200 dark:border-gray-800";
-
-  const itemHover = darkTheme
-    ? "hover:bg-white/[0.03]"
-    : "hover:bg-gray-100 dark:hover:bg-gray-900";
-
-  const itemText = darkTheme
-    ? "text-white/70 hover:text-white/90"
-    : "text-gray-700 dark:text-gray-300";
-
-  const selectedBg = darkTheme
-    ? "bg-white/10 text-white"
-    : "bg-black dark:bg-white text-white dark:text-black";
+  const menuBg = "bg-surface/95 border-line/60 backdrop-blur-xl";
+  const itemHover = "hover:bg-surface-muted/60";
+  const itemText = "text-ink-muted hover:text-ink";
+  const selectedBg = "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25";
 
   return (
     <div className="relative" ref={menuRef}>
@@ -93,7 +81,7 @@ export default function ModelDropdown({
                 }`}
               >
                 <div className="font-medium truncate">{model.name}</div>
-                <div className={`text-xs mt-0.5 ${darkTheme ? "opacity-60" : "opacity-60"}`}>
+                <div className="text-xs mt-0.5 text-ink-subtle">
                   {model.provider}
                 </div>
               </button>

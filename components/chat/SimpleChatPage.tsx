@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
+import { useChatHistory, type ChatMessage } from "@/contexts/ChatHistoryContext";
 import MessageList from "./MessageList";
 import RepoDropdown from "./RepoDropdown";
 import ModelDropdown from "./ModelDropdown";
@@ -22,11 +23,6 @@ interface ModelOption {
   name: string;
   provider: Provider;
   description?: string;
-}
-
-interface ChatMessage {
-  role: "user" | "assistant" | "system";
-  content: string;
 }
 
 export default function SimpleChatPage() {
