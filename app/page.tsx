@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import ChatInterface from "@/components/chat/ChatInterface";
 import HistoryPage from "@/components/chat/HistoryPage";
@@ -13,6 +14,7 @@ import TridentLogo from "@/components/ui/TridentLogo";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 
 export default function MainPage() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +22,14 @@ export default function MainPage() {
 
   // Check if running in Electron app
   const isElectron = typeof window !== 'undefined' && !!(window as any).electronAPI;
+
+  // Handle tab from URL search params
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && ["chat", "repos", "deploy", "history", "settings"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Skip auth for Electron app
