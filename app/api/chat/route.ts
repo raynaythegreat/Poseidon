@@ -17,7 +17,8 @@ const MODEL_CONFIG: Record<
       | "groq"
       | "gemini"
       | "opencodezen"
-      | "fireworks";
+      | "fireworks"
+      | "zai";
     apiModel: string;
   }
 > = {
@@ -121,6 +122,13 @@ const MODEL_CONFIG: Record<
   "gemini-3-flash": { provider: "opencodezen", apiModel: "gemini-3-flash" },
   "gemini-3-pro": { provider: "opencodezen", apiModel: "gemini-3-pro" },
 
+  // Z.ai GLM models (cloud via Z.ai API)
+  "glm-4.7:zai": { provider: "zai", apiModel: "glm-4.7" },
+  "glm-4.7:cloud": { provider: "zai", apiModel: "glm-4.7" },
+  "glm-4.6:zai": { provider: "zai", apiModel: "glm-4.6" },
+  "glm-4-flash:zai": { provider: "zai", apiModel: "glm-4-flash" },
+  "glm-4-flashx:zai": { provider: "zai", apiModel: "glm-4-flashx" },
+
   // Ollama Local Models (Standard)
   "llama3": { provider: "ollama", apiModel: "llama3" },
   "llama3:8b": { provider: "ollama", apiModel: "llama3:8b" },
@@ -151,7 +159,6 @@ const MODEL_CONFIG: Record<
     apiModel: "gemini-3-flash-preview:cloud",
   },
   "gemma3:4b-cloud": { provider: "ollama", apiModel: "gemma3:4b-cloud" },
-  "glm-4.7:cloud": { provider: "ollama", apiModel: "glm-4.7:cloud" },
   "gpt-oss:20b-cloud": { provider: "ollama", apiModel: "gpt-oss:20b-cloud" },
   "gpt-oss:120b-cloud": { provider: "ollama", apiModel: "gpt-oss:120b-cloud" },
   "kimi-k2-thinking:cloud": {
@@ -254,6 +261,7 @@ const MODEL_PROVIDERS = [
   "gemini",
   "opencodezen",
   "fireworks",
+  "zai",
 ] as const;
 type ModelProvider = (typeof MODEL_PROVIDERS)[number];
 
@@ -865,6 +873,7 @@ export async function POST(request: NextRequest) {
       groq: groqApiKey,
       opencodezen: opencodeApiKey,
       fireworks: fireworksApiKey,
+      zai: process.env.ZAI_API_KEY,
     }[provider];
     const providerKey =
       typeof rawProviderKey === "string" ? rawProviderKey.trim() : rawProviderKey;
@@ -881,6 +890,8 @@ export async function POST(request: NextRequest) {
                 ? "Set OPENCODE_API_KEY (or OPENCODE_ZEN_API_KEY / OPENCODEZEN_API_KEY)."
                 : provider === "fireworks"
                   ? "Set FIREWORKS_API_KEY."
+                : provider === "zai"
+                  ? "Set ZAI_API_KEY."
                 : "";
       return new Response(
         JSON.stringify({
@@ -1574,6 +1585,33 @@ export async function POST(request: NextRequest) {
                 } catch (parseError) {
                   // Ignore parsing errors for incomplete chunks
                 }
+              }
+            }
+          } else if (provider === "zai") {
+            // Z.ai GLM API (OpenAI-compatible)
+            const zai = new OpenAI({
+              apiKey: providerKey,
+              baseURL: "https://api.z.ai/api/paas/v4/",
+            });
+
+            const response = await zai.chat.completions.create({
+              model: apiModel,
+              messages: buildOpenAICompatibleMessages(
+                contextPrompt,
+                messages,
+                normalizedAttachments,
+              ),
+              stream: true,
+            });
+
+            for await (const chunk of response) {
+              const content = chunk.choices[0]?.delta?.content;
+              if (content) {
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({ type: "text", content })}\n\n`,
+                  ),
+                );
               }
             }
           } else {
