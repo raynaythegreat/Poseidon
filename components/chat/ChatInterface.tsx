@@ -52,7 +52,7 @@ interface Repository {
   name: string;
   full_name: string;
   description: string | null;
-  default_branch: string;
+  default_branch?: string;
 }
 
 interface RepoContextData {
