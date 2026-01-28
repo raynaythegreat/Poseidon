@@ -62,21 +62,20 @@ export default function ThreeColumnLayout({
   }
 
   return (
-    <div className="flex h-dvh bg-poseidon-deep-blue text-poseidon-pearl relative">
+    <div className="flex h-dvh bg-white dark:bg-black text-gray-900 dark:text-white relative">
       {/* Left Panel - File Tree */}
       {!leftCollapsed && (
-        <div className="w-64 border-r border-poseidon-teal/20 flex-shrink-0 overflow-y-auto bg-poseidon-ocean transition-all duration-300 ease-out">
+        <div className="w-64 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 overflow-y-auto bg-white dark:bg-black transition-all duration-300 ease-out">
           {leftPanel}
         </div>
       )}
       {leftCollapsed && (
-        <div className="w-12 border-r border-poseidon-teal/20 flex-shrink-0 flex flex-col items-center py-4 gap-4 bg-poseidon-ocean transition-all duration-300 ease-out">
+        <div className="w-12 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black transition-all duration-300 ease-out">
           {/* Collapsed state - trident icon */}
-          <svg className="w-6 h-6 text-poseidon-gold/60" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L10 8H14L12 2Z"/>
-            <rect x="10" y="8" width="4" height="8"/>
-            <path d="M8 14Q6 16 4 20H8Q10 16 12 16V14Z"/>
-            <path d="M16 14Q18 16 20 20H16Q14 16 12 16V14Z"/>
+          <svg className="w-6 h-6 text-gray-400 dark:text-gray-600" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 15 L50 65" stroke="currentColor" strokeWidth="6" strokeLinecap="square"/>
+            <path d="M50 30 L28 15 M50 45 L35 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
+            <path d="M50 30 L72 15 M50 45 L65 35" stroke="currentColor" strokeWidth="5" strokeLinecap="square"/>
           </svg>
         </div>
       )}
@@ -84,33 +83,33 @@ export default function ThreeColumnLayout({
       {/* Left Collapse Button */}
       <button
         onClick={toggleLeftPanel}
-        className="w-8 h-8 flex items-center justify-center hover:bg-poseidon-teal/10 border-r border-poseidon-teal/20 flex-shrink-0 transition-all duration-200 group"
+        className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 transition-all duration-200 group"
         title={leftCollapsed ? "Expand (Cmd+[)" : "Collapse (Cmd+[)"}
       >
-        <svg className={`w-4 h-4 text-poseidon-teal/40 group-hover:text-poseidon-gold transition-all duration-200 ${leftCollapsed ? "rotate-0" : "rotate-180"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={`w-4 h-4 text-gray-400 dark:text-gray-600 group-hover:text-gray-900 dark:group-hover:text-white transition-all duration-200 ${leftCollapsed ? "rotate-0" : "rotate-180"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       {/* Center Panel - Chat */}
-      <div className="flex-1 overflow-hidden flex flex-col bg-poseidon-deep-blue min-w-0">
+      <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-black min-w-0">
         {centerPanel}
       </div>
 
       {/* Right Collapse Button */}
       <button
         onClick={toggleRightPanel}
-        className="w-8 h-8 flex items-center justify-center hover:bg-poseidon-teal/10 border-l border-poseidon-teal/20 flex-shrink-0 transition-all duration-200 group"
+        className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-900 border-l border-gray-200 dark:border-gray-800 flex-shrink-0 transition-all duration-200 group"
         title={rightCollapsed ? "Expand (Cmd+])" : "Collapse (Cmd+])"}
       >
-        <svg className={`w-4 h-4 text-poseidon-teal/40 group-hover:text-poseidon-gold transition-all duration-200 ${rightCollapsed ? "rotate-180" : "rotate-0"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={`w-4 h-4 text-gray-400 dark:text-gray-600 group-hover:text-gray-900 dark:group-hover:text-white transition-all duration-200 ${rightCollapsed ? "rotate-180" : "rotate-0"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
       {/* Right Panel - Preview/Inspector */}
       {!rightCollapsed && (
-        <div className="w-80 border-l border-poseidon-teal/20 flex-shrink-0 overflow-y-auto bg-poseidon-ocean transition-all duration-300 ease-out">
+        <div className="w-80 border-l border-gray-200 dark:border-gray-800 flex-shrink-0 overflow-y-auto bg-white dark:bg-black transition-all duration-300 ease-out">
           {rightPanel}
         </div>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ApiUsageDisplay from "./ApiUsageDisplay";
 
 interface ChatHeaderBubbleProps {
   selectedRepo: { id: number; name: string; full_name: string } | null;
@@ -8,6 +9,7 @@ interface ChatHeaderBubbleProps {
   onModelClick: () => void;
   onNewChat: () => void;
   onMenuClick: () => void;
+  currentProvider?: string;
 }
 
 export default function ChatHeaderBubble({
@@ -16,11 +18,12 @@ export default function ChatHeaderBubble({
   onModelClick,
   onNewChat,
   onMenuClick,
+  currentProvider,
 }: ChatHeaderBubbleProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="px-4 py-3 border-b border-white/[0.08] bg-black">
+    <div className="px-4 py-3 border-b border-white/[0.08] bg-black relative z-50">
       <div className="max-w-3xl mx-auto flex items-center justify-between">
         {/* Left: Logo/Brand and Model */}
         <div className="flex items-center gap-3">
@@ -67,6 +70,9 @@ export default function ChatHeaderBubble({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>
+
+          {/* API Usage Display */}
+          {currentProvider && <ApiUsageDisplay currentProvider={currentProvider} compact />}
 
           {/* Menu Button */}
           <div className="relative">

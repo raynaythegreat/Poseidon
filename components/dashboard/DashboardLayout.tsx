@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -69,16 +69,60 @@ const mobileNavItems = [
 ];
 
 export default function DashboardLayout({ children, activeTab, onTabChange }: DashboardLayoutProps) {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Load saved state from localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem("poseidon-sidebar-collapsed");
+    if (savedState !== null) {
+      setIsSidebarCollapsed(savedState === "true");
+    }
+  }, []);
+
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("poseidon-sidebar-collapsed", String(isSidebarCollapsed));
+  }, [isSidebarCollapsed]);
+
   return (
     <div className="flex h-screen supports-[height:100dvh]:h-dvh">
-      {/* Sidebar - Hidden on mobile */}
-      <Sidebar activeTab={activeTab} onTabChange={onTabChange} />
+      {/* Sidebar - Collapsible */}
+      {!isSidebarCollapsed && (
+        <div className="hidden md:flex w-64 flex-shrink-0 transition-all duration-300 ease-in-out">
+          <Sidebar
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          />
+        </div>
+      )}
+
+      {/* Collapse Toggle Button - Show when sidebar is collapsed */}
+      {isSidebarCollapsed && (
+        <button
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className="hidden md:flex flex-col items-center justify-center w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-shrink-0 transition-all duration-200 group"
+          title="Expand Sidebar"
+        >
+          <svg
+            className="w-4 h-4 text-gray-400 dark:text-gray-600 transition-transform duration-200 rotate-180"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {activeTab !== "chat" && <Header activeTab={activeTab} />}
-        <main className="flex-1 overflow-hidden pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
-          {children}
+        <main className="flex-1 overflow-y-auto pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+          <div className="h-full">
+            {children}
+          </div>
         </main>
 
         {/* Mobile Bottom Navigation */}

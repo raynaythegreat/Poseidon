@@ -162,12 +162,7 @@ export default function MainPage() {
     return <HomePage />;
   }
 
-  // For chat tab, render ChatInterface directly without DashboardLayout wrapper
-  // This allows the ThreeColumnLayout to take full viewport
-  if (activeTab === "chat") {
-    return <ChatInterface />;
-  }
-
+  // All other pages (including chat) use DashboardLayout with sidebar
   return (
     <DashboardLayout activeTab={activeTab} onTabChange={setActiveTab}>
       {renderContent()}

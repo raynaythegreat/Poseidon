@@ -70,9 +70,11 @@ const navItems: NavItem[] = [
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, onToggleCollapse }: SidebarProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -106,8 +108,8 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         ))}
       </nav>
 
-      {/* Theme Toggle & Version */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+      {/* Theme Toggle, Collapse & Version */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
         <button
           onClick={toggleTheme}
           className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
@@ -125,7 +127,27 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             {theme === "dark" ? "Light" : "Dark"}
           </span>
         </button>
-        <div className="mt-2 px-4 text-xs text-gray-400 dark:text-gray-600">
+        <button
+          onClick={onToggleCollapse}
+          className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          <span className="flex items-center gap-3">
+            <svg
+              className={`w-5 h-5 transition-transform duration-200 ${
+                isCollapsed ? "rotate-180" : "rotate-0"
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            {isCollapsed ? "Expand" : "Collapse"}
+          </span>
+        </button>
+        <div className="px-4 text-xs text-gray-400 dark:text-gray-600 text-center">
           v1.0.0
         </div>
       </div>
