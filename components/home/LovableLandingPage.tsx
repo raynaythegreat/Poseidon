@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 import TridentLogo from "@/components/ui/TridentLogo";
+import RepoSelector from "@/components/chat/RepoSelector";
+import ModelDropdown from "@/components/chat/ModelDropdown";
 
 const navItems = [
   { label: "Chat", id: "chat" },
@@ -20,6 +22,8 @@ export default function LovableLandingPage() {
   const router = useRouter();
   const { clearCurrentSession } = useChatHistory();
   const { settings } = useUserSettings();
+  const [selectedRepo, setSelectedRepo] = useState<any>(null);
+  const [selectedModel, setSelectedModel] = useState<any>(null);
 
   const handleSubmit = () => {
     if (input.trim()) {
@@ -108,29 +112,24 @@ export default function LovableLandingPage() {
               {/* Bottom Toolbar */}
               <div className="flex items-center justify-between px-4 pb-4">
                 <div className="flex items-center gap-2">
-                  {/* Repo Selector - Opens Repos page */}
-                  <button
-                    onClick={() => handleNavClick("repos")}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                    title="Select a GitHub repository"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
-                    <span>Select Repo</span>
-                  </button>
+                  {/* Repo Selector - Dropdown to select/create repository */}
+                  <RepoSelector
+                    selectedRepo={selectedRepo}
+                    onSelect={setSelectedRepo}
+                  />
 
-                  {/* Model Selector - Opens Settings for model configuration */}
-                  <button
-                    onClick={() => handleNavClick("settings")}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                    title="Configure AI model"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span>Models</span>
-                  </button>
+                  {/* Model Selector - Shows dropdown of available models */}
+                  <div className="flex items-center gap-2">
+                    <ModelDropdown
+                      modelInfo={selectedModel || { name: "Claude 3.5 Sonnet", provider: "Claude" }}
+                      models={[
+                        { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around" },
+                        { id: "gpt-4", name: "GPT-4", provider: "OpenAI", description: "Most capable" },
+                        { id: "llama-3", name: "Llama 3", provider: "Ollama", description: "Local option" },
+                      ]}
+                      onSelect={setSelectedModel}
+                    />
+                  </div>
 
                   {/* Brainstorm */}
                   <button
