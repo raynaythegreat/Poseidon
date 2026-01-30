@@ -466,28 +466,6 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       ),
     },
     {
-      name: "Nanobanana",
-      description: "Image generation",
-      configured: status?.nanobanana?.configured,
-      category: "ai",
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 6a5 5 0 019-1l2 2a5 5 0 01-7 7l-4-4a3 3 0 010-4z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Ideogram",
-      description: "Image generation",
-      configured: status?.ideogram?.configured,
-      category: "ai",
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4 4h16v3H4V4zm0 6h16v3H4v-3zm0 6h16v3H4v-3z" />
-        </svg>
-      ),
-    },
-    {
       name: "Ollama",
       description: "Local or hosted Ollama models",
       configured: status?.ollama?.configured,
