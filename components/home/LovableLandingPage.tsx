@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
@@ -24,6 +24,33 @@ export default function LovableLandingPage() {
   const { settings } = useUserSettings();
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
   const [selectedModel, setSelectedModel] = useState<any>(null);
+  const [models, setModels] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchModels();
+  }, []);
+
+  const fetchModels = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/models");
+      const data = await response.json();
+      if (data.models) {
+        const modelList: any[] = [];
+        Object.entries(data.models).forEach(([provider, providerModels]: [string, any[]]) => {
+          providerModels.forEach((model: any) => {
+            modelList.push({ ...model, provider });
+          });
+        });
+        setModels(modelList);
+      }
+    } catch (error) {
+      console.error("Failed to fetch models:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = () => {
     if (input.trim()) {
@@ -122,10 +149,8 @@ export default function LovableLandingPage() {
                   <div className="flex items-center gap-2">
                     <ModelDropdown
                       modelInfo={selectedModel || { name: "Claude 3.5 Sonnet", provider: "Claude" }}
-                      models={[
+                      models={models.length > 0 ? models : [
                         { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around" },
-                        { id: "gpt-4", name: "GPT-4", provider: "OpenAI", description: "Most capable" },
-                        { id: "llama-3", name: "Llama 3", provider: "Ollama", description: "Local option" },
                       ]}
                       onSelect={setSelectedModel}
                     />
