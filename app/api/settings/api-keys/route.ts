@@ -101,10 +101,30 @@ export async function POST(request: NextRequest) {
     env[envKey] = apiKey.trim();
     writeEnvFile(env);
 
+    // Restart dev server for Claude, OpenAI, Groq if they were just configured
+    const providersNeedingRestart = ["Claude API", "OpenAI API", "Groq"];
+    let restarted = false;
+
+    if (providersNeedingRestart.includes(provider)) {
+      try {
+        // Use poseidon.sh restart command
+        const { spawn } = await import("child_process");
+        spawn("bash", ["./poseidon.sh", "restart"], {
+          cwd: process.cwd(),
+          stdio: "ignore",
+          detached: false,
+        });
+        restarted = true;
+      } catch (error) {
+        console.error("Failed to restart dev server:", error);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       key: provider,
       envKey,
+      restarted,
     });
   } catch (error) {
     return NextResponse.json(
