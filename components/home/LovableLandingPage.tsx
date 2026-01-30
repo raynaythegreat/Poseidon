@@ -141,21 +141,21 @@ export default function LovableLandingPage() {
               <div className="flex items-center justify-between px-4 pb-4">
                 <div className="flex items-center gap-2">
                   {/* Repo Selector - Dropdown to select/create repository */}
-                  <RepoSelector
-                    selectedRepo={selectedRepo}
-                    onSelect={setSelectedRepo}
-                  />
-
-                  {/* Model Selector - Shows dropdown of available models */}
-                  <div className="flex items-center gap-2">
-                    <ModelDropdown
-                      modelInfo={selectedModel || { name: "Claude 3.5 Sonnet", provider: "Claude" }}
-                      models={models.length > 0 ? models : [
-                        { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around" },
-                      ]}
-                      onSelect={setSelectedModel}
+                  <div className="relative">
+                    <RepoSelector
+                      selectedRepo={selectedRepo}
+                      onSelect={setSelectedRepo}
                     />
                   </div>
+
+                  {/* Model Selector - Shows dropdown of available models */}
+                  <ModelDropdown
+                    modelInfo={selectedModel || { name: "Claude 3.5 Sonnet", provider: "Claude" }}
+                    models={models.length > 0 ? models : [
+                      { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around" },
+                    ]}
+                    onSelect={setSelectedModel}
+                  />
 
                   {/* Brainstorm */}
                   <button
