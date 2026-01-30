@@ -38,8 +38,9 @@ export default function LovableLandingPage() {
       const data = await response.json();
       if (data.models) {
         const modelList: any[] = [];
-        Object.entries(data.models).forEach(([provider, providerModels]: [string, any[]]) => {
-          providerModels.forEach((model: any) => {
+        Object.entries(data.models).forEach(([provider, providerModels]: [string, unknown]) => {
+          const models = providerModels as any[];
+          models.forEach((model: any) => {
             modelList.push({ ...model, provider });
           });
         });

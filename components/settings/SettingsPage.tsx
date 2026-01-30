@@ -8,6 +8,42 @@ import ProviderCard from "@/components/ui/ProviderCard";
 import RotatingCardsButton from "@/components/ui/RotatingCardsButton";
 import RotatingCardsToggle from "@/components/ui/RotatingCardsToggle";
 import CustomProviderSettings from "./CustomProviderSettings";
+import ApiKeyModal from "./ApiKeyModal";
+import { CustomProviderConfig } from "./CustomProviderSettings";
+
+interface Status {
+  runtime?: {
+    onVercel: boolean;
+    onRender?: boolean;
+    vercelEnv: string | null;
+    vercelUrl: string | null;
+    vercelGitRef: string | null;
+  };
+  claude: { configured: boolean };
+  openai: { configured: boolean };
+  gemini: { configured: boolean };
+  groq: {
+    configured: boolean;
+    source?: string | null;
+    warning?: string | null;
+  };
+  openrouter: { configured: boolean };
+  fireworks?: { configured: boolean };
+  nanobanana?: { configured: boolean };
+  ideogram?: { configured: boolean };
+  ollama: {
+    configured: boolean;
+    reachable: boolean | null;
+    error: string | null;
+    source?: string | null;
+    url?: string | null;
+    warning?: string | null;
+  };
+  github: { configured: boolean; username: string | null };
+  vercel: { configured: boolean };
+  render?: { configured: boolean };
+  customProviders?: CustomProviderConfig[];
+}
 
 interface SettingsPageProps {
   onLogout: () => void;
@@ -79,6 +115,11 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
     url?: string | null;
     deploymentUrl?: string | null;
   } | null>(null);
+
+  // API Key Modal state
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [configuringProvider, setConfiguringProvider] = useState<{ name: string; description: string } | null>(null);
+  const [customProviders, setCustomProviders] = useState<CustomProviderConfig[]>([]);
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -298,12 +339,45 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
     }
   }, []);
 
+  const handleSaveApiKey = async (apiKey: string) => {
+    // API key is saved via the modal's handleSave
+    console.log(`API key saved for ${configuringProvider?.name}`);
+    // Refresh status to update configurations
+    await fetchStatus();
+  };
+
+  const handleConfigureProvider = (name: string, description: string) => {
+    setConfiguringProvider({ name, description });
+    setShowApiKeyModal(true);
+  };
+
+  // Load custom providers on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("poseidon_custom_providers_list");
+      if (stored) {
+        const configs = JSON.parse(stored) as CustomProviderConfig[];
+        setCustomProviders(configs.filter(c => c.id && c.enabled));
+      }
+    } catch (e) {
+      console.error("Failed to load custom providers", e);
+    }
+  }, []);
+
+  // Add custom provider to status when it changes
+  useEffect(() => {
+    if (status) {
+      status.customProviders = customProviders;
+    }
+  }, [customProviders, status]);
 
   useEffect(() => {
     fetchStatus();
     const interval = setInterval(fetchStatus, 15000);
     return () => clearInterval(interval);
   }, [fetchStatus]);
+
+  type ProviderCategory = "deployment" | "ai" | "custom";
 
   type StatusItem = {
     name: string;
@@ -313,6 +387,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
     error?: string | null;
     warning?: string | null;
     icon: JSX.Element;
+    category?: ProviderCategory;
   };
 
   const statusItems: StatusItem[] = [
@@ -320,6 +395,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Claude API",
       description: "Anthropic Claude for AI assistance",
       configured: status?.claude?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
@@ -330,6 +406,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "OpenAI API",
       description: "OpenAI GPT models",
       configured: status?.openai?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729z" />
@@ -340,6 +417,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Google Gemini",
       description: "Google Gemini models",
       configured: status?.gemini?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2L2 19.7778H22L12 2ZM12 5.68889L17.5111 16H6.48889L12 5.68889Z" />
@@ -350,6 +428,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Groq",
       description: "Groq (free-tier rate limits apply)",
       configured: status?.groq?.configured,
+      category: "ai",
       warning: status?.groq?.warning || null,
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -361,6 +440,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "OpenRouter",
       description: "Free & paid AI models",
       configured: status?.openrouter?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path
@@ -378,6 +458,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Fireworks",
       description: "Image generation",
       configured: status?.fireworks?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2l1.6 4.9 5.1.1-4.1 3 1.6 4.9-4.2-3-4.2 3 1.6-4.9-4.1-3 5.1-.1L12 2z" />
@@ -388,6 +469,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Nanobanana",
       description: "Image generation",
       configured: status?.nanobanana?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M7 6a5 5 0 019-1l2 2a5 5 0 01-7 7l-4-4a3 3 0 010-4z" />
@@ -398,6 +480,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Ideogram",
       description: "Image generation",
       configured: status?.ideogram?.configured,
+      category: "ai",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M4 4h16v3H4V4zm0 6h16v3H4v-3zm0 6h16v3H4v-3z" />
@@ -408,6 +491,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Ollama",
       description: "Local or hosted Ollama models",
       configured: status?.ollama?.configured,
+      category: "ai",
       reachable: status?.ollama?.reachable,
       error: status?.ollama?.error,
       warning: status?.ollama?.warning || null,
@@ -423,6 +507,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
         ? `@${status.github.username}`
         : "Repository management",
       configured: status?.github?.configured,
+      category: "deployment",
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path
@@ -437,6 +522,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Vercel",
       description: "Deployment platform",
       configured: status?.vercel?.configured,
+      category: "deployment",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 76 65" fill="currentColor">
           <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" />
@@ -447,12 +533,25 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       name: "Render",
       description: "Deployment platform",
       configured: status?.render?.configured,
+      category: "deployment",
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z" />
         </svg>
       ),
     },
+    // Custom providers
+    ...customProviders.map((provider) => ({
+      name: provider.name,
+      description: `${provider.baseUrl} ${provider.apiKey ? '✓ Configured' : ''}`,
+      configured: provider.enabled && provider.apiKey ? true : false,
+      category: "custom" as const,
+      icon: (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    })),
   ];
 
   const runtimeLabel = (() => {
@@ -670,6 +769,122 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
     );
   })();
 
+  // Group providers by category
+  const deploymentProviders = statusItems.filter(item => item.category === "deployment");
+  const aiProviders = statusItems.filter(item => item.category === "ai");
+  const customProviders_items = statusItems.filter(item => item.category === "custom");
+
+  // Helper function to render provider card
+  const renderProviderCard = (item: typeof statusItems[0]) => {
+    const showOffline =
+      item.name === "Ollama" &&
+      item.configured &&
+      item.reachable === false;
+    const showChecking =
+      item.name === "Ollama" &&
+      item.configured &&
+      item.reachable === null;
+
+    const providerStatus = showOffline
+      ? ("error" as const)
+      : showChecking
+        ? ("loading" as const)
+        : item.configured
+          ? ("connected" as const)
+          : ("disconnected" as const);
+
+    let errorMessage: string | undefined;
+    let warningMessage: string | undefined;
+
+    if (showOffline && item.error) {
+      errorMessage = item.error;
+    } else if (item.warning) {
+      warningMessage = item.warning;
+    }
+
+    return (
+      <ProviderCard
+        key={item.name}
+        name={item.name}
+        description={item.description}
+        icon={item.icon}
+        status={providerStatus}
+        error={errorMessage}
+        warning={warningMessage}
+        action={
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            {item.name === "Groq" &&
+              status?.runtime?.onVercel === false &&
+              status?.runtime?.onRender !== true && (
+                <RotatingCardsButton
+                  onClick={syncGroqToVercel}
+                  disabled={
+                    groqSyncing ||
+                    !status?.vercel?.configured ||
+                    !status?.github?.configured
+                  }
+                  className="px-3 py-1 rounded-full text-xs font-medium"
+                  variant="secondary"
+                >
+                  {groqSyncing ? "Syncing..." : "Sync to Vercel"}
+                </RotatingCardsButton>
+              )}
+            {item.name === "Ollama" && showOffline && (
+              <button
+                type="button"
+                onClick={retryFetchOllama}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-500/20 transition-colors"
+              >
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+                Retry
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => handleConfigureProvider(item.name, item.description)}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 transition-colors"
+              title="Configure API Key"
+            >
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Configure
+            </button>
+          </div>
+        }
+      />
+    );
+  };
+
+
+
   return (
     <div className="h-full overflow-y-auto p-4 sm:p-6">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -690,7 +905,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
           {runtimeLabel && (
             <p className="text-sm text-ink-muted mb-3">{runtimeLabel}</p>
           )}
-          <div className="space-y-3">
+          <div className="space-y-6">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <svg
@@ -714,162 +929,37 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                 </svg>
               </div>
             ) : (
-              statusItems.map((item) => {
-                const showOffline =
-                  item.name === "Ollama" &&
-                  item.configured &&
-                  item.reachable === false;
-                const showChecking =
-                  item.name === "Ollama" &&
-                  item.configured &&
-                  item.reachable === null;
+              <>
+                {/* Deployment */}
+                {deploymentProviders.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-ink mb-3 uppercase tracking-wide">Deployment</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {deploymentProviders.map(renderProviderCard)}
+                    </div>
+                  </div>
+                )}
 
-                const providerStatus = showChecking
-                  ? ("loading" as const)
-                  : showOffline
-                    ? ("error" as const)
-                    : item.configured
-                      ? ("connected" as const)
-                      : ("disconnected" as const);
+                {/* AI Chat & Coding */}
+                {aiProviders.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-ink mb-3 uppercase tracking-wide">AI Chat & Coding</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {aiProviders.map(renderProviderCard)}
+                    </div>
+                  </div>
+                )}
 
-                // Build error message
-                let errorMessage: string | undefined;
-                let warningMessage: string | undefined;
-
-                if (showOffline && item.error) {
-                  errorMessage = item.error;
-                } else if (item.warning) {
-                  warningMessage = item.warning;
-                }
-
-                return (
-                  <ProviderCard
-                    key={item.name}
-                    name={item.name}
-                    description={item.description}
-                    icon={item.icon}
-                    status={providerStatus}
-                    error={errorMessage}
-                    warning={warningMessage}
-                    action={
-                      <div className="flex items-center gap-2 flex-wrap justify-end">
-                        {item.name === "Groq" &&
-                          status?.runtime?.onVercel === false &&
-                          status?.runtime?.onRender !== true && (
-                            <RotatingCardsButton
-                              onClick={syncGroqToVercel}
-                              disabled={
-                                groqSyncing ||
-                                !status?.vercel?.configured ||
-                                !status?.github?.configured
-                              }
-                              className="gap-1.5 px-3 py-1 rounded-full text-xs"
-                              variant="gold"
-                            >
-                              {groqSyncing ? "Syncing…" : "Sync to Vercel"}
-                            </RotatingCardsButton>
-                          )}
-                        {item.name === "Render" &&
-                          status?.runtime?.onVercel === false &&
-                          status?.runtime?.onRender !== true && (
-                            <RotatingCardsButton
-                              onClick={syncRenderToVercel}
-                              disabled={
-                                renderSyncing ||
-                                !status?.vercel?.configured ||
-                                !status?.github?.configured
-                              }
-                              className="gap-1.5 px-3 py-1 rounded-full text-xs"
-                              variant="gold"
-                            >
-                              {renderSyncing ? "Syncing…" : "Sync to Vercel"}
-                            </RotatingCardsButton>
-                          )}
-                        {item.name === "Ollama" &&
-                          status?.runtime?.onVercel === false &&
-                          status?.runtime?.onRender !== true && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={startNgrokTunnel}
-                                disabled={ollamaNgrokStarting}
-                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
-                                {ollamaNgrokStarting
-                                  ? "Starting ngrok…"
-                                  : "Start ngrok"}
-                              </button>
-                              <RotatingCardsButton
-                                onClick={syncNgrokToVercel}
-                                disabled={
-                                  ollamaNgrokSyncing ||
-                                  !status?.vercel?.configured
-                                }
-                                className="gap-1.5 px-3 py-1 rounded-full text-xs"
-                                variant="gold"
-                              >
-                                {ollamaNgrokSyncing
-                                  ? "Syncing…"
-                                  : "Sync to Vercel"}
-                              </RotatingCardsButton>
-                            </>
-                          )}
-                        {item.name === "Ollama" && item.configured && (
-                          <button
-                            type="button"
-                            onClick={retryFetchOllama}
-                            disabled={ollamaRetrying || showChecking}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-muted/70 text-ink hover:bg-surface-muted/80 dark:hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            title="Retry fetching Ollama models"
-                          >
-                            {ollamaRetrying ? (
-                              <>
-                                <svg
-                                  className="animate-spin h-3.5 w-3.5"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                    fill="none"
-                                  />
-                                  <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                  />
-                                </svg>
-                                Retrying…
-                              </>
-                            ) : (
-                              <>
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                                  />
-                                </svg>
-                                Retry
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    }
-                  />
-                );
-              })
+                {/* Custom Endpoints */}
+                {customProviders_items.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-ink mb-3 uppercase tracking-wide">Custom Endpoints</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {customProviders_items.map(renderProviderCard)}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -1165,6 +1255,16 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
             </div>
           </div>
         </section>
+
+        {/* API Key Modal */}
+        {showApiKeyModal && configuringProvider && (
+          <ApiKeyModal
+            provider={configuringProvider.name}
+            description={configuringProvider.description}
+            onSave={handleSaveApiKey}
+            onClose={() => setShowApiKeyModal(false)}
+          />
+        )}
       </div>
     </div>
   );
