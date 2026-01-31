@@ -47,27 +47,38 @@ export default function ModelDropdown({
   const itemText = "text-ink-muted hover:text-ink";
   const selectedBg = "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25";
 
+  // Sort models by provider name alphabetically
+  const sortedModels = [...models].sort((a, b) => {
+    const providerA = a.provider.toLowerCase();
+    const providerB = b.provider.toLowerCase();
+    if (providerA !== providerB) {
+      return providerA.localeCompare(providerB);
+    }
+    // If same provider, sort by model name
+    return a.name.localeCompare(b.name);
+  });
+
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className={`flex items-center gap-2 ${compact ? "px-2 py-1" : "px-3 py-1.5"} rounded-lg ${buttonBg} transition-colors ${compact ? "text-xs" : "text-sm"}`}
+        className={`flex items-center ${compact ? "gap-1" : "gap-2"} ${compact ? "px-2 py-1" : "px-3 py-1.5"} rounded-lg ${buttonBg} transition-colors ${compact ? "text-xs" : "text-sm"}`}
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
         {!compact && (
           <span className="truncate max-w-[120px]">{modelInfo.name}</span>
         )}
-        <svg className={`w-4 h-4 transition-transform ${showMenu ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={`w-3.5 h-3.5 transition-transform ${showMenu ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {showMenu && (
-        <div className={`absolute top-full right-0 mt-2 w-64 rounded-xl border shadow-xl z-50 max-h-[300px] overflow-y-auto ${menuBg}`}>
+        <div className={`absolute bottom-full right-0 mb-2 w-64 rounded-xl border shadow-xl z-[9999] max-h-[300px] overflow-y-auto ${menuBg}`}>
           <div className="p-2">
-            {models.map((model) => (
+            {sortedModels.map((model) => (
               <button
                 key={model.id}
                 onClick={() => {

@@ -69,7 +69,7 @@ export default function RepoDropdown({
       </button>
 
       {showMenu && (
-        <div className={`absolute top-full left-0 mt-2 w-56 rounded-xl border shadow-xl z-50 max-h-[300px] overflow-y-auto ${menuBg}`}>
+        <div className={`absolute bottom-full left-0 mb-2 w-56 rounded-xl border shadow-xl z-[9999] max-h-[300px] overflow-y-auto ${menuBg}`}>
           <div className="p-2">
             {repos.map((repo) => (
               <button

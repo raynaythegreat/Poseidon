@@ -1512,6 +1512,31 @@ export default function ChatInterface() {
   // Load custom provider config
   const loadCustomModels = useCallback(() => {
     try {
+      // First try loading from the new multi-provider format
+      const storedList = localStorage.getItem("poseidon_custom_providers_list");
+      if (storedList) {
+        const providers = JSON.parse(storedList) as any[];
+        const options: ModelOption[] = [];
+
+        providers.forEach((provider) => {
+          if (provider.enabled && Array.isArray(provider.models)) {
+            provider.models.forEach((m: any) => {
+              options.push({
+                id: `custom:${provider.id}:${m.id}`,
+                name: m.name || m.id,
+                description: provider.name,
+                provider: provider.name,
+                customConfig: provider,
+              });
+            });
+          }
+        });
+
+        setCustomModels(options);
+        return;
+      }
+
+      // Fall back to old single provider format for backwards compatibility
       const stored = localStorage.getItem("poseidon_custom_provider");
       if (stored) {
         const config = JSON.parse(stored) as CustomProviderConfig;

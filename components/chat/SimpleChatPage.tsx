@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
 import { useChatHistory, type ChatMessage } from "@/contexts/ChatHistoryContext";
 import MessageList from "./MessageList";
 import RepoDropdown from "./RepoDropdown";
 import ModelDropdown from "./ModelDropdown";
+import SkillAutocomplete from "./SkillAutocomplete";
+import type { Skill } from "@/lib/skills/types";
 import type { Provider } from "@/contexts/ApiUsageContext";
 
 interface Repository {
@@ -31,15 +33,88 @@ export default function SimpleChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [repos, setRepos] = useState<Repository[]>([]);
-  const [models] = useState<ModelOption[]>([]);
+  const [models, setModels] = useState<ModelOption[]>([]);
   const [modelInfo, setModelInfo] = useState<{ name: string; provider: Provider }>({ name: "Claude", provider: "claude" });
+  const [showSkillAutocomplete, setShowSkillAutocomplete] = useState(false);
+  const [skillQuery, setSkillQuery] = useState("");
+  const [autocompletePosition, setAutocompletePosition] = useState({ top: 0, left: 0 });
+  const [allSkills, setAllSkills] = useState<Skill[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { settings } = useUserSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Handle auto-start brainstorm/plan mode from URL params
+  useEffect(() => {
+    const brainstorm = searchParams.get("brainstorm");
+    const plan = searchParams.get("plan");
+
+    if (brainstorm === "true" && messages.length === 0) {
+      const brainstormMsg: ChatMessage = {
+        role: "user",
+        content: "Start brainstorming mode. Ask me questions to understand what I want to build.",
+      };
+      setMessages([brainstormMsg]);
+      // Clean URL
+      router.replace("/", { scroll: false });
+    } else if (plan === "true" && messages.length === 0) {
+      const planMsg: ChatMessage = {
+        role: "user",
+        content: "Start planning mode. Help me create an implementation plan for what I want to build.",
+      };
+      setMessages([planMsg]);
+      // Clean URL
+      router.replace("/", { scroll: false });
+    }
+  }, []); // Run only on mount
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const getContextReason = (): string | undefined => {
+    if (messages.length === 0) return "Starting a new conversation";
+    if (selectedRepo) return "Working in a repository";
+    return undefined;
+  };
+
+  const handleSkillSelect = (skill: Skill) => {
+    const currentValue = input;
+    const cursorPos = textareaRef.current?.selectionStart || 0;
+    const beforeCursor = currentValue.substring(0, cursorPos);
+    const afterCursor = currentValue.substring(cursorPos);
+
+    const newValue = beforeCursor.replace(/\/\w*$/, `/${skill.metadata.name} `) + afterCursor;
+    setInput(newValue);
+    setShowSkillAutocomplete(false);
+
+    setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 0);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setInput(value);
+
+    const cursorPos = e.target.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPos);
+    const lastWordMatch = textBeforeCursor.match(/\/(\w*)$/);
+
+    if (lastWordMatch) {
+      setSkillQuery(lastWordMatch[1]);
+      setShowSkillAutocomplete(true);
+
+      const rect = e.target.getBoundingClientRect();
+      setAutocompletePosition({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX,
+      });
+    } else {
+      setShowSkillAutocomplete(false);
+    }
   };
 
   useEffect(() => {
@@ -62,12 +137,112 @@ export default function SimpleChatPage() {
     loadRepos();
   }, []);
 
-  const handleSubmit = async () => {
-    if (!input.trim() || isLoading) return;
+  // Load skills on mount
+  useEffect(() => {
+    const loadSkills = async () => {
+      try {
+        const response = await fetch("/api/skills");
+        if (response.ok) {
+          const data = await response.json();
+          setAllSkills(data.skills || []);
+        }
+      } catch (error) {
+        console.error("Failed to load skills:", error);
+      }
+    };
+    loadSkills();
+  }, []);
 
-    const userMessage: ChatMessage = { role: "user", content: input };
+  // Handle auto-start brainstorm/plan mode from URL params
+  useEffect(() => {
+    const brainstorm = searchParams.get("brainstorm");
+    const plan = searchParams.get("plan");
+
+    if (brainstorm === "true" && messages.length === 0) {
+      const brainstormMsg: ChatMessage = {
+        role: "user",
+        content: "Start brainstorming mode. Ask me questions to understand what I want to build.",
+      };
+      setMessages([brainstormMsg]);
+      // Clean URL
+      router.replace("/", { scroll: false });
+    } else if (plan === "true" && messages.length === 0) {
+      const planMsg: ChatMessage = {
+        role: "user",
+        content: "Start planning mode. Help me create an implementation plan for what I want to build.",
+      };
+      setMessages([planMsg]);
+      // Clean URL
+      router.replace("/", { scroll: false });
+    }
+  }, []); // Run only on mount
+
+  // Auto-submit initial message from URL params
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].role === "user" && !isLoading) {
+      const msg = messages[0];
+      // Check if this is an auto-start message
+      if (msg.content.includes("Start brainstorming mode") || msg.content.includes("Start planning mode")) {
+        handleSubmit(msg);
+      }
+    }
+  }, [messages.length]);
+
+  // Load models on mount
+  useEffect(() => {
+    const loadModels = async () => {
+      try {
+        const response = await fetch("/api/models");
+        const data = await response.json();
+        if (data.models) {
+          const modelList: ModelOption[] = [];
+          // Get providers in alphabetical order
+          const sortedProviders = Object.keys(data.models).sort();
+          sortedProviders.forEach((provider) => {
+            const providerModels = data.models[provider] as any[];
+            providerModels.forEach((model: any) => {
+              modelList.push({ ...model, provider });
+            });
+          });
+
+          // Load custom providers from localStorage
+          try {
+            const customProvidersStr = localStorage.getItem("poseidon_custom_providers_list");
+            if (customProvidersStr) {
+              const customProviders = JSON.parse(customProvidersStr);
+              customProviders.forEach((provider: any) => {
+                if (provider.enabled && provider.models && Array.isArray(provider.models)) {
+                  provider.models.forEach((model: any) => {
+                    modelList.push({
+                      id: model.id,
+                      name: model.name || model.id,
+                      provider: provider.name,
+                      description: "Custom provider",
+                    });
+                  });
+                }
+              });
+            }
+          } catch (e) {
+            console.error("Failed to load custom providers:", e);
+          }
+
+          setModels(modelList);
+        }
+      } catch (error) {
+        console.error("Failed to load models:", error);
+      }
+    };
+    loadModels();
+  }, []);
+
+  const handleSubmit = async (messageOverride?: ChatMessage) => {
+    const messageToSend = messageOverride || { role: "user" as const, content: input };
+    if (!messageToSend.content.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = messageToSend;
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    if (!messageOverride) setInput("");
     setIsLoading(true);
 
     try {
@@ -147,10 +322,11 @@ export default function SimpleChatPage() {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="relative bg-surface/90 rounded-2xl border border-line/60 overflow-hidden shadow-sm backdrop-blur-xl">
+          <div className="relative bg-surface/90 rounded-2xl border border-line/60 shadow-sm backdrop-blur-xl">
             <textarea
+              ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -184,6 +360,44 @@ export default function SimpleChatPage() {
                   darkTheme
                   compact
                 />
+
+                {/* Brainstorm */}
+                <button
+                  onClick={() => {
+                    const brainstormMsg: ChatMessage = {
+                      role: "user",
+                      content: "Start brainstorming mode. Ask me questions to understand what I want to build.",
+                    };
+                    setMessages((prev) => [...prev, brainstormMsg]);
+                    // Submit on next tick to ensure state is updated
+                    Promise.resolve().then(() => handleSubmit(brainstormMsg));
+                  }}
+                  className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
+                  title="Brainstorm ideas"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </button>
+
+                {/* Write Plan */}
+                <button
+                  onClick={() => {
+                    const planMsg: ChatMessage = {
+                      role: "user",
+                      content: "Start planning mode. Help me create an implementation plan for what I want to build.",
+                    };
+                    setMessages((prev) => [...prev, planMsg]);
+                    // Submit on next tick to ensure state is updated
+                    Promise.resolve().then(() => handleSubmit(planMsg));
+                  }}
+                  className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
+                  title="Create a plan"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </button>
               </div>
 
               {/* Submit Button */}
@@ -200,7 +414,7 @@ export default function SimpleChatPage() {
                 </button>
               ) : (
                 <button
-                  onClick={handleSubmit}
+                  onClick={() => handleSubmit()}
                   disabled={!input.trim()}
                   className="flex items-center gap-2 px-6 py-3 rounded-lg gradient-sunset text-white font-medium transition-opacity hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed ring-1 ring-white/20 dark:ring-white/10"
                 >
@@ -212,6 +426,17 @@ export default function SimpleChatPage() {
               )}
             </div>
           </div>
+
+          {showSkillAutocomplete && (
+            <SkillAutocomplete
+              visible={showSkillAutocomplete}
+              query={skillQuery}
+              skills={allSkills}
+              onSelect={handleSkillSelect}
+              position={autocompletePosition}
+              contextReason={getContextReason()}
+            />
+          )}
         </motion.div>
       </div>
     </div>

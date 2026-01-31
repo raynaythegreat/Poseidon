@@ -94,7 +94,7 @@ export default function LovableChatHeader({
             </button>
 
             {showRepoMenu && (
-              <div className="absolute top-full left-0 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black shadow-xl z-50 max-h-[300px] overflow-y-auto">
+              <div className="absolute bottom-full left-0 mb-2 w-56 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black shadow-xl z-[9999] max-h-[300px] overflow-y-auto">
                 <div className="p-2">
                   {repos.map((repo) => (
                     <button
@@ -158,7 +158,7 @@ export default function LovableChatHeader({
             </button>
 
             {showModelMenu && (
-              <div className="absolute top-full right-0 mt-2 w-64 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black shadow-xl z-50 max-h-[300px] overflow-y-auto">
+              <div className="absolute bottom-full right-0 mb-2 w-64 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black shadow-xl z-[9999] max-h-[300px] overflow-y-auto">
                 <div className="p-2">
                   {models.map((model) => (
                     <button
