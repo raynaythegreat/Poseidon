@@ -80,41 +80,10 @@ export default function ProviderCard({
         relative group
         card rounded-none p-4
         overflow-hidden
-        ${onClick && !action ? "cursor-pointer hover:shadow-lg transition-shadow" : ""}
+        ${onClick && !action ? "cursor-pointer" : ""}
         ${className}
       `}
     >
-      {/* Rotating cards background effect */}
-      <div
-        className={`
-          absolute inset-0 pointer-events-none opacity-0
-          group-hover:opacity-100 transition-opacity duration-700
-          ${status === "connected" ? "opacity-20" : ""}
-        `}
-        style={{
-          animation: "rotating 12s linear infinite",
-        }}
-      >
-        <div
-          className="relative w-full h-full"
-          style={{
-            perspective: "1000px",
-            transformStyle: "preserve-3d" as const,
-          }}
-        >
-          {cards.map((color, index) => (
-            <div
-              key={index}
-              className="absolute inset-0 rounded-none"
-              style={{
-                background: `radial-gradient(circle at 30% 50%, ${color.from} 0%, ${color.to} 60%, transparent 100%)`,
-                transform: `rotateY(${(360 / cards.length) * index}deg) translateZ(30px)`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Content */}
       <div className="relative z-10">
         {/* Provider Info */}
@@ -189,8 +158,6 @@ export default function ProviderCard({
         </div>
       </div>
 
-      {/* Hover glow effect */}
-      <div className="absolute inset-0 rounded-none bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   );
 }

@@ -52,7 +52,7 @@ export default function RotatingCardsToggle({
           relative w-14 h-8 rounded-full
           transition-all duration-300 ease-in-out
           ${checked ? "bg-gradient-to-r from-cyan-400 to-purple-500" : "bg-surface-muted"}
-          ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:shadow-lg"}
+          ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
         `}
         aria-checked={checked}
         role="switch"
