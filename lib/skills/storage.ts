@@ -1,21 +1,33 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import * as os from "node:os";
 import { parse } from "yaml";
 import type { Skill } from "./types";
 
-const SKILLS_DIR = path.join(process.env.HOME || "", ".poseidon", "skills");
+const SKILLS_DIR = path.join(os.homedir(), ".poseidon", "skills");
 
 export async function ensureSkillsDir(): Promise<void> {
   await fs.mkdir(SKILLS_DIR, { recursive: true });
 }
 
 export async function loadSkill(name: string): Promise<Skill | null> {
+  // Validate skill name to prevent path traversal attacks
+  if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+    return null;
+  }
+
   const skillPath = path.join(SKILLS_DIR, name, "skill.md");
   try {
     const content = await fs.readFile(skillPath, "utf-8");
     const frontmatterMatch = content.match(/^---\n(.*?)\n---/s);
     if (!frontmatterMatch) return null;
+
     const metadata = parse(frontmatterMatch[1]);
+    // Validate required metadata fields
+    if (!metadata.name || !metadata.description) {
+      return null;
+    }
+
     const prompt = content.replace(/^---\n.*?\n---\n/s, "");
     const handlerPath = path.join(SKILLS_DIR, name, "handler.ts");
     let handlerExists = false;

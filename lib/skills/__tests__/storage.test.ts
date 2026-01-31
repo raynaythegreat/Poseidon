@@ -1,8 +1,16 @@
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect, afterEach } from "@jest/globals";
+import { rm } from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 import { loadSkill, listAllSkills, saveSkill } from "../storage";
 import type { Skill } from "../types";
 
 describe("Skill Storage", () => {
+  afterEach(async () => {
+    try {
+      await rm(path.join(os.homedir(), ".poseidon", "skills", "test-skill"), { recursive: true, force: true });
+    } catch {}
+  });
   it("should list all skills", async () => {
     const skills = await listAllSkills();
     expect(Array.isArray(skills)).toBe(true);
