@@ -403,7 +403,7 @@ export default function SimpleChatPage() {
                 <button
                   onClick={() => handleSubmit()}
                   disabled={!input.trim()}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white dark:bg-black text-black dark:text-white font-medium transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-black text-white font-medium transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>Send</span>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
