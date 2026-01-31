@@ -308,8 +308,8 @@ app.whenReady().then(async () => {
           "img-src 'self' data: blob: https: http:;",
           "connect-src 'self' https: http: ws://localhost:* ws://127.0.0.1:* ws://0.0.0.0:*;",
           "worker-src 'self' blob:;",
-          "frame-src 'self' blob:;",
-          "object-src 'none';",
+          "frame-src 'self' blob: data:;",
+          "object-src 'self' blob: data:;",
           "base-uri 'self';",
           "form-action 'self';"
         ].join(' ')
