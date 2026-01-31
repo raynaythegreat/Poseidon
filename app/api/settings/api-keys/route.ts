@@ -53,6 +53,8 @@ export async function GET() {
       OPENROUTER_API_KEY: env.OPENROUTER_API_KEY,
       FIREWORKS_API_KEY: env.FIREWORKS_API_KEY,
       GEMINI_API_KEY: env.GEMINI_API_KEY,
+      GITHUB_TOKEN: env.GITHUB_TOKEN,
+      GITHUB_USERNAME: env.GITHUB_USERNAME,
     };
 
     return NextResponse.json({ apiKeys });
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
       "OpenRouter": "OPENROUTER_API_KEY",
       "Fireworks": "FIREWORKS_API_KEY",
       "Google Gemini": "GEMINI_API_KEY",
+      "GitHub": "GITHUB_TOKEN",
     };
 
     const envKey = envKeyMap[provider];
@@ -157,6 +160,7 @@ export async function DELETE(request: NextRequest) {
       "OpenRouter": "OPENROUTER_API_KEY",
       "Fireworks": "FIREWORKS_API_KEY",
       "Google Gemini": "GEMINI_API_KEY",
+      "GitHub": "GITHUB_TOKEN",
     };
 
     const envKey = envKeyMap[provider];

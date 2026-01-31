@@ -156,7 +156,12 @@ export default function ApiKeyModal({ provider, description, onSave, onClose }: 
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder={provider === "Claude API" ? "sk-ant-..." : provider === "OpenAI API" ? "sk-..." : ""}
+            placeholder={
+              provider === "Claude API" ? "sk-ant-..." :
+              provider === "OpenAI API" ? "sk-..." :
+              provider === "GitHub" ? "ghp_..." :
+              ""
+            }
             className="w-full px-3 py-2 bg-surface-muted border border-line rounded text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-accent-500"
             autoFocus
           />

@@ -19,7 +19,7 @@ export async function loadSkill(name: string): Promise<Skill | null> {
   const skillPath = path.join(SKILLS_DIR, name, "skill.md");
   try {
     const content = await fs.readFile(skillPath, "utf-8");
-    const frontmatterMatch = content.match(/^---\n(.*?)\n---/s);
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
     if (!frontmatterMatch) return null;
 
     const metadata = parse(frontmatterMatch[1]);
@@ -28,7 +28,7 @@ export async function loadSkill(name: string): Promise<Skill | null> {
       return null;
     }
 
-    const prompt = content.replace(/^---\n.*?\n---\n/s, "");
+    const prompt = content.replace(/^---\n[\s\S]*?\n---\n/, "");
     const handlerPath = path.join(SKILLS_DIR, name, "handler.ts");
     let handlerExists = false;
     try { await fs.access(handlerPath); handlerExists = true; } catch {}

@@ -8,10 +8,13 @@ export async function GET() {
     const repos = await github.listRepositories();
     return NextResponse.json({ repos });
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to list repositories";
     console.error("Failed to list repos:", error);
+    // Return 401 instead of 500 if token is missing/invalid
+    const isAuthError = message.includes("GitHub token") || message.includes("401") || message.includes("API token");
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to list repositories" },
-      { status: 500 }
+      { error: message, isAuthError },
+      { status: isAuthError ? 401 : 500 }
     );
   }
 }

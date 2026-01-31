@@ -117,48 +117,32 @@ export default function ProviderCard({
 
       {/* Content */}
       <div className="relative z-10">
-        <div className="flex items-start justify-between gap-4">
-          {/* Icon with status indicator */}
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className={`
-                w-12 h-12 rounded-sm bg-surface-muted/70
-                flex items-center justify-center text-ink
-                border border-line/40
-              `}>
-                {icon}
-              </div>
-              {/* Status dot */}
-              <div className={`
-                absolute -top-1 -right-1 w-4 h-4 rounded-full
-                ${config.dot}
-                border-2 border-background
-              `} />
+        {/* Provider Info */}
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className={`
+              w-12 h-12 rounded-sm bg-surface-muted/70
+              flex items-center justify-center text-ink
+              border border-line/40
+            `}>
+              {icon}
             </div>
-
-            <div>
-              <h4 className="font-semibold text-ink text-base">
-                {name}
-              </h4>
-              {description && (
-                <p className="text-sm text-ink-muted mt-0.5">
-                  {description}
-                </p>
-              )}
-            </div>
+            {/* Status dot */}
+            <div className={`
+              absolute -top-1 -right-1 w-4 h-4 rounded-full
+              ${config.dot}
+              border-2 border-background
+            `} />
           </div>
 
-          {/* Action/Status */}
-          <div className="flex items-center gap-2">
-            {action ? (
-              action
-            ) : (
-              <div className={`
-                px-3 py-1 rounded-full text-xs font-medium
-                ${config.bg} ${config.text}
-              `}>
-                {config.label}
-              </div>
+          <div className="flex-1">
+            <h4 className="font-semibold text-ink text-base">
+              {name}
+            </h4>
+            {description && (
+              <p className="text-sm text-ink-muted mt-0.5">
+                {description}
+              </p>
             )}
           </div>
         </div>
@@ -175,6 +159,34 @@ export default function ProviderCard({
             {error || warning}
           </div>
         )}
+
+        {/* Action Bar */}
+        <div className="mt-4 pt-3 border-t border-line/60">
+          <div className="flex items-center justify-between">
+            {/* Status Badge */}
+            {!action && (
+              <div className={`
+                px-3 py-1 rounded-full text-xs font-medium
+                ${config.bg} ${config.text}
+              `}>
+                {config.label}
+              </div>
+            )}
+
+            {/* Action Button */}
+            {action && (
+              <div className="flex items-center gap-2">
+                <span className={`
+                  px-3 py-1 rounded-full text-xs font-medium
+                  ${config.bg} ${config.text}
+                `}>
+                  {config.label}
+                </span>
+                {action}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Hover glow effect */}

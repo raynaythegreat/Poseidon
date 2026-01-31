@@ -32,6 +32,7 @@ function stop_processes() {
   pkill -f "next start" 2>/dev/null
   pkill -f "next dev" 2>/dev/null
   pkill -f "watch-ngrok" 2>/dev/null
+  pkill -f "electron" 2>/dev/null
   echo "✅ Stopped."
 }
 
@@ -52,6 +53,12 @@ function start_processes() {
   nohup npm run watch-ngrok >> "$LOG_FILE" 2>&1 &
   WATCH_PID=$!
   echo $WATCH_PID >> "$PID_FILE"
+
+  # Start Electron in development mode
+  echo "   - Starting Electron..."
+  nohup npm run electron-dev >> "$LOG_FILE" 2>&1 &
+  ELECTRON_PID=$!
+  echo $ELECTRON_PID >> "$PID_FILE"
 
   # Cloudflare Tunnel for Ollama
   if command -v cloudflared &> /dev/null && [ "$USE_CLOUDFLARED_TUNNEL" = "1" ]; then
