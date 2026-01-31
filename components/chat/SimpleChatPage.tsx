@@ -11,6 +11,7 @@ import ModelDropdown from "./ModelDropdown";
 import SkillAutocomplete from "./SkillAutocomplete";
 import type { Skill } from "@/lib/skills/types";
 import type { Provider } from "@/contexts/ApiUsageContext";
+import { registry } from "@/lib/skills/registry";
 
 interface Repository {
   id: number;
@@ -141,11 +142,8 @@ export default function SimpleChatPage() {
   useEffect(() => {
     const loadSkills = async () => {
       try {
-        const response = await fetch("/api/skills");
-        if (response.ok) {
-          const data = await response.json();
-          setAllSkills(data.skills || []);
-        }
+        await registry.load();
+        setAllSkills(registry.list());
       } catch (error) {
         console.error("Failed to load skills:", error);
       }
