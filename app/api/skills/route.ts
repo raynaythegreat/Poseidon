@@ -8,9 +8,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       skills: skills.map((skill) => ({
-        name: skill.metadata.name,
-        description: skill.metadata.description,
-        tags: skill.metadata.tags,
+        metadata: skill.metadata,
         prompt: skill.prompt,
       })),
     });

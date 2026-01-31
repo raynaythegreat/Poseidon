@@ -19,9 +19,7 @@ export async function GET(
 
     return NextResponse.json({
       skill: {
-        name: skill.metadata.name,
-        description: skill.metadata.description,
-        tags: skill.metadata.tags,
+        metadata: skill.metadata,
         prompt: skill.prompt,
       },
     });

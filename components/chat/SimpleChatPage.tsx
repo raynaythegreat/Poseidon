@@ -231,7 +231,7 @@ export default function SimpleChatPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.skill) {
-            finalContent = `[Skill: ${data.skill.name}]\n${data.skill.prompt}\n\nUser input: ${args}`;
+            finalContent = `[Skill: ${data.skill.metadata.name}]\n${data.skill.prompt}\n\nUser input: ${args}`;
           }
         }
       } catch (error) {
