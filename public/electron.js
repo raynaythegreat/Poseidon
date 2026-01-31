@@ -297,7 +297,19 @@ app.whenReady().then(async () => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': ["default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: http://localhost:* ws://localhost:*; worker-src 'self' blob:"]
+        'Content-Security-Policy': [
+          "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:;",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+          "font-src 'self' https://fonts.gstatic.com;",
+          "img-src 'self' data: blob: https: http:;",
+          "connect-src 'self' https: http: ws://localhost:* ws://127.0.0.1:* ws://0.0.0.0:*;",
+          "worker-src 'self' blob:;",
+          "frame-src 'self' blob:;",
+          "object-src 'none';",
+          "base-uri 'self';",
+          "form-action 'self';"
+        ].join(' ')
       }
     })
   })
