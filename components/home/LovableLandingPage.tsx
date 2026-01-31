@@ -204,7 +204,7 @@ export default function LovableLandingPage() {
                   <button
                     onClick={() => {
                       clearCurrentSession();
-                      router.push("/?brainstorm=true");
+                      router.push("/?prompt=/brainstorm");
                     }}
                     className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
                     title="Brainstorm ideas"
@@ -218,7 +218,7 @@ export default function LovableLandingPage() {
                   <button
                     onClick={() => {
                       clearCurrentSession();
-                      router.push("/?plan=true");
+                      router.push("/?prompt=/plan");
                     }}
                     className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
                     title="Create a plan"

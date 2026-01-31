@@ -50,6 +50,7 @@ export default function SimpleChatPage() {
   useEffect(() => {
     const brainstorm = searchParams.get("brainstorm");
     const plan = searchParams.get("plan");
+    const promptParam = searchParams.get("prompt");
 
     if (brainstorm === "true" && messages.length === 0) {
       const brainstormMsg: ChatMessage = {
@@ -66,6 +67,9 @@ export default function SimpleChatPage() {
       };
       setMessages([planMsg]);
       // Clean URL
+      router.replace("/", { scroll: false });
+    } else if (promptParam && messages.length === 0 && !input) {
+      setInput(promptParam + " ");
       router.replace("/", { scroll: false });
     }
   }, []); // Run only on mount
@@ -152,30 +156,6 @@ export default function SimpleChatPage() {
     };
     loadSkills();
   }, []);
-
-  // Handle auto-start brainstorm/plan mode from URL params
-  useEffect(() => {
-    const brainstorm = searchParams.get("brainstorm");
-    const plan = searchParams.get("plan");
-
-    if (brainstorm === "true" && messages.length === 0) {
-      const brainstormMsg: ChatMessage = {
-        role: "user",
-        content: "Start brainstorming mode. Ask me questions to understand what I want to build.",
-      };
-      setMessages([brainstormMsg]);
-      // Clean URL
-      router.replace("/", { scroll: false });
-    } else if (plan === "true" && messages.length === 0) {
-      const planMsg: ChatMessage = {
-        role: "user",
-        content: "Start planning mode. Help me create an implementation plan for what I want to build.",
-      };
-      setMessages([planMsg]);
-      // Clean URL
-      router.replace("/", { scroll: false });
-    }
-  }, []); // Run only on mount
 
   // Auto-submit initial message from URL params
   useEffect(() => {
@@ -381,44 +361,6 @@ export default function SimpleChatPage() {
                   darkTheme
                   compact
                 />
-
-                {/* Brainstorm */}
-                <button
-                  onClick={() => {
-                    const brainstormMsg: ChatMessage = {
-                      role: "user",
-                      content: "Start brainstorming mode. Ask me questions to understand what I want to build.",
-                    };
-                    setMessages((prev) => [...prev, brainstormMsg]);
-                    // Submit on next tick to ensure state is updated
-                    Promise.resolve().then(() => handleSubmit(brainstormMsg));
-                  }}
-                  className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                  title="Brainstorm ideas"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </button>
-
-                {/* Write Plan */}
-                <button
-                  onClick={() => {
-                    const planMsg: ChatMessage = {
-                      role: "user",
-                      content: "Start planning mode. Help me create an implementation plan for what I want to build.",
-                    };
-                    setMessages((prev) => [...prev, planMsg]);
-                    // Submit on next tick to ensure state is updated
-                    Promise.resolve().then(() => handleSubmit(planMsg));
-                  }}
-                  className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                  title="Create a plan"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </button>
               </div>
 
               {/* Submit Button */}
