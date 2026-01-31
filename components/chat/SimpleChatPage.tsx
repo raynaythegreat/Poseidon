@@ -240,7 +240,27 @@ export default function SimpleChatPage() {
     const messageToSend = messageOverride || { role: "user" as const, content: input };
     if (!messageToSend.content.trim() || isLoading) return;
 
-    const userMessage: ChatMessage = messageToSend;
+    // Check for skill command
+    const skillMatch = messageToSend.content.match(/^\/(\w+)\s*([\s\S]*)$/);
+    let finalContent = messageToSend.content;
+
+    if (skillMatch) {
+      const [, skillName, args] = skillMatch;
+      try {
+        const response = await fetch(`/api/skills/${encodeURIComponent(skillName)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.skill) {
+            finalContent = `[Skill: ${data.skill.name}]\n${data.skill.prompt}\n\nUser input: ${args}`;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load skill:", error);
+        // If skill loading fails, use original content
+      }
+    }
+
+    const userMessage: ChatMessage = { ...messageToSend, content: finalContent };
     setMessages((prev) => [...prev, userMessage]);
     if (!messageOverride) setInput("");
     setIsLoading(true);
@@ -253,6 +273,7 @@ export default function SimpleChatPage() {
           messages: [...messages, userMessage],
           model: modelInfo.name,
           provider: modelInfo.provider,
+          skillMode: !!skillMatch,
         }),
       });
 

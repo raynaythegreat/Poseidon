@@ -725,6 +725,7 @@ export async function POST(request: NextRequest) {
       repoContext,
       attachments,
       mode,
+      skillMode,
     } = body;
 
     if (!messages || messages.length === 0) {
@@ -924,6 +925,10 @@ export async function POST(request: NextRequest) {
 
     if (resolvedMode) {
       contextPrompt += MODE_PROMPTS[resolvedMode];
+    }
+
+    if (skillMode) {
+      contextPrompt += "\n\nThe user is using a skill. You should follow the skill's prompt instructions and respond accordingly. The skill prompt contains specific guidance for how to handle this request.";
     }
 
     const normalizedAttachments = normalizeAttachments(
