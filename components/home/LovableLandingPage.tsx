@@ -265,12 +265,102 @@ export default function LovableLandingPage() {
           </motion.div>
         </motion.div>
 
-        {/* Social Proof - Optional */}
+        {/* Features Section */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-20 text-center"
+          className="mt-20 w-full max-w-4xl"
+        >
+          <h3 className="text-center text-lg font-semibold text-gray-900 dark:text-white mb-8">
+            Everything you need to build
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                ),
+                title: "AI-Powered Chat",
+                description: "Chat with Claude to generate code, debug issues, and get explanations"
+              },
+              {
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                ),
+                title: "GitHub Integration",
+                description: "Connect your repos and apply changes directly from the chat"
+              },
+              {
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                ),
+                title: "One-Click Deploy",
+                description: "Deploy to Vercel or Render with a single click"
+              },
+              {
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                ),
+                title: "Skills System",
+                description: "Use slash commands like /brainstorm and /plan for specialized workflows"
+              },
+              {
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                ),
+                title: "Local & Private",
+                description: "Run locally with Ollama or use your own API keys"
+              },
+              {
+                icon: (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                  </svg>
+                ),
+                title: "Multi-Provider Support",
+                description: "Choose from Claude, OpenAI, Groq, Gemini, Ollama, and custom providers"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 + (index * 0.1) }}
+                className="p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-black dark:bg-white rounded-lg text-white dark:text-black">
+                    {feature.icon}
+                  </div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                    {feature.title}
+                  </h4>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.4 }}
+          className="mt-16 text-center"
         >
           <p className="text-sm text-gray-400 dark:text-gray-600">
             Powered by Claude • GitHub Integration • One-Click Deployment
