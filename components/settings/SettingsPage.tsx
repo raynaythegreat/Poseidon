@@ -9,6 +9,7 @@ import RotatingCardsButton from "@/components/ui/RotatingCardsButton";
 import RotatingCardsToggle from "@/components/ui/RotatingCardsToggle";
 import CustomProviderSettings from "./CustomProviderSettings";
 import ApiKeyModal from "./ApiKeyModal";
+import SkillsManager from "./SkillsManager";
 import { CustomProviderConfig } from "./CustomProviderSettings";
 
 interface Status {
@@ -1227,6 +1228,11 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Skills */}
+        <section>
+          <SkillsManager />
         </section>
 
         {/* API Key Modal */}
