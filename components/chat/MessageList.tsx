@@ -1,11 +1,12 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChatMessage } from "@/contexts/ChatHistoryContext";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import SkillFeedback from "./SkillFeedback";
 
 interface MessageListProps {
   messages: ChatMessage[];
@@ -28,7 +29,20 @@ const formatBytes = (bytes: number) => {
   return `${value.toFixed(precision)} ${units[unitIndex]}`;
 };
 
+const extractSkillName = (content: string): string | null => {
+  const skillMatch = content.match(/^\[Skill:\s*([^\]]+)\]/);
+  return skillMatch ? skillMatch[1].trim() : null;
+};
+
 const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage }) {
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const skillName = message.role === "assistant" && message.content ? extractSkillName(message.content) : null;
+
+  const handleFeedbackSubmit = (feedback: { helpful: boolean; comment?: string }) => {
+    console.log("Feedback submitted:", feedback);
+    setFeedbackSubmitted(true);
+  };
+
   return (
     <div
       className={`flex gap-3 sm:gap-4 ${message.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
@@ -127,6 +141,9 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
                   </div>
                 ))}
               </div>
+            )}
+            {skillName && !feedbackSubmitted && (
+              <SkillFeedback skillName={skillName} onSubmit={handleFeedbackSubmit} />
             )}
           </div>
         )}
