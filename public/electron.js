@@ -292,6 +292,9 @@ function createMenu() {
 
 // App event handlers
 app.whenReady().then(async () => {
+  // Suppress Electron CSP warning (we need 'unsafe-inline' and 'unsafe-eval' for React/Next.js)
+  process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
+
   // Set CSP for all windows
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
