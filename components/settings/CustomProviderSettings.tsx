@@ -202,7 +202,22 @@ export default function CustomProviderSettings() {
         setProviders([...providers, newProvider]);
     };
 
-    const handleRemove = (id: string) => {
+    const handleRemove = async (id: string) => {
+        const provider = providers.find(p => p.id === id);
+        if (!provider) return;
+
+        // Remove from .env.local
+        try {
+            await fetch("/api/settings/custom-providers", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, name: provider.name }),
+            });
+        } catch (err) {
+            console.warn("Failed to remove from .env.local:", err);
+        }
+
+        // Remove from localStorage
         const updated = providers.filter(p => p.id !== id);
         saveProviders(updated);
     };
@@ -212,23 +227,40 @@ export default function CustomProviderSettings() {
         setProviders(updatedProviders);
 
         try {
-            const response = await fetch("/api/custom/test", {
+            // Test the connection first
+            const testResponse = await fetch("/api/custom/test", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ baseUrl: config.baseUrl, apiKey: config.apiKey }),
             });
 
-            const data = await response.json();
+            const testData = await testResponse.json();
 
-            if (!response.ok) {
-                throw new Error(data.error || "Failed to connect");
+            if (!testResponse.ok) {
+                throw new Error(testData.error || "Failed to connect");
             }
-            
+
+            // Save to .env.local
+            const envResponse = await fetch("/api/settings/custom-providers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: config.id,
+                    name: config.name,
+                    baseUrl: config.baseUrl,
+                    apiKey: config.apiKey,
+                }),
+            });
+
+            if (!envResponse.ok) {
+                console.warn("Failed to save to .env.local, but connection test passed");
+            }
+
             const finalConfig = {
                 ...config,
                 isLoading: false,
-                success: `Successfully connected! Found ${data.models.length} models.`,
-                models: data.models,
+                success: `Successfully connected! Found ${testData.models.length} models.`,
+                models: testData.models,
                 enabled: true,
             };
             saveProviders(providers.map(p => p.id === config.id ? finalConfig : p));
