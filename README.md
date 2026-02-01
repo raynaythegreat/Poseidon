@@ -8,27 +8,43 @@
 
 Poseidon is a cyber-styled AI development environment that combines powerful chat capabilities with GitHub integration, one-click deployment, and a specialized skill system for accelerated development workflows.
 
-## 🚀 Quick Start (Linux Debian/Ubuntu)
+## 🚀 Quick Start - One-Click Installation
 
-**One-command installation:**
+**Linux Debian/Ubuntu (Recommended):**
+
+Install Poseidon with a single command - everything is automated:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/install.sh | bash
 ```
 
-**Or manually:**
+That's it! Poseidon will:
+- ✅ Install Node.js (if needed)
+- ✅ Install all dependencies
+- ✅ Build for production
+- ✅ Create desktop shortcut
+- ✅ Launch automatically
+
+**After installation**, the app will be running at:
+```
+http://localhost:1998
+```
+
+---
+
+**macOS / Windows:**
+
 ```bash
 # Clone the repository
 git clone https://github.com/raynaythegreat/Poseidon.git
 cd Poseidon
 
-# Run the installation script
-chmod +x install.sh
-./install.sh
+# Install dependencies
+npm install
+
+# Start the app
+./poseidon.sh start
 ```
-
-That's it! The app will start automatically at http://localhost:1998
-
-**For other platforms:** See [Installation](#installation) below.
 
 ---
 
