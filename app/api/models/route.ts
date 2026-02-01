@@ -143,23 +143,23 @@ async function fetchOpenRouterModels(apiKey: string): Promise<any[]> {
 
 // Claude/Anthropic doesn't have a public models endpoint, so we use known models
 const CLAUDE_MODELS = [
-  { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around model" },
-  { id: "claude-3-5-haiku-20241022", name: "Claude 3.5 Haiku", provider: "Claude", description: "Fast and efficient" },
+  { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5", provider: "Claude", description: "Best all-around" },
+  { id: "claude-3-5-haiku-20241022", name: "Claude 3.5 Haiku", provider: "Claude", description: "Fast & efficient" },
   { id: "claude-3-opus-20240229", name: "Claude 3 Opus", provider: "Claude", description: "Most powerful" },
-  { id: "claude-3-sonnet-20240229", name: "Claude 3 Sonnet", provider: "Claude", description: "Balanced performance" },
+  { id: "claude-3-sonnet-20240229", name: "Claude 3", provider: "Claude", description: "Balanced" },
   { id: "claude-3-haiku-20240307", name: "Claude 3 Haiku", provider: "Claude", description: "Fastest" },
 ];
 
 // Gemini has a limited set of models, we use known ones
 const GEMINI_MODELS = [
-  { id: "gemini-2.5-flash-exp", name: "Gemini 2.5 Flash Exp", provider: "Google Gemini", description: "Latest experimental Flash" },
-  { id: "gemini-2.5-pro-exp", name: "Gemini 2.5 Pro Exp", provider: "Google Gemini", description: "Latest experimental Pro" },
-  { id: "gemini-2.0-flash-exp", name: "Gemini 2.0 Flash Exp", provider: "Google Gemini", description: "Experimental" },
-  { id: "gemini-2.0-flash-thinking-exp", name: "Gemini 2.0 Flash Thinking Exp", provider: "Google Gemini", description: "Reasoning model" },
+  { id: "gemini-2.5-flash-exp", name: "Gemini 2.5 Flash", provider: "Google Gemini", description: "Latest Flash" },
+  { id: "gemini-2.5-pro-exp", name: "Gemini 2.5 Pro", provider: "Google Gemini", description: "Latest Pro" },
+  { id: "gemini-2.0-flash-exp", name: "Gemini 2.0 Flash", provider: "Google Gemini", description: "Experimental" },
+  { id: "gemini-2.0-flash-thinking-exp", name: "Gemini 2.0 Thinking", provider: "Google Gemini", description: "Reasoning" },
   { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro", provider: "Google Gemini", description: "Multimodal" },
-  { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash", provider: "Google Gemini", description: "Fast and efficient" },
-  { id: "gemini-1.5-flash-8b", name: "Gemini 1.5 Flash 8B", provider: "Google Gemini", description: "Lightweight Flash" },
-  { id: "gemini-pro", name: "Gemini Pro", provider: "Google Gemini", description: "Google's flagship model" },
+  { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash", provider: "Google Gemini", description: "Fast" },
+  { id: "gemini-1.5-flash-8b", name: "Gemini 1.5 8B", provider: "Google Gemini", description: "Lightweight" },
+  { id: "gemini-pro", name: "Gemini Pro", provider: "Google Gemini", description: "Stable" },
 ];
 
 // Map model IDs to friendly names
@@ -170,16 +170,16 @@ function getModelName(id: string, provider: string): string {
     'gpt-4o-mini': 'GPT-4o Mini',
     'gpt-4-turbo': 'GPT-4 Turbo',
     'gpt-4': 'GPT-4',
-    'gpt-3.5-turbo': 'GPT-3.5 Turbo',
-    'o1-preview': 'o1-preview',
-    'o1-mini': 'o1-mini',
+    'gpt-3.5-turbo': 'GPT-3.5',
+    'o1-preview': 'o1',
+    'o1-mini': 'o1 Mini',
   };
 
   // Groq model names
   const groqNames: Record<string, string> = {
-    'llama-3.3-70b-versatile': 'Llama 3.3 70B',
-    'llama-3.1-70b-versatile': 'Llama 3.1 70B',
-    'llama3-70b-8192': 'Llama 3 70B',
+    'llama-3.3-70b-versatile': 'Llama 3.3',
+    'llama-3.1-70b-versatile': 'Llama 3.1',
+    'llama3-70b-8192': 'Llama 3',
     'mixtral-8x7b-32768': 'Mixtral 8x7B',
     'gemma2-9b-it': 'Gemma 2 9B',
   };
@@ -194,20 +194,29 @@ function getModelName(id: string, provider: string): string {
 // Format model names nicely (for Ollama and other providers)
 function formatModelName(id: string): string {
   // Remove common prefixes
-  const cleanName = id.replace(/^(hf\.|hf-|^chat-|^instruct-)/i, '');
+  let cleanName = id.replace(/^(hf\.|hf-|^chat-|^instruct-)/i, '');
 
   // Handle tag format (e.g., "model:tag" or "model:tag")
   if (cleanName.includes(':')) {
     const [model, tag] = cleanName.split(':');
-    // Format tag nicely (e.g., "3b" -> "3B", "latest" -> "Latest")
-    const formattedTag = tag.replace(/(\d)b$/, '$1B').replace(/^(\d)/, (match) => match.toUpperCase());
-    return formatBaseName(model) + (tag !== 'latest' ? ` (${formattedTag})` : '');
+    // Skip "latest" tag, only show specific versions
+    if (tag === 'latest') {
+      return formatBaseName(model);
+    }
+    // Format tag nicely (e.g., "3b" -> "3B")
+    const formattedTag = tag.replace(/(\d+)b/i, '$1B').replace(/^(\d)/, '$1');
+    const baseName = formatBaseName(model);
+    // Don't add redundant size info if it's already in the model name
+    if (baseName.match(/\d+b$/i) || baseName.match(/\d+b \(/i)) {
+      return `${baseName} (${formattedTag})`;
+    }
+    return `${baseName} ${formattedTag}`;
   }
 
   return formatBaseName(cleanName);
 }
 
-// Format the base model name
+// Format the base model name - shorter and cleaner
 function formatBaseName(name: string): string {
   // Split by common separators
   const parts = name.split(/[-_/]/);
@@ -219,15 +228,15 @@ function formatBaseName(name: string): string {
 
     // Handle version numbers (e.g., "3", "3.2", "3.2.1")
     if (/^\d+(\.\d+)*$/.test(part)) {
-      return part.toUpperCase();
+      return part;
     }
 
-    // Handle size suffixes (e.g., "70b", "8b")
+    // Handle size suffixes (e.g., "70b", "8b") - keep these
     if (/^\d+b$/i.test(part)) {
       return part.toUpperCase();
     }
 
-    // Capitalize first letter of each word
+    // Handle common model names - keep first part capitalized, rest lowercase
     if (index === 0) {
       return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
     }
@@ -235,7 +244,15 @@ function formatBaseName(name: string): string {
   });
 
   // Join with spaces and clean up
-  return formattedParts.filter(Boolean).join(' ');
+  let result = formattedParts.filter(Boolean).join(' ');
+
+  // Shorten some common patterns
+  result = result.replace(/\s*(instruct|chat)/gi, ''); // Remove instruct/chat suffixes
+  result = result.replace(/\s+versatile/gi, ''); // Remove "versatile"
+  result = result.replace(/\s+latest/gi, ''); // Remove "latest"
+  result = result.trim();
+
+  return result;
 }
 
 // Get provider display name
