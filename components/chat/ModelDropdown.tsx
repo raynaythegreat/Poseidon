@@ -87,6 +87,16 @@ export default function ModelDropdown({
     return a.name.localeCompare(b.name);
   });
 
+  // Group models by provider
+  const modelsByProvider = sortedModels.reduce((acc, model) => {
+    const provider = model.provider;
+    if (!acc[provider]) {
+      acc[provider] = [];
+    }
+    acc[provider].push(model);
+    return acc;
+  }, {} as Record<string, ModelOption[]>);
+
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -105,35 +115,40 @@ export default function ModelDropdown({
       {showMenu && (
         <div className={`absolute bottom-full right-0 mb-2 w-80 rounded-xl border shadow-xl z-[9999] max-h-[400px] overflow-y-auto ${menuBg}`}>
           <div className="p-2">
-            {sortedModels.map((model) => {
-              const priceDisplay = getPriceDisplay(model.price);
-              return (
-                <button
-                  key={model.id}
-                  onClick={() => {
-                    onSelect(model);
-                    setShowMenu(false);
-                  }}
-                  className={`w-full px-3 py-2.5 text-left text-sm rounded-lg transition-colors ${
-                    modelInfo.name === model.name
-                      ? selectedBg
-                      : `${itemText} ${itemHover}`
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{model.name}</div>
-                      <div className="text-xs mt-0.5 text-ink-subtle truncate">
-                        {model.provider}
+            {Object.entries(modelsByProvider).map(([provider, providerModels], index) => (
+              <div key={provider} className={index > 0 ? "mt-3 pt-3 border-t border-line/60" : ""}>
+                {/* Provider Header */}
+                <div className="px-3 py-1 text-xs font-semibold text-ink-muted uppercase tracking-wide">
+                  {provider}
+                </div>
+                {providerModels.map((model) => {
+                  const priceDisplay = getPriceDisplay(model.price);
+                  return (
+                    <button
+                      key={model.id}
+                      onClick={() => {
+                        onSelect(model);
+                        setShowMenu(false);
+                      }}
+                      className={`w-full px-3 py-2 text-left text-sm rounded-lg transition-colors ${
+                        modelInfo.name === model.name
+                          ? selectedBg
+                          : `${itemText} ${itemHover}`
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium truncate">{model.name}</div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border whitespace-nowrap ${priceDisplay.color}`}>
+                          {priceDisplay.text}
+                        </span>
                       </div>
-                    </div>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border whitespace-nowrap ${priceDisplay.color}`}>
-                      {priceDisplay.text}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
       )}
