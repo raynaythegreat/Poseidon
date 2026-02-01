@@ -162,6 +162,15 @@ const GEMINI_MODELS = [
   { id: "gemini-pro", name: "Gemini Pro", provider: "Google Gemini", description: "Stable" },
 ];
 
+// GLM models (Zhipu AI / ZAI)
+const GLM_MODELS = [
+  { id: "glm-4.7", name: "GLM 4.7", provider: "GLM", description: "Latest GLM model" },
+  { id: "glm-4-flash", name: "GLM 4 Flash", provider: "GLM", description: "Fast & efficient" },
+  { id: "glm-4-plus", name: "GLM 4 Plus", provider: "GLM", description: "Enhanced capabilities" },
+  { id: "glm-4-air", name: "GLM 4 Air", provider: "GLM", description: "Lightweight" },
+  { id: "glm-3-turbo", name: "GLM 3 Turbo", provider: "GLM", description: "Turbocharged speed" },
+];
+
 // Map model IDs to friendly names
 function getModelName(id: string, provider: string): string {
   // OpenAI model names
@@ -264,6 +273,7 @@ function getProviderName(providerKey: string): string {
     openrouter: 'OpenRouter',
     fireworks: 'Fireworks',
     gemini: 'Google Gemini',
+    glm: 'GLM',
     ollama: 'Ollama',
   };
   return names[providerKey] || providerKey;
@@ -279,6 +289,7 @@ export async function GET() {
       openrouter: process.env.OPENROUTER_API_KEY ? true : false,
       fireworks: process.env.FIREWORKS_API_KEY ? true : false,
       gemini: process.env.GEMINI_API_KEY ? true : false,
+      glm: process.env.GLM_API_KEY ? true : false,
       ollama: process.env.OLLAMA_BASE_URL ? true : false,
     };
 
@@ -289,6 +300,7 @@ export async function GET() {
       openrouter: [],
       fireworks: [],
       gemini: [],
+      glm: [],
       ollama: [],
     };
 
@@ -377,6 +389,36 @@ export async function GET() {
         ...m,
         price: getModelPrice(m.id, m.provider),
       }));
+    }
+
+    // Fetch GLM models (hardcoded list for now, Zhipu AI API)
+    if (providers.glm) {
+      // Also try to fetch from the API
+      try {
+        const glmModels = await fetchOpenAIModels('https://api.z.ai/api/coding/paas/v4', process.env.GLM_API_KEY!);
+        if (glmModels.length > 0) {
+          models.glm = glmModels.map((m: any) => ({
+            id: m.id,
+            name: m.id, // Use the ID as name since GLM API returns simple IDs
+            provider: 'GLM',
+            description: 'Zhipu AI model',
+            price: 0.5, // Default pricing
+          }));
+        } else {
+          // Fallback to hardcoded list
+          models.glm = GLM_MODELS.map(m => ({
+            ...m,
+            price: 0.5,
+          }));
+        }
+      } catch (e) {
+        // If fetch fails, use hardcoded list
+        console.log('GLM API fetch failed, using hardcoded models:', e);
+        models.glm = GLM_MODELS.map(m => ({
+          ...m,
+          price: 0.5,
+        }));
+      }
     }
 
     // Fetch Ollama models

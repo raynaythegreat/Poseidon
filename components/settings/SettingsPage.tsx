@@ -23,6 +23,7 @@ interface Status {
   claude: { configured: boolean };
   openai: { configured: boolean };
   gemini: { configured: boolean };
+  glm: { configured: boolean };
   groq: {
     configured: boolean;
     source?: string | null;
@@ -61,6 +62,7 @@ interface Status {
   claude: { configured: boolean };
   openai: { configured: boolean };
   gemini: { configured: boolean };
+  glm: { configured: boolean };
   groq: {
     configured: boolean;
     source?: string | null;
@@ -429,6 +431,18 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2L2 19.7778H22L12 2ZM12 5.68889L17.5111 16H6.48889L12 5.68889Z" />
+        </svg>
+      ),
+    },
+    {
+      name: "GLM (Zhipu AI)",
+      description: "Z.ai GLM coding plan API for coding tasks",
+      configured: status?.glm?.configured,
+      category: "ai",
+      apiKeyUrl: "https://z.ai/manage-apikey/apikey-list",
+      icon: (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6z" />
         </svg>
       ),
     },
@@ -845,7 +859,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
             <button
               type="button"
               onClick={() => handleConfigureProvider(item.name, item.description)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
               title="Configure API Key"
             >
               <svg
@@ -887,7 +901,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
             </h3>
             <button
               onClick={fetchStatus}
-              className="px-3 py-1.5 rounded-sm text-sm font-medium bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-colors"
+              className="px-3 py-1.5 rounded-sm text-sm font-medium bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
               Refresh
             </button>
@@ -1113,7 +1127,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                     setProfileUsername(settings.username);
                     setProfileEmail(settings.email || "");
                   }}
-                  className="px-4 py-2 rounded-none text-sm font-medium bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-colors"
+                  className="px-4 py-2 rounded-none text-sm font-medium bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                 >
                   Edit
                 </button>
@@ -1161,7 +1175,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                   </RotatingCardsButton>
                   <button
                     onClick={() => setIsEditingProfile(false)}
-                    className="px-4 py-2 rounded-none text-sm font-medium bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-colors"
+                    className="px-4 py-2 rounded-none text-sm font-medium bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                   >
                     Cancel
                   </button>

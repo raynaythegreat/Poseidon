@@ -26,7 +26,14 @@ export default function MainPage() {
   // Handle tab from URL search params
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    if (tabParam && ["chat", "repos", "deploy", "history", "settings"].includes(tabParam)) {
+    const promptParam = searchParams.get("prompt");
+    const brainstormParam = searchParams.get("brainstorm");
+    const planParam = searchParams.get("plan");
+
+    // If there's a prompt, brainstorm, or plan param, switch to chat tab
+    if (promptParam || brainstormParam === "true" || planParam === "true") {
+      setActiveTab("chat");
+    } else if (tabParam && ["chat", "repos", "deploy", "history", "settings"].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);

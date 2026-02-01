@@ -16,8 +16,10 @@ type Provider =
   | "openrouter"
   | "ollama"
   | "gemini"
+  | "glm"
   | "opencodezen"
   | "fireworks"
+  | "zai"
   | "custom";
 
 interface UsageRecord {
@@ -44,8 +46,10 @@ interface ApiUsageState {
   groq: ProviderUsage;
   openrouter: ProviderUsage;
   ollama: ProviderUsage;
+  glm: ProviderUsage;
   opencodezen: ProviderUsage;
   fireworks: ProviderUsage;
+  zai: ProviderUsage;
   custom: ProviderUsage;
 }
 
@@ -56,8 +60,10 @@ interface ApiLimits {
   groq: { daily: number; weekly: number; note: string };
   openrouter: { daily: number; weekly: number; note: string };
   ollama: { daily: number; weekly: number; note: string };
+  glm: { daily: number; weekly: number; note: string };
   opencodezen: { daily: number; weekly: number; note: string };
   fireworks: { daily: number; weekly: number; note: string };
+  zai: { daily: number; weekly: number; note: string };
   custom: { daily: number; weekly: number; note: string };
 }
 
@@ -126,6 +132,11 @@ const DEFAULT_LIMITS: ApiLimits = {
     weekly: Infinity,
     note: "Paid API - budget varies by plan",
   },
+  glm: {
+    daily: Infinity,
+    weekly: Infinity,
+    note: "GLM (Zhipu AI) - budget varies by plan",
+  },
   groq: {
     daily: Infinity,
     weekly: Infinity,
@@ -151,6 +162,11 @@ const DEFAULT_LIMITS: ApiLimits = {
     weekly: Infinity,
     note: "Fireworks paid API - budget varies by plan",
   },
+  zai: {
+    daily: Infinity,
+    weekly: Infinity,
+    note: "Z.ai GLM API - budget varies by plan",
+  },
   custom: {
     daily: Infinity,
     weekly: Infinity,
@@ -171,8 +187,10 @@ const DEFAULT_STATE: ApiUsageState = {
   groq: { ...DEFAULT_USAGE },
   openrouter: { ...DEFAULT_USAGE },
   ollama: { ...DEFAULT_USAGE },
+  glm: { ...DEFAULT_USAGE },
   opencodezen: { ...DEFAULT_USAGE },
   fireworks: { ...DEFAULT_USAGE },
+  zai: { ...DEFAULT_USAGE },
   custom: { ...DEFAULT_USAGE },
 };
 
@@ -199,8 +217,10 @@ const DEFAULT_BILLING_STATE: BillingState = {
     remainingUsd: 0,
     source: "local",
   },
+  glm: { ...DEFAULT_BILLING },
   opencodezen: { ...DEFAULT_BILLING },
   fireworks: { ...DEFAULT_BILLING },
+  zai: { ...DEFAULT_BILLING },
   custom: { ...DEFAULT_BILLING },
 };
 
@@ -224,8 +244,10 @@ const DEFAULT_RATE_LIMITS_STATE: RateLimitsState = {
   groq: { ...DEFAULT_PROVIDER_RATE_LIMIT },
   openrouter: { ...DEFAULT_PROVIDER_RATE_LIMIT },
   ollama: { ...DEFAULT_PROVIDER_RATE_LIMIT },
+  glm: { ...DEFAULT_PROVIDER_RATE_LIMIT },
   opencodezen: { ...DEFAULT_PROVIDER_RATE_LIMIT },
   fireworks: { ...DEFAULT_PROVIDER_RATE_LIMIT },
+  zai: { ...DEFAULT_PROVIDER_RATE_LIMIT },
   custom: { ...DEFAULT_PROVIDER_RATE_LIMIT },
 };
 
@@ -306,8 +328,10 @@ export function ApiUsageProvider({ children }: { children: ReactNode }) {
       groq: { today: 0, thisWeek: 0, thisMonth: 0 },
       openrouter: { today: 0, thisWeek: 0, thisMonth: 0 },
       ollama: { today: 0, thisWeek: 0, thisMonth: 0 },
+      glm: { today: 0, thisWeek: 0, thisMonth: 0 },
       opencodezen: { today: 0, thisWeek: 0, thisMonth: 0 },
       fireworks: { today: 0, thisWeek: 0, thisMonth: 0 },
+      zai: { today: 0, thisWeek: 0, thisMonth: 0 },
       custom: { today: 0, thisWeek: 0, thisMonth: 0 },
     };
 

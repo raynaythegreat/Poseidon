@@ -91,7 +91,6 @@ export default function LovableStyleChatInput({
               repos={repos}
               onSelect={onRepoSelect}
               onCreateRepo={onCreateRepo}
-              compact
             />
           ) : (
             <button
@@ -112,7 +111,6 @@ export default function LovableStyleChatInput({
               modelInfo={modelInfo}
               models={models}
               onSelect={onModelSelect}
-              compact
             />
           ) : (
             <button

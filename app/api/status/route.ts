@@ -374,6 +374,13 @@ export async function GET() {
       configured: Boolean(process.env.GEMINI_API_KEY),
       reachable: (await checkHttpOk(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`, { timeoutMs: 3000 })).ok,
     },
+    glm: {
+      configured: Boolean(process.env.GLM_API_KEY),
+      reachable: (await checkHttpOk("https://api.z.ai/api/coding/paas/v4/models", {
+        timeoutMs: 3000,
+        headers: { Authorization: `Bearer ${process.env.GLM_API_KEY}` }
+      })).ok,
+    },
     openai: {
       configured: Boolean(process.env.OPENAI_API_KEY),
       reachable: (await checkHttpOk("https://api.openai.com/v1/models", { 

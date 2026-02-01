@@ -117,7 +117,7 @@ function ProviderForm({ provider, onSave, onRemove }: { provider: CustomProvider
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder="https://api.example.com/v1"
-                className="w-full px-3 py-2 bg-surface-muted/30 border border-line rounded text-sm text-ink focus:outline-none focus:border-accent-500"
+                className="w-full px-3 py-2 bg-surface-muted/30 border border-line rounded text-sm text-ink focus:outline-none focus:border-blue-500"
               />
             </div>
 
@@ -128,7 +128,7 @@ function ProviderForm({ provider, onSave, onRemove }: { provider: CustomProvider
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="sk-..."
-                className="w-full px-3 py-2 bg-surface-muted/30 border border-line rounded text-sm text-ink focus:outline-none focus:border-accent-500"
+                className="w-full px-3 py-2 bg-surface-muted/30 border border-line rounded text-sm text-ink focus:outline-none focus:border-blue-500"
               />
             </div>
              <button

@@ -111,7 +111,7 @@ export default function NotificationPanel({
           className="w-full flex items-center justify-between px-4 py-3 hover:bg-surface-muted/70 dark:hover:bg-surface-strong/70 transition-colors rounded-t-xl"
         >
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-accent-500 rounded-full animate-pulse" />
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
             <span className="font-semibold text-sm text-ink">
               Notifications
             </span>

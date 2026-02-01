@@ -61,9 +61,15 @@ export default function ModelDropdown({
     return { emoji: "💰💰💰💰", tooltip: `$${price}/1M - Expensive` };
   }
 
-  // Sort models: by Provider (A-Z), then by Price (free → cheap → expensive)
+  // Sort models: GLM first, then by Provider (A-Z), then by Price
   const sortedModels = [...models].sort((a, b) => {
-    // First by provider name (alphabetically)
+    // GLM provider always comes first
+    const isGlmA = a.provider.toLowerCase() === "glm";
+    const isGlmB = b.provider.toLowerCase() === "glm";
+    if (isGlmA && !isGlmB) return -1;
+    if (!isGlmA && isGlmB) return 1;
+
+    // Then by provider name (alphabetically)
     const providerA = a.provider.toLowerCase();
     const providerB = b.provider.toLowerCase();
     if (providerA !== providerB) {
@@ -95,7 +101,7 @@ export default function ModelDropdown({
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${buttonBg} transition-colors text-sm min-w-[180px] max-w-[280px]`}
+        className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg ${buttonBg} transition-colors text-xs sm:text-sm min-w-[140px] sm:min-w-[180px] max-w-[200px] sm:max-w-[280px]`}
       >
         <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -107,7 +113,7 @@ export default function ModelDropdown({
       </button>
 
       {showMenu && (
-        <div className={`absolute bottom-full left-0 mb-2 w-full min-w-[280px] rounded-xl border shadow-2xl z-[9999] max-h-[400px] overflow-y-auto ${menuBg}`}>
+        <div className={`absolute bottom-full left-0 sm:left-auto right-0 sm:right-0 mb-2 w-full min-w-[200px] sm:min-w-[280px] rounded-xl border shadow-2xl z-[9999] max-h-[280px] sm:max-h-[400px] overflow-y-auto ${menuBg}`}>
           <div className="p-1">
             {Object.entries(modelsByProvider).map(([provider, providerModels], index) => (
               <div key={provider} className={index > 0 ? "mt-2 pt-2 border-t border-line/50" : ""}>

@@ -39,8 +39,10 @@ export interface ChatSession {
     | "openrouter"
     | "ollama"
     | "gemini"
+    | "glm"
     | "opencodezen"
     | "fireworks"
+    | "zai"
     | "custom";
   model?: string;
   repoName?: string | null;

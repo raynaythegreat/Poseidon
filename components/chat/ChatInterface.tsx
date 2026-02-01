@@ -76,8 +76,10 @@ type ModelProvider =
   | "openrouter"
   | "ollama"
   | "gemini"
+  | "glm"
   | "opencodezen"
   | "fireworks"
+  | "zai"
   | "custom";
 const MODEL_PROVIDERS: ModelProvider[] = [
   "claude",
@@ -86,8 +88,10 @@ const MODEL_PROVIDERS: ModelProvider[] = [
   "openrouter",
   "ollama",
   "gemini",
+  "glm",
   "opencodezen",
   "fireworks",
+  "zai",
   "custom",
 ];
 
@@ -368,6 +372,8 @@ function sortModelOptionsAlphabetically(options: ModelOption[]): ModelOption[] {
 
 function getProviderSortKey(groupName: string): string {
   const normalized = groupName.toLowerCase();
+  // GLM always comes first
+  if (normalized.startsWith("glm")) return "AAA-GLM";
   if (normalized.includes("openrouter")) return "OpenRouter";
   if (normalized.startsWith("claude")) return "Claude";
   if (normalized.startsWith("ollama")) return "Ollama";
@@ -1443,7 +1449,7 @@ export default function ChatInterface() {
   const [repoContext, setRepoContext] = useState<RepoContextData | null>(null);
   const [loadingContext, setLoadingContext] = useState(false);
   const [selectedModel, setSelectedModel] = useState(
-    "ollama:gemini-3-flash-preview:cloud",
+    "glm:glm-4.7",
   );
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [showFloatingControls, setShowFloatingControls] = useState(false);
@@ -3081,6 +3087,12 @@ export default function ChatInterface() {
       push(selectedModel, selectedModelInfo.provider, selectedModelInfo.name);
     }
 
+    if (isProviderAvailable("glm")) {
+      push("glm-4.7", "glm", "GLM 4.7");
+      push("glm-4-flash", "glm", "GLM 4 Flash");
+      push("glm-4-plus", "glm", "GLM 4 Plus");
+    }
+
     if (isProviderAvailable("claude")) {
       push("claude-sonnet-4", "claude", "Claude Sonnet 4");
       push("claude-3.5-haiku", "claude", "Claude 3.5 Haiku");
@@ -4429,7 +4441,19 @@ export default function ChatInterface() {
         />
       }
       centerPanel={
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full relative">
+          {/* Floating New Chat Button - Top Right */}
+          <button
+            onClick={handleNewChat}
+            className="absolute top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
+            title="New Chat"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span className="font-medium">New Chat</span>
+          </button>
+
           {/* Header Bubble - Integrated into chat flow like lovable.dev */}
           <ChatHeaderBubble
             selectedRepo={selectedRepo}

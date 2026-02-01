@@ -16,6 +16,7 @@ const MODEL_CONFIG: Record<
       | "ollama"
       | "groq"
       | "gemini"
+      | "glm"
       | "opencodezen"
       | "fireworks"
       | "zai";
@@ -70,6 +71,13 @@ const MODEL_CONFIG: Record<
   "gemini-1.5-pro": { provider: "gemini", apiModel: "gemini-pro-latest" },
   "gemini-1.5-flash": { provider: "gemini", apiModel: "gemini-flash-latest" },
   "gemini-2.0-pro": { provider: "gemini", apiModel: "gemini-2.5-pro" },
+
+  // GLM models (Zhipu AI / ZAI)
+  "glm-4.7": { provider: "glm", apiModel: "glm-4.7" },
+  "glm-4-flash": { provider: "glm", apiModel: "glm-4-flash" },
+  "glm-4-plus": { provider: "glm", apiModel: "glm-4-plus" },
+  "glm-4-air": { provider: "glm", apiModel: "glm-4-air" },
+  "glm-3-turbo": { provider: "glm", apiModel: "glm-3-turbo" },
 
   // OpenRouter Pro/Latest
   "anthropic/claude-3.5-sonnet": {
@@ -259,6 +267,7 @@ const MODEL_PROVIDERS = [
   "ollama",
   "groq",
   "gemini",
+  "glm",
   "opencodezen",
   "fireworks",
   "zai",
@@ -832,7 +841,7 @@ export async function POST(request: NextRequest) {
           ? baseConfig
           : { provider: normalizedProvider, apiModel: modelName };
     } else {
-      modelConfig = baseConfig || MODEL_CONFIG["claude-sonnet-4"];
+      modelConfig = baseConfig || MODEL_CONFIG["glm-4.7"];
     }
     const provider = modelConfig.provider;
     const apiModel = modelConfig.apiModel;
@@ -872,6 +881,7 @@ export async function POST(request: NextRequest) {
       openrouter: openrouterApiKey,
       ollama: process.env.OLLAMA_API_KEY,
       groq: groqApiKey,
+      glm: process.env.GLM_API_KEY,
       opencodezen: opencodeApiKey,
       fireworks: fireworksApiKey,
       zai: process.env.ZAI_API_KEY,
@@ -1600,6 +1610,34 @@ export async function POST(request: NextRequest) {
             });
 
             const response = await zai.chat.completions.create({
+              model: apiModel,
+              messages: buildOpenAICompatibleMessages(
+                contextPrompt,
+                messages,
+                normalizedAttachments,
+              ),
+              stream: true,
+            });
+
+            for await (const chunk of response) {
+              const content = chunk.choices[0]?.delta?.content;
+              if (content) {
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({ type: "text", content })}\n\n`,
+                  ),
+                );
+              }
+            }
+          } else if (provider === "glm") {
+            // GLM (Zhipu AI) API (OpenAI-compatible)
+            // Uses the coding-specific endpoint
+            const glm = new OpenAI({
+              apiKey: providerKey,
+              baseURL: "https://api.z.ai/api/coding/paas/v4",
+            });
+
+            const response = await glm.chat.completions.create({
               model: apiModel,
               messages: buildOpenAICompatibleMessages(
                 contextPrompt,

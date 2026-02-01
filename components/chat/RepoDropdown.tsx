@@ -49,7 +49,7 @@ export default function RepoDropdown({
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-muted/60 hover:bg-surface-muted/80 text-ink-muted hover:text-ink border border-line/60 transition-colors text-sm min-w-[180px] max-w-[280px]"
+        className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-muted/60 hover:bg-surface-muted/80 text-ink-muted hover:text-ink border border-line/60 transition-colors text-xs sm:text-sm min-w-[140px] sm:min-w-[180px] max-w-[200px] sm:max-w-[280px]"
       >
         <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -63,7 +63,7 @@ export default function RepoDropdown({
       </button>
 
       {showMenu && (
-        <div className={`absolute bottom-full left-0 mb-2 w-full min-w-[280px] rounded-xl border shadow-2xl z-[9999] max-h-[350px] overflow-y-auto ${menuBg}`}>
+        <div className={`absolute bottom-full left-0 sm:left-auto right-0 sm:right-0 mb-2 w-full min-w-[200px] sm:min-w-[280px] rounded-xl border shadow-2xl z-[9999] max-h-[250px] sm:max-h-[350px] overflow-y-auto ${menuBg}`}>
           <div className="p-1">
             {/* Create New Repository - Now at the top */}
             <button

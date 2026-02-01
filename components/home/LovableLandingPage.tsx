@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUserSettings } from "@/contexts/UserSettingsContext";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 import TridentLogo from "@/components/ui/TridentLogo";
-import RepoSelector from "@/components/chat/RepoSelector";
-import ModelDropdown from "@/components/chat/ModelDropdown";
 
 const navItems = [
   { label: "Repos", id: "repos" },
@@ -17,93 +14,13 @@ const navItems = [
 ];
 
 export default function LovableLandingPage() {
-  const [input, setInput] = useState("");
   const router = useRouter();
   const { clearCurrentSession } = useChatHistory();
   const { settings } = useUserSettings();
-  const [selectedRepo, setSelectedRepo] = useState<any>(null);
-  const [selectedModel, setSelectedModel] = useState<{ name: string; provider: string; price?: number } | null>(null);
-  const [models, setModels] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchModels();
-  }, []);
-
-  const fetchModels = useCallback(async () => {
-    // Check cache first (1 minute cache)
-    const cached = localStorage.getItem("poseidon_models_cache");
-    const cachedTime = localStorage.getItem("poseidon_models_cache_time");
-    const now = Date.now();
-
-    if (cached && cachedTime) {
-      const cacheAge = now - parseInt(cachedTime, 10);
-      // Use cache if less than 1 minute old
-      if (cacheAge < 1 * 60 * 1000) {
-        setModels(JSON.parse(cached));
-        return;
-      }
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch("/api/models");
-      const data = await response.json();
-      if (data.models && data.providers) {
-        const modelList: any[] = [];
-
-        // Only load models from configured providers
-        const sortedProviders = Object.keys(data.models).sort();
-        sortedProviders.forEach((providerKey) => {
-          // Check if this provider is configured
-          if (data.providers[providerKey]) {
-            const providerModels = data.models[providerKey] as any[];
-            providerModels.forEach((model: any) => {
-              // Use providerKey for consistency, model.provider may be capitalized
-              modelList.push({ ...model, provider: model.provider || providerKey });
-            });
-          }
-        });
-
-        // Load custom providers from localStorage
-        try {
-          const customProvidersStr = localStorage.getItem("poseidon_custom_providers_list");
-          if (customProvidersStr) {
-            const customProviders = JSON.parse(customProvidersStr);
-            customProviders.forEach((provider: any) => {
-              if (provider.enabled && provider.models && Array.isArray(provider.models)) {
-                provider.models.forEach((model: any) => {
-                  modelList.push({
-                    id: model.id,
-                    name: model.name || model.id,
-                    provider: provider.name,
-                    description: "Custom provider",
-                  });
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.error("Failed to load custom providers:", e);
-        }
-
-        setModels(modelList);
-        // Cache the results (1 minute cache)
-        localStorage.setItem("poseidon_models_cache", JSON.stringify(modelList));
-        localStorage.setItem("poseidon_models_cache_time", now.toString());
-      }
-    } catch (error) {
-      console.error("Failed to fetch models:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const handleSubmit = () => {
-    if (input.trim()) {
-      clearCurrentSession();
-      router.push(`/?prompt=${encodeURIComponent(input)}`);
-    }
+  const handleGetStarted = () => {
+    clearCurrentSession();
+    router.push("/?tab=chat");
   };
 
   const handleNavClick = (tabId: string) => {
@@ -141,113 +58,52 @@ export default function LovableLandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section - Lovable.dev Style */}
+      {/* Hero Section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-32 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-3xl"
+          className="w-full max-w-4xl text-center"
         >
           {/* Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold text-center text-gray-900 dark:text-white mb-8 leading-tight">
-            Ship apps
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
+            Build software
             <br />
-            <span className="text-gray-400 dark:text-gray-600">with the speed of thought.</span>
+            <span className="text-gray-400 dark:text-gray-600">at the speed of thought.</span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg text-center text-gray-500 dark:text-gray-400 mb-12 max-w-xl mx-auto">
-            Describe what you want to build, {settings.username || "Developer"}. Poseidon handles the rest — from planning to deployment.
+          <p className="text-xl text-center text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+            Your AI-powered development companion. From idea to deployment — Poseidon helps you plan, code, debug, and ship faster than ever.
           </p>
 
-          {/* Chat Input - Lovable.dev Style */}
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
+            className="flex items-center justify-center gap-4 flex-wrap"
           >
-            <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl focus-within:border-gray-200 dark:focus-within:border-gray-800 focus-within:ring-0 focus-within:shadow-2xl">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-                placeholder="Describe the app you want to build..."
-                className="w-full px-6 py-5 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:!outline-none focus:!ring-0 resize-none text-lg min-h-[140px]"
-                rows={5}
-              />
-
-              {/* Bottom Toolbar */}
-              <div className="flex items-center justify-between px-3 pb-3 flex-wrap gap-y-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  {/* Repo Selector - Dropdown to select/create repository */}
-                  <div className="relative">
-                    <RepoSelector
-                      selectedRepo={selectedRepo}
-                      onSelect={setSelectedRepo}
-                    />
-                  </div>
-
-                  {/* Model Selector - Shows dropdown of available models */}
-                  <ModelDropdown
-                    modelInfo={selectedModel || { name: "Claude 3.5 Sonnet", provider: "Claude" }}
-                    models={models.length > 0 ? models : [
-                      { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around", price: 3 },
-                    ]}
-                    onSelect={setSelectedModel}
-                  />
-
-                  {/* Brainstorm */}
-                  <button
-                    onClick={() => {
-                      clearCurrentSession();
-                      router.push("/?brainstorm=true");
-                    }}
-                    className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                    title="Brainstorm ideas"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                  </button>
-
-                  {/* Write Plan */}
-                  <button
-                    onClick={() => {
-                      clearCurrentSession();
-                      router.push("/?plan=true");
-                    }}
-                    className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                    title="Create a plan"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  onClick={handleSubmit}
-                  disabled={!input.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-black dark:bg-white text-white dark:text-black font-medium text-xs transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span>Generate</span>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur-xl opacity-20 -z-10" />
+            <button
+              onClick={handleGetStarted}
+              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold text-lg transition-all hover:opacity-90 hover:scale-105"
+            >
+              <span>Get Started</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => handleNavClick("settings")}
+              className="flex items-center gap-2 px-8 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-semibold text-lg transition-all hover:border-gray-300 dark:hover:border-gray-700 hover:scale-105"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Configure</span>
+            </button>
           </motion.div>
 
           {/* Feature Pills */}
@@ -255,9 +111,9 @@ export default function LovableLandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex items-center justify-center gap-3 mt-8 flex-wrap"
+            className="flex items-center justify-center gap-3 mt-12 flex-wrap"
           >
-            {["Web Apps", "Mobile Apps", "APIs", "Databases", "UI Components"].map((feature) => (
+            {["AI-Powered", "GitHub Integrated", "Multi-Provider", "Local & Private", "One-Click Deploy"].map((feature) => (
               <span
                 key={feature}
                 className="px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-full text-sm text-gray-600 dark:text-gray-400"
@@ -268,16 +124,80 @@ export default function LovableLandingPage() {
           </motion.div>
         </motion.div>
 
-        {/* Features Section */}
+        {/* How It Works Section */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-20 w-full max-w-4xl"
+          className="mt-32 w-full max-w-5xl"
         >
-          <h3 className="text-center text-lg font-semibold text-gray-900 dark:text-white mb-8">
-            Everything you need to build
-          </h3>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
+            How it works
+          </h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+            From initial idea to deployed application in four simple steps
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              {
+                step: "01",
+                title: "Describe",
+                description: "Tell Poseidon what you want to build in plain English. Use /brainstorm to explore ideas or /plan for detailed implementation guides.",
+              },
+              {
+                step: "02",
+                title: "Generate",
+                description: "Watch as AI generates clean, production-ready code. Ask questions, request changes, and iterate in real-time.",
+              },
+              {
+                step: "03",
+                title: "Integrate",
+                description: "Connect your GitHub repository and apply changes directly. Poseidon creates branches, makes commits, and handles pull requests.",
+              },
+              {
+                step: "04",
+                title: "Deploy",
+                description: "One-click deployment to Vercel or Render. Your application is live and ready for users in minutes.",
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 + (index * 0.1) }}
+                className="relative"
+              >
+                <div className="text-5xl font-bold text-gray-200 dark:text-gray-800 absolute -top-4 -left-2 -z-10">
+                  {item.step}
+                </div>
+                <div className="relative p-6 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 h-full">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {item.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Features Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+          className="mt-32 w-full max-w-5xl"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
+            Powerful features
+          </h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+            Everything you need to build modern applications
+          </p>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
@@ -287,7 +207,7 @@ export default function LovableLandingPage() {
                   </svg>
                 ),
                 title: "AI-Powered Chat",
-                description: "Chat with Claude to generate code, debug issues, and get explanations"
+                description: "Chat with Claude, GPT-4, Gemini, and more. Generate code, debug issues, and get explanations in real-time.",
               },
               {
                 icon: (
@@ -296,7 +216,7 @@ export default function LovableLandingPage() {
                   </svg>
                 ),
                 title: "GitHub Integration",
-                description: "Connect your repos and apply changes directly from the chat"
+                description: "Connect your repositories and apply changes directly. Create branches, make commits, and manage pull requests.",
               },
               {
                 icon: (
@@ -305,7 +225,7 @@ export default function LovableLandingPage() {
                   </svg>
                 ),
                 title: "One-Click Deploy",
-                description: "Deploy to Vercel or Render with a single click"
+                description: "Deploy to Vercel or Render with a single click. Automatic builds, previews, and production rollouts.",
               },
               {
                 icon: (
@@ -314,7 +234,7 @@ export default function LovableLandingPage() {
                   </svg>
                 ),
                 title: "Skills System",
-                description: "Use slash commands like /brainstorm and /plan for specialized workflows"
+                description: "Use slash commands like /brainstorm, /plan, /explain for specialized AI workflows and faster development.",
               },
               {
                 icon: (
@@ -323,7 +243,7 @@ export default function LovableLandingPage() {
                   </svg>
                 ),
                 title: "Local & Private",
-                description: "Run locally with Ollama or use your own API keys"
+                description: "Run entirely locally with Ollama. Your code never leaves your machine. Full privacy and control.",
               },
               {
                 icon: (
@@ -331,26 +251,26 @@ export default function LovableLandingPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                   </svg>
                 ),
-                title: "Multi-Provider Support",
-                description: "Choose from Claude, OpenAI, Groq, Gemini, Ollama, and custom providers"
-              }
+                title: "Multi-Provider",
+                description: "Choose from Claude, OpenAI, Groq, Gemini, Fireworks, Ollama, or add your own OpenAI-compatible provider.",
+              },
             ].map((feature, index) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 + (index * 0.1) }}
-                className="p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800"
+                transition={{ duration: 0.5, delay: 1.1 + (index * 0.1) }}
+                className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800"
               >
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-black dark:bg-white rounded-lg text-white dark:text-black">
                     {feature.icon}
                   </div>
-                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg">
                     {feature.title}
-                  </h4>
+                  </h3>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -358,15 +278,135 @@ export default function LovableLandingPage() {
           </div>
         </motion.div>
 
-        {/* Footer */}
+        {/* Use Cases Section */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.4 }}
-          className="mt-16 text-center"
+          className="mt-32 w-full max-w-5xl"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
+            Built for developers
+          </h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+            Whether you&apos;re a startup, agency, or solo developer
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                title: "Rapid Prototyping",
+                description: "Go from idea to working prototype in minutes. Perfect for hackathons, MVPs, and proof-of-concepts.",
+                examples: ["Landing pages", "Dashboards", "APIs", "Microservices"],
+              },
+              {
+                title: "Learning & Exploration",
+                description: "Understand new technologies and patterns. Ask questions, get explanations, and see code examples.",
+                examples: ["New frameworks", "Best practices", "Code patterns", "Debugging"],
+              },
+              {
+                title: "Productivity Boost",
+                description: "Automate repetitive tasks and accelerate development. Focus on what matters most.",
+                examples: ["Boilerplate generation", "Refactoring", "Testing", "Documentation"],
+              },
+              {
+                title: "Collaboration",
+                description: "Work seamlessly with your team. Share conversations, sync with GitHub, and deploy together.",
+                examples: ["Code reviews", "Pair programming", "Knowledge sharing", "Onboarding"],
+              },
+            ].map((useCase, index) => (
+              <motion.div
+                key={useCase.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.5 + (index * 0.1) }}
+                className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800"
+              >
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  {useCase.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                  {useCase.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {useCase.examples.map((example) => (
+                    <span
+                      key={example}
+                      className="px-3 py-1 bg-white dark:bg-black rounded-full text-xs text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800"
+                    >
+                      {example}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Tech Stack Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.8 }}
+          className="mt-32 w-full max-w-4xl text-center"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Works with your stack
+          </h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+            Poseidon supports all major frameworks, languages, and platforms
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 opacity-60">
+            {["React", "Next.js", "Vue", "Svelte", "Node.js", "Python", "TypeScript", "Go", "Rust", "PostgreSQL", "MongoDB", "Redis"].map((tech) => (
+              <span
+                key={tech}
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 2.0 }}
+          className="mt-32 w-full max-w-3xl text-center"
+        >
+          <div className="p-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Ready to build faster?
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
+              Join thousands of developers shipping better software with AI.
+            </p>
+            <button
+              onClick={handleGetStarted}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold text-lg transition-all hover:opacity-90 hover:scale-105"
+            >
+              <span>Start Building</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 2.2 }}
+          className="mt-20 text-center"
         >
           <p className="text-sm text-gray-400 dark:text-gray-600">
             Powered by Claude • GitHub Integration • One-Click Deployment
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-700 mt-2">
+            Open source • Private by default • Built for developers
           </p>
         </motion.div>
       </div>

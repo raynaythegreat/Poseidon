@@ -70,8 +70,6 @@ export default function ChatHeaderBubble({
               modelInfo={modelInfo}
               models={models}
               onSelect={onModelSelect}
-              darkTheme
-              compact
             />
           ) : (
             <div className="text-sm text-white/50 hover:text-white/80 transition-colors flex items-center gap-1.5">
@@ -89,8 +87,6 @@ export default function ChatHeaderBubble({
               repos={repos}
               onSelect={onRepoSelect}
               onCreateRepo={onCreateRepo}
-              darkTheme
-              compact
             />
           ) : selectedRepo ? (
             <span className="text-sm text-white/50">{selectedRepo.name}</span>
