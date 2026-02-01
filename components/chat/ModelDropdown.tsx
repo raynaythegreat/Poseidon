@@ -44,21 +44,21 @@ export default function ModelDropdown({
   const itemText = "text-ink-muted hover:text-ink";
   const selectedBg = "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25";
 
-  // Helper to get price display text and color
-  function getPriceDisplay(price?: number): { text: string; color: string } {
+  // Helper to get price display emoji based on cost
+  function getPriceDisplay(price?: number): { emoji: string; tooltip: string } {
     if (price === 0 || price === undefined) {
-      return { text: "Free", color: "bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-300 border-green-300 dark:border-green-500/30" };
+      return { emoji: "🆓", tooltip: "Free" };
     }
     if (price < 0.5) {
-      return { text: `$${price}/1M`, color: "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30" };
+      return { emoji: "💰", tooltip: `$${price}/1M - Very affordable` };
     }
     if (price < 3) {
-      return { text: `$${price}/1M`, color: "bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-500/30" };
+      return { emoji: "💰💰", tooltip: `$${price}/1M - Affordable` };
     }
     if (price < 10) {
-      return { text: `$${price}/1M`, color: "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-500/30" };
+      return { emoji: "💰💰💰", tooltip: `$${price}/1M - Moderate` };
     }
-    return { text: `$${price}/1M`, color: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-300 border-red-300 dark:border-red-500/30" };
+    return { emoji: "💰💰💰💰", tooltip: `$${price}/1M - Expensive` };
   }
 
   // Sort models: free models first, then by provider, then by price (ascending)
@@ -135,13 +135,14 @@ export default function ModelDropdown({
                           ? selectedBg
                           : `${itemText} ${itemHover}`
                       }`}
+                      title={priceDisplay.tooltip}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <div className="font-medium truncate">{model.name}</div>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border whitespace-nowrap ${priceDisplay.color}`}>
-                          {priceDisplay.text}
+                        <span className="text-xs" title={priceDisplay.tooltip}>
+                          {priceDisplay.emoji}
                         </span>
                       </div>
                     </button>
