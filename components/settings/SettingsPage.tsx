@@ -820,21 +820,6 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                 Get Key
               </a>
             )}
-            {item.name === "Groq" &&
-              status?.runtime?.onVercel === false &&
-              status?.runtime?.onRender !== true && (
-                <button
-                  onClick={syncGroqToVercel}
-                  disabled={
-                    groqSyncing ||
-                    !status?.vercel?.configured ||
-                    !status?.github?.configured
-                  }
-                  className="px-3 py-1 rounded-full text-xs font-medium bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {groqSyncing ? "Syncing..." : "Sync to Vercel"}
-                </button>
-              )}
             {item.name === "Ollama" && showOffline && (
               <button
                 type="button"
