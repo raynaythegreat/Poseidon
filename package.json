@@ -15,7 +15,11 @@
     "dist": "npm run build && electron-builder",
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
-    "dist:linux": "npm run build && electron-builder --linux"
+    "dist:linux": "npm run build && electron-builder --linux",
+    "dist:linux:deb": "npm run build && electron-builder --linux deb",
+    "dist:linux:appimage": "npm run build && electron-builder --linux appimage",
+    "dist:linux:snap": "npm run build && electron-builder --linux snap",
+    "dist:linux:arm": "npm run build && electron-builder --linux --arm64"
   },
   "keywords": [
     "github",
