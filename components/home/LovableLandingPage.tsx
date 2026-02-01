@@ -183,8 +183,8 @@ export default function LovableLandingPage() {
               />
 
               {/* Bottom Toolbar */}
-              <div className="flex items-center justify-between px-3 pb-3">
-                <div className="flex items-center gap-1">
+              <div className="flex items-center justify-between px-3 pb-3 flex-wrap gap-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   {/* Repo Selector - Dropdown to select/create repository */}
                   <div className="relative">
                     <RepoSelector
@@ -197,7 +197,7 @@ export default function LovableLandingPage() {
                   <ModelDropdown
                     modelInfo={selectedModel || { name: "Claude 3.5 Sonnet", provider: "Claude" }}
                     models={models.length > 0 ? models : [
-                      { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around" },
+                      { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around", price: 3 },
                     ]}
                     onSelect={setSelectedModel}
                     compact={true}
@@ -236,7 +236,7 @@ export default function LovableLandingPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={!input.trim()}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-black dark:bg-white text-white dark:text-black font-medium text-xs transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-black dark:bg-white text-white dark:text-black font-medium text-xs transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>Generate</span>
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
