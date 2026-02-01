@@ -201,7 +201,6 @@ export default function LovableLandingPage() {
                       { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", provider: "Claude", description: "Best all-around", price: 3 },
                     ]}
                     onSelect={setSelectedModel}
-                    compact={true}
                   />
 
                   {/* Brainstorm */}

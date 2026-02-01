@@ -376,8 +376,6 @@ export default function SimpleChatPage() {
                   repos={repos}
                   onSelect={handleRepoSelect}
                   onCreateRepo={handleCreateRepo}
-                  darkTheme
-                  compact
                 />
 
                 {/* Model Selector */}
@@ -385,8 +383,6 @@ export default function SimpleChatPage() {
                   modelInfo={modelInfo}
                   models={models}
                   onSelect={handleModelSelect}
-                  darkTheme
-                  compact
                 />
 
                 {/* Brainstorm Button */}

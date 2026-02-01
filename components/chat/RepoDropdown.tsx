@@ -15,8 +15,6 @@ interface RepoDropdownProps {
   repos: Repository[];
   onSelect: (repo: Repository) => void;
   onCreateRepo: () => void;
-  darkTheme?: boolean;
-  compact?: boolean;
 }
 
 export default function RepoDropdown({
@@ -24,8 +22,6 @@ export default function RepoDropdown({
   repos,
   onSelect,
   onCreateRepo,
-  darkTheme: _darkTheme = true,
-  compact = false,
 }: RepoDropdownProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -53,17 +49,15 @@ export default function RepoDropdown({
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className={`flex items-center gap-2 ${compact ? "px-2 py-1" : "px-3 py-1.5"} rounded-lg ${buttonBg} transition-colors ${compact ? "text-xs" : "text-sm"}`}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-muted/60 hover:bg-surface-muted/80 text-ink-muted hover:text-ink border border-line/60 transition-colors text-sm min-w-[180px] max-w-[280px]"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
         </svg>
-        {!compact && (
-          <span className="truncate max-w-[120px]">
-            {selectedRepo ? selectedRepo.name : "Select Repo"}
-          </span>
-        )}
-        <svg className={`w-4 h-4 transition-transform ${showMenu ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <span className="truncate flex-1 text-left font-medium">
+          {selectedRepo ? selectedRepo.name : "Select Repo"}
+        </span>
+        <svg className={`w-4 h-4 transition-transform shrink-0 ${showMenu ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
