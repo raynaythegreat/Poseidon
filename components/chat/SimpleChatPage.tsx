@@ -174,15 +174,19 @@ export default function SimpleChatPage() {
       try {
         const response = await fetch("/api/models");
         const data = await response.json();
-        if (data.models) {
+        if (data.models && data.providers) {
           const modelList: ModelOption[] = [];
-          // Get providers in alphabetical order
+
+          // Only load models from configured providers
           const sortedProviders = Object.keys(data.models).sort();
           sortedProviders.forEach((provider) => {
-            const providerModels = data.models[provider] as any[];
-            providerModels.forEach((model: any) => {
-              modelList.push({ ...model, provider });
-            });
+            // Check if this provider is configured
+            if (data.providers[provider]) {
+              const providerModels = data.models[provider] as any[];
+              providerModels.forEach((model: any) => {
+                modelList.push({ ...model, provider });
+              });
+            }
           });
 
           // Load custom providers from localStorage
@@ -293,6 +297,27 @@ export default function SimpleChatPage() {
       <div className="flex-1 flex flex-col px-4 sm:px-6 py-6 max-w-4xl mx-auto w-full min-h-0">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto mb-6 min-h-0">
+          {/* Mode Indicator */}
+          {messages.length > 0 && (
+            <div className="mb-4">
+              {messages[0].content.includes("brainstorming mode") && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-100 dark:bg-yellow-500/10 border border-yellow-300 dark:border-yellow-500/30 text-yellow-800 dark:text-yellow-300 text-sm">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  <span className="font-medium">Brainstorm Mode Active</span>
+                </div>
+              )}
+              {messages[0].content.includes("planning mode") && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-500/10 border border-blue-300 dark:border-blue-500/30 text-blue-800 dark:text-blue-300 text-sm">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span className="font-medium">Planning Mode Active</span>
+                </div>
+              )}
+            </div>
+          )}
           {messages.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -323,7 +348,7 @@ export default function SimpleChatPage() {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <div className="relative bg-surface/90 rounded-2xl border border-line/60 shadow-sm backdrop-blur-xl">
+          <div className="relative bg-surface/90 rounded-2xl border border-line/60 shadow-sm backdrop-blur-xl focus-within:border-line/60 focus-within:ring-0 focus-within:shadow-sm">
             <textarea
               ref={textareaRef}
               value={input}
@@ -335,7 +360,7 @@ export default function SimpleChatPage() {
                 }
               }}
               placeholder="Describe what you want to build or ask a question..."
-              className="w-full px-6 py-5 bg-transparent text-ink placeholder:text-ink-subtle focus:outline-none resize-none text-lg min-h-[120px]"
+              className="w-full px-6 py-5 bg-transparent text-ink placeholder:text-ink-subtle focus:!outline-none focus:!ring-0 resize-none text-lg min-h-[120px]"
               rows={4}
               disabled={isLoading}
             />

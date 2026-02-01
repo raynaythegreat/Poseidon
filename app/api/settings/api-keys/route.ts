@@ -47,7 +47,7 @@ export async function GET() {
     const env = readEnvFile();
     // Extract common provider API keys
     const apiKeys = {
-      ANTHROPIC_API_KEY: env.ANTHROPIC_API_KEY,
+      CLAUDE_API_KEY: env.CLAUDE_API_KEY,
       OPENAI_API_KEY: env.OPENAI_API_KEY,
       GROQ_API_KEY: env.GROQ_API_KEY,
       OPENROUTER_API_KEY: env.OPENROUTER_API_KEY,
@@ -55,6 +55,8 @@ export async function GET() {
       GEMINI_API_KEY: env.GEMINI_API_KEY,
       GITHUB_TOKEN: env.GITHUB_TOKEN,
       GITHUB_USERNAME: env.GITHUB_USERNAME,
+      VERCEL_TOKEN: env.VERCEL_TOKEN,
+      RENDER_API_KEY: env.RENDER_API_KEY,
     };
 
     return NextResponse.json({ apiKeys });
@@ -83,13 +85,15 @@ export async function POST(request: NextRequest) {
 
     // Map provider name to env variable name
     const envKeyMap: Record<string, string> = {
-      "Claude API": "ANTHROPIC_API_KEY",
+      "Claude API": "CLAUDE_API_KEY",
       "OpenAI API": "OPENAI_API_KEY",
       "Groq": "GROQ_API_KEY",
       "OpenRouter": "OPENROUTER_API_KEY",
       "Fireworks": "FIREWORKS_API_KEY",
       "Google Gemini": "GEMINI_API_KEY",
       "GitHub": "GITHUB_TOKEN",
+      "Vercel": "VERCEL_TOKEN",
+      "Render": "RENDER_API_KEY",
     };
 
     const envKey = envKeyMap[provider];
@@ -154,13 +158,15 @@ export async function DELETE(request: NextRequest) {
 
     // Map provider name to env variable name
     const envKeyMap: Record<string, string> = {
-      "Claude API": "ANTHROPIC_API_KEY",
+      "Claude API": "CLAUDE_API_KEY",
       "OpenAI API": "OPENAI_API_KEY",
       "Groq": "GROQ_API_KEY",
       "OpenRouter": "OPENROUTER_API_KEY",
       "Fireworks": "FIREWORKS_API_KEY",
       "Google Gemini": "GEMINI_API_KEY",
       "GitHub": "GITHUB_TOKEN",
+      "Vercel": "VERCEL_TOKEN",
+      "Render": "RENDER_API_KEY",
     };
 
     const envKey = envKeyMap[provider];

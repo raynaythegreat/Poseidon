@@ -10,7 +10,6 @@ import RepoSelector from "@/components/chat/RepoSelector";
 import ModelDropdown from "@/components/chat/ModelDropdown";
 
 const navItems = [
-  { label: "Chat", id: "chat" },
   { label: "Repos", id: "repos" },
   { label: "Deploy", id: "deploy" },
   { label: "History", id: "history" },
@@ -32,15 +31,15 @@ export default function LovableLandingPage() {
   }, []);
 
   const fetchModels = useCallback(async () => {
-    // Check cache first (5 minute cache)
+    // Check cache first (1 minute cache)
     const cached = localStorage.getItem("poseidon_models_cache");
     const cachedTime = localStorage.getItem("poseidon_models_cache_time");
     const now = Date.now();
 
     if (cached && cachedTime) {
       const cacheAge = now - parseInt(cachedTime, 10);
-      // Use cache if less than 5 minutes old
-      if (cacheAge < 5 * 60 * 1000) {
+      // Use cache if less than 1 minute old
+      if (cacheAge < 1 * 60 * 1000) {
         setModels(JSON.parse(cached));
         return;
       }
@@ -50,15 +49,19 @@ export default function LovableLandingPage() {
     try {
       const response = await fetch("/api/models");
       const data = await response.json();
-      if (data.models) {
+      if (data.models && data.providers) {
         const modelList: any[] = [];
-        // Get providers in alphabetical order
+
+        // Only load models from configured providers
         const sortedProviders = Object.keys(data.models).sort();
         sortedProviders.forEach((provider) => {
-          const providerModels = data.models[provider] as any[];
-          providerModels.forEach((model: any) => {
-            modelList.push({ ...model, provider });
-          });
+          // Check if this provider is configured
+          if (data.providers[provider]) {
+            const providerModels = data.models[provider] as any[];
+            providerModels.forEach((model: any) => {
+              modelList.push({ ...model, provider });
+            });
+          }
         });
 
         // Load custom providers from localStorage
@@ -84,7 +87,7 @@ export default function LovableLandingPage() {
         }
 
         setModels(modelList);
-        // Cache the results
+        // Cache the results (1 minute cache)
         localStorage.setItem("poseidon_models_cache", JSON.stringify(modelList));
         localStorage.setItem("poseidon_models_cache_time", now.toString());
       }
@@ -164,7 +167,7 @@ export default function LovableLandingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl">
+            <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl focus-within:border-gray-200 dark:focus-within:border-gray-800 focus-within:ring-0 focus-within:shadow-2xl">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -175,7 +178,7 @@ export default function LovableLandingPage() {
                   }
                 }}
                 placeholder="Describe the app you want to build..."
-                className="w-full px-6 py-5 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none resize-none text-lg min-h-[140px]"
+                className="w-full px-6 py-5 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:!outline-none focus:!ring-0 resize-none text-lg min-h-[140px]"
                 rows={5}
               />
 
@@ -204,7 +207,7 @@ export default function LovableLandingPage() {
                   <button
                     onClick={() => {
                       clearCurrentSession();
-                      router.push("/?prompt=/brainstorm");
+                      router.push("/?brainstorm=true");
                     }}
                     className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
                     title="Brainstorm ideas"
@@ -218,7 +221,7 @@ export default function LovableLandingPage() {
                   <button
                     onClick={() => {
                       clearCurrentSession();
-                      router.push("/?prompt=/plan");
+                      router.push("/?plan=true");
                     }}
                     className="flex items-center justify-center p-1.5 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 cursor-pointer"
                     title="Create a plan"

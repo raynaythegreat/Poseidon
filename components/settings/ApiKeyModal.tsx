@@ -109,6 +109,9 @@ export default function ApiKeyModal({ provider, description, onSave, onClose }: 
 
       setApiKey("");
       setHasApiKey(false);
+      // Clear the models cache so removed provider models disappear immediately
+      localStorage.removeItem("poseidon_models_cache");
+      localStorage.removeItem("poseidon_models_cache_time");
       setMessage({ type: "success", text: `✓ ${provider} API key removed!` });
     } catch (error) {
       setMessage({

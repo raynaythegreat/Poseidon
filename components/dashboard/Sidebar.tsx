@@ -71,10 +71,9 @@ interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
 }
 
-export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, onToggleCollapse }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, isCollapsed = false }: SidebarProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -117,7 +116,7 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
         ))}
       </nav>
 
-      {/* Theme Toggle, Collapse & Version */}
+      {/* Theme Toggle & Version */}
       <div className={`border-t border-line/60 ${isCollapsed ? "p-2" : "p-4"} space-y-2`}>
         <button
           onClick={toggleTheme}
@@ -137,28 +136,6 @@ export default function Sidebar({ activeTab, onTabChange, isCollapsed = false, o
               </svg>
             )}
             {!isCollapsed && (theme === "dark" ? "Light" : "Dark")}
-          </span>
-        </button>
-        <button
-          onClick={onToggleCollapse}
-          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          className={`w-full flex items-center rounded-lg text-sm font-medium text-ink-muted hover:bg-surface-muted/60 hover:text-ink transition-colors ${
-            isCollapsed ? "justify-center px-3 py-3" : "justify-between px-4 py-3"
-          }`}
-        >
-          <span className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
-            <svg
-              className={`w-5 h-5 transition-transform duration-200 ${
-                isCollapsed ? "rotate-180" : "rotate-0"
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-            {!isCollapsed && "Collapse"}
           </span>
         </button>
         {!isCollapsed && (

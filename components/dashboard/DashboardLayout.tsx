@@ -116,7 +116,6 @@ export default function DashboardLayout({ children, activeTab, onTabChange }: Da
           activeTab={activeTab}
           onTabChange={onTabChange}
           isCollapsed={isEffectivelyCollapsed}
-          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
       </div>
 

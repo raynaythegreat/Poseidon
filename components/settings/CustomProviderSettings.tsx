@@ -220,6 +220,10 @@ export default function CustomProviderSettings() {
         // Remove from localStorage
         const updated = providers.filter(p => p.id !== id);
         saveProviders(updated);
+
+        // Clear the models cache so removed custom provider models disappear immediately
+        localStorage.removeItem("poseidon_models_cache");
+        localStorage.removeItem("poseidon_models_cache_time");
     };
 
     const handleSave = async (config: CustomProviderConfig) => {
@@ -264,6 +268,10 @@ export default function CustomProviderSettings() {
                 enabled: true,
             };
             saveProviders(providers.map(p => p.id === config.id ? finalConfig : p));
+
+            // Clear the models cache so new custom provider models appear immediately
+            localStorage.removeItem("poseidon_models_cache");
+            localStorage.removeItem("poseidon_models_cache_time");
 
         } catch (err) {
             const finalConfig = {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_DIR="/Users/ray/Documents/Poseidon"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PID_FILE="$PROJECT_DIR/.poseidon.pids"
 LOG_FILE="$PROJECT_DIR/.poseidon.log"
 USE_CLOUDFLARED_TUNNEL="${USE_CLOUDFLARED_TUNNEL:-0}"

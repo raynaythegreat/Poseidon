@@ -343,6 +343,9 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
   const handleSaveApiKey = async (apiKey: string) => {
     // API key is saved via the modal's handleSave
     console.log(`API key saved for ${configuringProvider?.name}`);
+    // Clear the models cache so new provider models appear immediately
+    localStorage.removeItem("poseidon_models_cache");
+    localStorage.removeItem("poseidon_models_cache_time");
     // Refresh status to update configurations
     await fetchStatus();
   };
