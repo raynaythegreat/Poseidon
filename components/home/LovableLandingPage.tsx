@@ -54,12 +54,13 @@ export default function LovableLandingPage() {
 
         // Only load models from configured providers
         const sortedProviders = Object.keys(data.models).sort();
-        sortedProviders.forEach((provider) => {
+        sortedProviders.forEach((providerKey) => {
           // Check if this provider is configured
-          if (data.providers[provider]) {
-            const providerModels = data.models[provider] as any[];
+          if (data.providers[providerKey]) {
+            const providerModels = data.models[providerKey] as any[];
             providerModels.forEach((model: any) => {
-              modelList.push({ ...model, provider });
+              // Use providerKey for consistency, model.provider may be capitalized
+              modelList.push({ ...model, provider: model.provider || providerKey });
             });
           }
         });

@@ -188,7 +188,54 @@ function getModelName(id: string, provider: string): string {
   if (provider === 'Groq' && groqNames[id]) return groqNames[id];
 
   // Default: return the ID with nice formatting
-  return id.split('/').pop() || id;
+  return formatModelName(id);
+}
+
+// Format model names nicely (for Ollama and other providers)
+function formatModelName(id: string): string {
+  // Remove common prefixes
+  const cleanName = id.replace(/^(hf\.|hf-|^chat-|^instruct-)/i, '');
+
+  // Handle tag format (e.g., "model:tag" or "model:tag")
+  if (cleanName.includes(':')) {
+    const [model, tag] = cleanName.split(':');
+    // Format tag nicely (e.g., "3b" -> "3B", "latest" -> "Latest")
+    const formattedTag = tag.replace(/(\d)b$/, '$1B').replace(/^(\d)/, (match) => match.toUpperCase());
+    return formatBaseName(model) + (tag !== 'latest' ? ` (${formattedTag})` : '');
+  }
+
+  return formatBaseName(cleanName);
+}
+
+// Format the base model name
+function formatBaseName(name: string): string {
+  // Split by common separators
+  const parts = name.split(/[-_/]/);
+
+  // Format each part
+  const formattedParts = parts.map((part, index) => {
+    // Skip empty parts
+    if (!part) return '';
+
+    // Handle version numbers (e.g., "3", "3.2", "3.2.1")
+    if (/^\d+(\.\d+)*$/.test(part)) {
+      return part.toUpperCase();
+    }
+
+    // Handle size suffixes (e.g., "70b", "8b")
+    if (/^\d+b$/i.test(part)) {
+      return part.toUpperCase();
+    }
+
+    // Capitalize first letter of each word
+    if (index === 0) {
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    }
+    return part.toLowerCase();
+  });
+
+  // Join with spaces and clean up
+  return formattedParts.filter(Boolean).join(' ');
 }
 
 // Get provider display name
@@ -321,7 +368,7 @@ export async function GET() {
       const ollamaModels = await fetchOllamaModels(ollamaBaseUrl);
       models.ollama = ollamaModels.map((m: any) => ({
         id: m.name,
-        name: m.name,
+        name: formatModelName(m.name), // Use formatted name
         provider: 'Ollama',
         description: `Size: ${m.size ? Math.round(m.size / 1024 / 1024 / 1024) + 'GB' : 'Unknown'}`,
         price: 0, // Local models are free
