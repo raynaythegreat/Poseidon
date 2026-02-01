@@ -8,6 +8,7 @@ interface ModelOption {
   name: string;
   provider: Provider;
   description?: string;
+  price?: number; // Price per 1M input tokens
 }
 
 interface ModelDropdownProps {
@@ -47,14 +48,19 @@ export default function ModelDropdown({
   const itemText = "text-ink-muted hover:text-ink";
   const selectedBg = "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25";
 
-  // Sort models by provider name alphabetically
+  // Sort models by provider name alphabetically, then by price (ascending) within provider
   const sortedModels = [...models].sort((a, b) => {
     const providerA = a.provider.toLowerCase();
     const providerB = b.provider.toLowerCase();
     if (providerA !== providerB) {
       return providerA.localeCompare(providerB);
     }
-    // If same provider, sort by model name
+    // If same provider, sort by price (ascending), then by model name as tiebreaker
+    const priceA = a.price ?? 1;
+    const priceB = b.price ?? 1;
+    if (priceA !== priceB) {
+      return priceA - priceB;
+    }
     return a.name.localeCompare(b.name);
   });
 
@@ -92,8 +98,13 @@ export default function ModelDropdown({
                 }`}
               >
                 <div className="font-medium truncate">{model.name}</div>
-                <div className="text-xs mt-0.5 text-ink-subtle">
-                  {model.provider}
+                <div className="text-xs mt-0.5 text-ink-subtle flex items-center justify-between">
+                  <span>{model.provider}</span>
+                  {model.price !== undefined && model.price !== null && (
+                    <span className="text-ink-muted">
+                      {model.price === 0 ? 'Free' : `$${model.price}/1M`}
+                    </span>
+                  )}
                 </div>
               </button>
             ))}

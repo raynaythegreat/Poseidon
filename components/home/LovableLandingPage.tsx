@@ -22,7 +22,7 @@ export default function LovableLandingPage() {
   const { clearCurrentSession } = useChatHistory();
   const { settings } = useUserSettings();
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
-  const [selectedModel, setSelectedModel] = useState<any>(null);
+  const [selectedModel, setSelectedModel] = useState<{ name: string; provider: string; price?: number } | null>(null);
   const [models, setModels] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 

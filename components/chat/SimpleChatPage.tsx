@@ -25,6 +25,7 @@ interface ModelOption {
   name: string;
   provider: Provider;
   description?: string;
+  price?: number; // Price per 1M input tokens
 }
 
 export default function SimpleChatPage() {

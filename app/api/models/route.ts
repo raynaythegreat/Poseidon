@@ -1,5 +1,80 @@
 import { NextResponse } from "next/server";
 
+// Pricing data per 1M input tokens (USD, approximate 2025 rates)
+const MODEL_PRICING: Record<string, number> = {
+  // OpenAI
+  'o1-preview': 15,
+  'o1-mini': 3,
+  'gpt-4o': 5,
+  'gpt-4o-mini': 0.15,
+  'gpt-4-turbo': 10,
+  'gpt-4': 30,
+  'gpt-3.5-turbo': 0.5,
+
+  // Claude
+  'claude-3-opus': 15,
+  'claude-3-5-sonnet': 3,
+  'claude-3-5-sonnet-20241022': 3,
+  'claude-3-sonnet': 3,
+  'claude-3-sonnet-20240229': 3,
+  'claude-3-5-haiku': 0.25,
+  'claude-3-5-haiku-20241022': 0.25,
+  'claude-3-haiku': 0.25,
+  'claude-3-haiku-20240307': 0.25,
+
+  // Gemini
+  'gemini-2.5-pro-exp': 2.5,
+  'gemini-2.5-flash-exp': 0.08,
+  'gemini-2.0-flash-exp': 0.08,
+  'gemini-2.0-flash-thinking-exp': 0.5,
+  'gemini-1.5-pro': 1.25,
+  'gemini-1.5-flash': 0.075,
+  'gemini-1.5-flash-8b': 0.03,
+  'gemini-pro': 0.5,
+
+  // Groq
+  'llama-3.3-70b-versatile': 0.59,
+  'llama-3.1-70b-versatile': 0.59,
+  'llama3-70b-8192': 0.59,
+  'llama-3.3-70b': 0.59,
+  'llama-3.1-70b': 0.59,
+  'mixtral-8x7b-32768': 0.27,
+  'mixtral-8x7b': 0.27,
+  'gemma2-9b-it': 0.08,
+  'gemma-2-9b-it': 0.08,
+  'gemma2-9b': 0.08,
+
+  // Ollama (free, local)
+  'ollama-default': 0,
+
+  // Fireworks
+  'llama-v3p70b-instruct': 0.9,
+  'llama-3-70b': 0.9,
+};
+
+// Get price for a model, or return default based on provider
+function getModelPrice(modelId: string, provider: string): number {
+  const normalizedId = modelId.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (MODEL_PRICING[normalizedId] !== undefined) {
+    return MODEL_PRICING[normalizedId];
+  }
+  if (MODEL_PRICING[modelId] !== undefined) {
+    return MODEL_PRICING[modelId];
+  }
+
+  // Default pricing by provider
+  const defaults: Record<string, number> = {
+    'OpenAI': 5,
+    'Claude': 3,
+    'Google Gemini': 0.5,
+    'Groq': 0.3,
+    'OpenRouter': 1,
+    'Ollama': 0,
+    'Fireworks': 0.5,
+  };
+  return defaults[provider] ?? 1;
+}
+
 // Helper to fetch models from OpenAI-compatible APIs
 async function fetchOpenAIModels(baseUrl: string, apiKey: string): Promise<any[]> {
   try {
@@ -155,7 +230,10 @@ export async function GET() {
 
     // Fetch Claude models (hardcoded list)
     if (providers.claude) {
-      models.claude = CLAUDE_MODELS;
+      models.claude = CLAUDE_MODELS.map(m => ({
+        ...m,
+        price: getModelPrice(m.id, m.provider),
+      }));
     }
 
     // Fetch OpenAI models
@@ -168,6 +246,7 @@ export async function GET() {
           name: getModelName(m.id, 'OpenAI'),
           provider: 'OpenAI',
           description: m.owned_by === 'openai' ? 'OpenAI model' : 'Via OpenAI',
+          price: getModelPrice(m.id, 'OpenAI'),
         }));
     }
 
@@ -181,6 +260,7 @@ export async function GET() {
           name: getModelName(m.id, 'Groq'),
           provider: 'Groq',
           description: 'Fast inference',
+          price: getModelPrice(m.id, 'Groq'),
         }));
     }
 
@@ -189,12 +269,23 @@ export async function GET() {
       const orModels = await fetchOpenRouterModels(process.env.OPENROUTER_API_KEY!);
       models.openrouter = orModels
         .filter((m: any) => !m.id.includes('whisper'))
-        .map((m: any) => ({
-          id: m.id,
-          name: m.name || getModelName(m.id, 'OpenRouter'),
-          provider: 'OpenRouter',
-          description: `Pricing: $${m.pricing?.prompt || 'N/A'}/1M tokens`,
-        }));
+        .map((m: any) => {
+          // Parse OpenRouter pricing (format: "0.00015" for $0.15/1M)
+          let price = 1;
+          if (m.pricing?.prompt) {
+            const promptPrice = parseFloat(m.pricing.prompt);
+            if (!isNaN(promptPrice)) {
+              price = promptPrice * 1000000; // Convert to per 1M tokens
+            }
+          }
+          return {
+            id: m.id,
+            name: m.name || getModelName(m.id, 'OpenRouter'),
+            provider: 'OpenRouter',
+            description: `Pricing: $${m.pricing?.prompt || 'N/A'}/1M tokens`,
+            price,
+          };
+        });
     }
 
     // Fetch Fireworks models (if they have an API endpoint)
@@ -206,18 +297,22 @@ export async function GET() {
           name: getModelName(m.id, 'Fireworks'),
           provider: 'Fireworks',
           description: 'Fast inference',
+          price: getModelPrice(m.id, 'Fireworks'),
         }));
       } catch (e) {
         // Fallback to hardcoded list if API fails
         models.fireworks = [
-          { id: "accounts/fireworks/models/llama-v3p70b-instruct", name: "Llama 3 70B", provider: "Fireworks", description: "Fast training" },
+          { id: "accounts/fireworks/models/llama-v3p70b-instruct", name: "Llama 3 70B", provider: "Fireworks", description: "Fast training", price: getModelPrice('llama-v3p70b-instruct', 'Fireworks') },
         ];
       }
     }
 
     // Fetch Gemini models (hardcoded list)
     if (providers.gemini) {
-      models.gemini = GEMINI_MODELS;
+      models.gemini = GEMINI_MODELS.map(m => ({
+        ...m,
+        price: getModelPrice(m.id, m.provider),
+      }));
     }
 
     // Fetch Ollama models
@@ -229,6 +324,7 @@ export async function GET() {
         name: m.name,
         provider: 'Ollama',
         description: `Size: ${m.size ? Math.round(m.size / 1024 / 1024 / 1024) + 'GB' : 'Unknown'}`,
+        price: 0, // Local models are free
       }));
     }
 
