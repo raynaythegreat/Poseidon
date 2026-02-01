@@ -1,7 +1,31 @@
 import { NextResponse } from "next/server";
 import { getNgrokPublicUrl } from "@/lib/ngrok";
+import { readFileSync, existsSync } from "fs";
+import { join } from "path";
 
 export const dynamic = "force-dynamic";
+
+// Helper to read .env.local file directly (for dynamic config without restart)
+function readEnvLocal(): Record<string, string> {
+  const envPath = join(process.cwd(), ".env.local");
+  if (!existsSync(envPath)) {
+    return {};
+  }
+  const content = readFileSync(envPath, "utf-8");
+  const env: Record<string, string> = {};
+
+  content.split("\n").forEach((line) => {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+      const [key, ...valueParts] = trimmed.split("=");
+      const keyName = key.trim();
+      const value = valueParts.join("=").trim();
+      env[keyName] = value;
+    }
+  });
+
+  return env;
+}
 
 function parseUrl(value: string): URL | null {
   const trimmed = value.trim();
@@ -358,14 +382,14 @@ export async function GET() {
       })).ok,
     },
     github: {
-      configured: Boolean(process.env.GITHUB_TOKEN),
-      username: process.env.GITHUB_USERNAME || null,
+      configured: Boolean(process.env.GITHUB_TOKEN || readEnvLocal().GITHUB_TOKEN),
+      username: process.env.GITHUB_USERNAME || readEnvLocal().GITHUB_USERNAME || null,
     },
     vercel: {
-      configured: Boolean(process.env.VERCEL_TOKEN),
+      configured: Boolean(process.env.VERCEL_TOKEN || readEnvLocal().VERCEL_TOKEN),
     },
     render: {
-      configured: Boolean(process.env.RENDER_API_KEY),
+      configured: Boolean(process.env.RENDER_API_KEY || readEnvLocal().RENDER_API_KEY),
     },
   };
 
