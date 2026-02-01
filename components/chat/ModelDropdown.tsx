@@ -39,10 +39,10 @@ export default function ModelDropdown({
   const buttonBg =
     "bg-surface-muted/60 hover:bg-surface-muted/80 text-ink-muted hover:text-ink border border-line/60";
 
-  const menuBg = "bg-surface/95 border-line/60 backdrop-blur-xl";
+  const menuBg = "bg-surface/95 border-line/60 backdrop-blur-xl shadow-2xl";
   const itemHover = "hover:bg-surface-muted/60";
   const itemText = "text-ink-muted hover:text-ink";
-  const selectedBg = "bg-poseidon-teal-mid/15 text-ink ring-1 ring-poseidon-teal-light/25";
+  const selectedBg = "bg-accent-500/10 text-accent-500 border border-accent-500/20";
 
   // Helper to get price display emoji based on cost
   function getPriceDisplay(price?: number): { emoji: string; tooltip: string } {
@@ -113,12 +113,13 @@ export default function ModelDropdown({
       </button>
 
       {showMenu && (
-        <div className={`absolute bottom-full right-0 mb-2 w-80 rounded-xl border shadow-xl z-[9999] max-h-[400px] overflow-y-auto ${menuBg}`}>
-          <div className="p-2">
+        <div className={`absolute bottom-full left-0 mb-2 w-full min-w-[280px] rounded-xl border shadow-2xl z-[9999] max-h-[400px] overflow-y-auto ${menuBg}`}>
+          <div className="p-1">
             {Object.entries(modelsByProvider).map(([provider, providerModels], index) => (
-              <div key={provider} className={index > 0 ? "mt-3 pt-3 border-t border-line/60" : ""}>
+              <div key={provider} className={index > 0 ? "mt-2 pt-2 border-t border-line/50" : ""}>
                 {/* Provider Header */}
-                <div className="px-3 py-1 text-xs font-semibold text-ink-muted uppercase tracking-wide">
+                <div className="px-3 py-1.5 text-xs font-bold text-accent-500 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-500"></span>
                   {provider}
                 </div>
                 {providerModels.map((model) => {
@@ -137,11 +138,9 @@ export default function ModelDropdown({
                       }`}
                       title={priceDisplay.tooltip}
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium truncate">{model.name}</div>
-                        </div>
-                        <span className="text-xs" title={priceDisplay.tooltip}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium truncate">{model.name}</span>
+                        <span className="text-sm shrink-0" title={priceDisplay.tooltip}>
                           {priceDisplay.emoji}
                         </span>
                       </div>
