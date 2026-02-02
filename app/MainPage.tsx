@@ -22,29 +22,25 @@ export default function MainPage() {
 
   // Define checkAuth before using it in useEffect
   const checkAuth = async () => {
-    console.log("[Auth] Starting auth check...");
-    // First check if password is required
     try {
+      // First check if password is required
       const checkResponse = await fetch("/api/auth/login");
       const checkData = await checkResponse.json();
-      console.log("[Auth] Password check response:", checkData);
 
       // If no password required, skip auth
       if (!checkData.requiresPassword) {
-        console.log("[Auth] No password required, skipping auth");
         setIsAuthenticated(true);
         setIsLoading(false);
         return;
       }
     } catch (error) {
-      console.error("[Auth] Password check failed:", error);
+      // Ignore error, continue to token check
     }
 
     const deviceToken = localStorage.getItem("poseidon-device-token");
     const tokenHash = localStorage.getItem("poseidon-token-hash");
 
     if (!deviceToken || !tokenHash) {
-      console.log("[Auth] No device tokens found");
       setIsLoading(false);
       return;
     }
@@ -57,7 +53,6 @@ export default function MainPage() {
       });
 
       const data = await response.json();
-      console.log("[Auth] Token validation response:", data);
       if (data.valid) {
         setIsAuthenticated(true);
       } else {
@@ -65,9 +60,8 @@ export default function MainPage() {
         localStorage.removeItem("poseidon-token-hash");
       }
     } catch (error) {
-      console.error("[Auth] Auth check failed:", error);
+      // Ignore error
     } finally {
-      console.log("[Auth] Auth check complete, setting isLoading=false");
       setIsLoading(false);
     }
   };
@@ -88,26 +82,40 @@ export default function MainPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Check if running in Electron app using the flag set by Electron
-    // Also check for electronAPI as fallback
-    const isElectron = typeof window !== 'undefined' &&
-      ((window as any).__IS_ELECTRON__ === true || !!(window as any).electronAPI);
-    console.log("[Page] Auth effect running, isElectron:", isElectron);
+    // Multiple methods to detect Electron environment for reliability
+    let isElectron = false;
 
-    // Skip auth for Electron app
+    if (typeof window !== 'undefined') {
+      // Method 1: Check for __IS_ELECTRON__ flag set by preload script
+      if ((window as any).__IS_ELECTRON__ === true) {
+        isElectron = true;
+      }
+      // Method 2: Check for electronAPI object
+      else if (!!(window as any).electronAPI) {
+        isElectron = true;
+      }
+      // Method 3: Check for data-electron attribute on document
+      else if (typeof document !== 'undefined' &&
+               document.documentElement.getAttribute('data-electron') === 'true') {
+        isElectron = true;
+      }
+      // Method 4: Check for electronAPI.isElectron flag
+      else if ((window as any).electronAPI?.isElectron === true) {
+        isElectron = true;
+      }
+    }
+
+    // Skip auth for Electron app - always authenticated in desktop app
     if (isElectron) {
-      console.log("[Page] Electron detected, setting authenticated=true");
       setIsAuthenticated(true);
       setIsLoading(false);
     } else {
-      console.log("[Page] Not Electron, running checkAuth");
       checkAuth();
 
       // Safety timeout: if auth check doesn't complete in 3 seconds, render anyway
       const timeoutId = setTimeout(() => {
         setIsLoading(false);
         setIsAuthenticated(true);
-        console.warn("[Auth] Auth check timeout - rendering page anyway");
       }, 3000);
 
       return () => clearTimeout(timeoutId);
