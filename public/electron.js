@@ -187,14 +187,27 @@ function createWindow() {
 
   mainWindow.loadURL(startUrl)
 
-  // Show window when ready to prevent visual flash
-  mainWindow.once("ready-to-show", () => {
-    mainWindow.show()
+  // Track if window has been shown
+  let windowShown = false
 
-    if (isDev) {
-      mainWindow.webContents.openDevTools()
+  const showWindow = () => {
+    if (!windowShown && mainWindow && !mainWindow.isDestroyed()) {
+      windowShown = true
+      mainWindow.show()
+      if (isDev) {
+        mainWindow.webContents.openDevTools()
+      }
     }
-  })
+  }
+
+  // Show window when ready to prevent visual flash
+  mainWindow.once("ready-to-show", showWindow)
+
+  // Safety timeout: show window after 5 seconds even if ready-to-show doesn't fire
+  // This prevents the window from never appearing if the page has loading issues
+  setTimeout(() => {
+    showWindow()
+  }, 5000)
 
   // Handle window closed
   mainWindow.on("closed", () => {
