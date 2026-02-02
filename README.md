@@ -61,6 +61,30 @@ Uninstallers will:
 - ✅ Remove installed files
 - ✅ Optionally remove configuration files
 
+## 🔄 Update to Latest Version
+
+**Linux Debian/Ubuntu:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/update.sh | bash
+```
+
+**macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/update-mac.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/update.ps1 | iex
+```
+
+Update scripts will:
+- ✅ Check for new commits on GitHub
+- ✅ Show what's new before updating
+- ✅ Pull latest code
+- ✅ Rebuild the app
+- ✅ Restart automatically
+
 ## Features
 
 ### AI-Powered Development
