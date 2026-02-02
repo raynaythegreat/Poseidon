@@ -45,6 +45,36 @@ function killPort1998() {
   }
 }
 
+// Helper function to check if server is ready
+async function waitForServer() {
+  const http = require('http')
+  const maxAttempts = 30 // 30 attempts = 15 seconds
+  let attempts = 0
+
+  while (attempts < maxAttempts) {
+    try {
+      await new Promise((resolve, reject) => {
+        const req = http.get('http://localhost:1998', (res) => {
+          resolve(true)
+        })
+        req.on('error', reject)
+        req.setTimeout(1000, () => {
+          req.destroy()
+          reject(new Error('timeout'))
+        })
+      })
+      console.log('Server is ready!')
+      return true
+    } catch (e) {
+      attempts++
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    }
+  }
+  throw new Error('Server failed to start after 15 seconds')
+}
+
 // Start Next.js server in production mode
 async function startNextServer() {
   if (isDev) return // Don't start server in dev mode (user runs npm run electron-dev)
@@ -106,10 +136,12 @@ async function startNextServer() {
       console.error('Failed to start Next.js server:', err)
     })
 
-    // Wait a bit for server to start
-    await new Promise(resolve => setTimeout(resolve, 3000))
+    // Wait for server to actually be ready by polling it
+    console.log('Waiting for server to be ready...')
+    await waitForServer()
   } catch (error) {
     console.error('Error starting Next.js server:', error)
+    throw error
   }
 }
 
