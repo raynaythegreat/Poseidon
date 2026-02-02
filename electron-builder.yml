@@ -6,6 +6,10 @@ directories:
 asar: false
 files:
   - "**/*"
+  - "!**/*.ts"
+  - "!**/*.tsx"
+  - "!tsconfig.json"
+  - "!next.config.js"
 extraFiles:
   - from: "node_modules/next/dist"
     to: "node_modules/next/dist"
