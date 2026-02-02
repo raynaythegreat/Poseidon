@@ -22,7 +22,7 @@ echo "This will remove Poseidon from your system."
 echo ""
 echo "Install location: $INSTALL_DIR"
 echo ""
-read -p "Continue with uninstall? (y/n) " -n 1 -r
+read -p "Continue with uninstall? (y/n) " REPLY < /dev/tty
 echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Uninstallation cancelled."
@@ -70,7 +70,7 @@ echo ""
 CONFIG_FILE="$HOME/.env.local"
 if [ -f "$CONFIG_FILE" ] && grep -q "POSEISON\|CLAUDE_API_KEY\|OPENAI_API_KEY" "$CONFIG_FILE" 2>/dev/null; then
     echo "⚠️  Configuration file found at $CONFIG_FILE"
-    read -p "Remove configuration file too? (y/n) " -n 1 -r
+    read -p "Remove configuration file too? (y/n) " REPLY < /dev/tty
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         # Backup and remove Poseidon-related entries
