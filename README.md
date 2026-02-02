@@ -38,6 +38,29 @@ All installers will:
 
 **After installation**, the Poseidon desktop app window will open automatically.
 
+## 🗑️ Uninstall
+
+**Linux Debian/Ubuntu:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/uninstall.sh | bash
+```
+
+**macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/uninstall-mac.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/uninstall.ps1 | iex
+```
+
+Uninstallers will:
+- ✅ Stop all running Poseidon processes
+- ✅ Remove desktop shortcuts and menu entries
+- ✅ Remove installed files
+- ✅ Optionally remove configuration files
+
 ## Features
 
 ### AI-Powered Development
