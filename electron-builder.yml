@@ -11,7 +11,6 @@ extraFiles:
     to: "node_modules/next/dist"
   - from: ".next"
     to: ".next"
-description: "AI-powered development command center for planning, building, and deploying web applications"
 mac:
   category: public.app-category.developer-tools
   target:
@@ -53,13 +52,6 @@ linux:
   maintainer: "raynaythegreat <contact@poseidon.dev>"
   vendor: "Poseidon"
   description: "AI-powered development command center for planning, building, and deploying web applications"
-  longDescription: |
-    Poseidon is a cyber-styled AI command center that helps developers:
-    - Plan projects with AI assistance
-    - Build web applications with intelligent code generation
-    - Deploy to Vercel, Render, and other platforms
-    - Manage GitHub repositories
-    - Chat with multiple AI providers (Claude, GPT, GLM, and more)
   desktop:
     Name: Poseidon
     GenericName: AI Development Environment
