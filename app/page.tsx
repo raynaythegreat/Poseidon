@@ -28,8 +28,16 @@ function LoadingFallback() {
 async function checkIsElectronSSR(): Promise<boolean> {
   try {
     const headersList = await headers();
+
+    // Method 1: Check for X-Electron-App header
     const electronHeader = headersList.get('x-electron-app');
-    return electronHeader === 'true';
+    if (electronHeader === 'true') return true;
+
+    // Method 2: Check User-Agent for Electron (always contains "Electron")
+    const userAgent = headersList.get('user-agent') || '';
+    if (userAgent.includes('Electron')) return true;
+
+    return false;
   } catch {
     return false;
   }

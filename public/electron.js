@@ -380,6 +380,7 @@ app.whenReady().then(async () => {
   // Suppress Electron CSP warning (we need 'unsafe-inline' and 'unsafe-eval' for React/Next.js)
   process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
+  // Set up request handlers AFTER app is ready but BEFORE creating window
   // Add X-Electron-App header to all requests for SSR detection
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     callback({
