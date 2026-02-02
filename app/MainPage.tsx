@@ -20,53 +20,7 @@ export default function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { loadSession, clearCurrentSession } = useChatHistory();
 
-  // Check if running in Electron app
-  const isElectron = typeof window !== 'undefined' && !!(window as any).electronAPI;
-
-  // Handle tab from URL search params
-  useEffect(() => {
-    const tabParam = searchParams.get("tab");
-    const promptParam = searchParams.get("prompt");
-    const brainstormParam = searchParams.get("brainstorm");
-    const planParam = searchParams.get("plan");
-
-    // If there's a prompt, brainstorm, or plan param, switch to chat tab
-    if (promptParam || brainstormParam === "true" || planParam === "true") {
-      setActiveTab("chat");
-    } else if (tabParam && ["chat", "repos", "deploy", "history", "settings"].includes(tabParam)) {
-      setActiveTab(tabParam);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    console.log("[Page] Auth effect running, isElectron:", isElectron);
-    // Skip auth for Electron app
-    if (isElectron) {
-      console.log("[Page] Electron detected, setting authenticated=true");
-      setIsAuthenticated(true);
-      setIsLoading(false);
-    } else {
-      console.log("[Page] Not Electron, running checkAuth");
-      checkAuth();
-
-      // Safety timeout: if auth check doesn't complete in 3 seconds, render anyway
-      const timeoutId = setTimeout(() => {
-        setIsLoading(false);
-        setIsAuthenticated(true);
-        console.warn("[Auth] Auth check timeout - rendering page anyway");
-      }, 3000);
-
-      return () => clearTimeout(timeoutId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isElectron]);
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      clearCurrentSession();
-    }
-  }, [isLoading, isAuthenticated, clearCurrentSession]);
-
+  // Define checkAuth before using it in useEffect
   const checkAuth = async () => {
     console.log("[Auth] Starting auth check...");
     // First check if password is required
@@ -117,6 +71,53 @@ export default function MainPage() {
       setIsLoading(false);
     }
   };
+
+  // Handle tab from URL search params
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    const promptParam = searchParams.get("prompt");
+    const brainstormParam = searchParams.get("brainstorm");
+    const planParam = searchParams.get("plan");
+
+    // If there's a prompt, brainstorm, or plan param, switch to chat tab
+    if (promptParam || brainstormParam === "true" || planParam === "true") {
+      setActiveTab("chat");
+    } else if (tabParam && ["chat", "repos", "deploy", "history", "settings"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    // Check if running in Electron app (check after component mounts, ensuring preload script has run)
+    const isElectron = typeof window !== 'undefined' && !!(window as any).electronAPI;
+    console.log("[Page] Auth effect running, isElectron:", isElectron);
+
+    // Skip auth for Electron app
+    if (isElectron) {
+      console.log("[Page] Electron detected, setting authenticated=true");
+      setIsAuthenticated(true);
+      setIsLoading(false);
+    } else {
+      console.log("[Page] Not Electron, running checkAuth");
+      checkAuth();
+
+      // Safety timeout: if auth check doesn't complete in 3 seconds, render anyway
+      const timeoutId = setTimeout(() => {
+        setIsLoading(false);
+        setIsAuthenticated(true);
+        console.warn("[Auth] Auth check timeout - rendering page anyway");
+      }, 3000);
+
+      return () => clearTimeout(timeoutId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      clearCurrentSession();
+    }
+  }, [isLoading, isAuthenticated, clearCurrentSession]);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
