@@ -54,9 +54,9 @@ function start_processes() {
   WATCH_PID=$!
   echo $WATCH_PID >> "$PID_FILE"
 
-  # Start Electron in development mode
+  # Start Electron in development mode (foreground for window to appear)
   echo "   - Starting Electron..."
-  nohup npm run electron-dev >> "$LOG_FILE" 2>&1 &
+  npm run electron-dev &
   ELECTRON_PID=$!
   echo $ELECTRON_PID >> "$PID_FILE"
 
