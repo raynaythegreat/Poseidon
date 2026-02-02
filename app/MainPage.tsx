@@ -88,8 +88,10 @@ export default function MainPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Check if running in Electron app (check after component mounts, ensuring preload script has run)
-    const isElectron = typeof window !== 'undefined' && !!(window as any).electronAPI;
+    // Check if running in Electron app using the flag set by Electron
+    // Also check for electronAPI as fallback
+    const isElectron = typeof window !== 'undefined' &&
+      ((window as any).__IS_ELECTRON__ === true || !!(window as any).electronAPI);
     console.log("[Page] Auth effect running, isElectron:", isElectron);
 
     // Skip auth for Electron app

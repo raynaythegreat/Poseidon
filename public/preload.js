@@ -1,5 +1,10 @@
 const { contextBridge, ipcRenderer } = require("electron")
 
+// Set a flag immediately when the preload script runs (before page loads)
+if (typeof globalThis.window !== 'undefined') {
+  globalThis.window.__IS_ELECTRON__ = true;
+}
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("electronAPI", {
