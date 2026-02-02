@@ -92,7 +92,9 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
     [projects]
   );
 
-  if (!isLoaded) return null;
+  // Don't block rendering - render children with empty projects array immediately
+  // Data will be loaded asynchronously via useEffect
+  // The isLoaded state ensures we only save to localStorage after initial load
 
   return (
     <ProjectsContext.Provider

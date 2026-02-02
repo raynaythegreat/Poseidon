@@ -13,10 +13,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Check for stored theme preference
     const stored = localStorage.getItem("theme") as Theme | null;
     if (stored) {
       setTheme(stored);
@@ -26,18 +25,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    // Apply theme to document immediately
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
+    // Save to localStorage (but don't fail if localStorage is not available)
+    try {
+      localStorage.setItem("theme", theme);
+    } catch (e) {
+      // Ignore localStorage errors (e.g., in incognito mode)
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
-
-  if (!mounted) {
-    return <div className="min-h-screen bg-[color:rgb(var(--background))]" />;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

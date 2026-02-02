@@ -38,6 +38,33 @@ interface ModelOption {
   customConfig?: CustomProviderConfig; // For custom provider models
 }
 
+// Helper function to find the cheapest available model
+function getCheapestAvailableModel(models: ModelOption[]): ModelOption | null {
+  if (models.length === 0) return null;
+
+  // Priority 1: Ollama (free, local)
+  const ollamaModel = models.find(m => m.provider === "ollama");
+  if (ollamaModel) return ollamaModel;
+
+  // Priority 2: Sort by price (cheapest first)
+  // Models without price info are treated as expensive (put at end)
+  const modelsWithPrice = models.filter(m => typeof m.price === "number");
+  const modelsWithoutPrice = models.filter(m => typeof m.price !== "number");
+
+  if (modelsWithPrice.length > 0) {
+    // Sort by price ascending
+    const sortedByPrice = [...modelsWithPrice].sort((a, b) => {
+      const priceA = a.price ?? Infinity;
+      const priceB = b.price ?? Infinity;
+      return priceA - priceB;
+    });
+    return sortedByPrice[0];
+  }
+
+  // Fallback: first model without price info
+  return modelsWithoutPrice[0] || models[0];
+}
+
 export default function SimpleChatPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -45,9 +72,10 @@ export default function SimpleChatPage() {
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [repos, setRepos] = useState<Repository[]>([]);
   const [models, setModels] = useState<ModelOption[]>([]);
+  // Initial state - will be updated when models load
   const [modelInfo, setModelInfo] = useState<{ name: string; provider: Provider; customConfig?: CustomProviderConfig }>({
-    name: "glm-4.7",
-    provider: "glm",
+    name: "",
+    provider: "openai",
   });
   const [showSkillAutocomplete, setShowSkillAutocomplete] = useState(false);
   const [skillQuery, setSkillQuery] = useState("");
@@ -183,8 +211,8 @@ export default function SimpleChatPage() {
     setInput("");
     setSelectedRepo(null);
     setIsLoading(false);
-    // Reset to default model
-    const defaultModel = models.find(m => m.id === "glm:glm-4.7") || models[0];
+    // Reset to cheapest available model
+    const defaultModel = getCheapestAvailableModel(models);
     if (defaultModel) {
       setModelInfo({
         name: defaultModel.name,
@@ -230,8 +258,8 @@ export default function SimpleChatPage() {
   useEffect(() => {
     const modelParam = searchParams.get("model");
     const providerParam = searchParams.get("provider");
-    // Only set if we haven't already set a model (check if modelInfo is still default)
-    const isDefaultModel = modelInfo.name === "glm-4.7" && modelInfo.provider === "glm";
+    // Only set if we haven't already set a model (check if modelInfo is still empty default)
+    const isDefaultModel = !modelInfo.name || modelInfo.name === "";
     if (modelParam && providerParam && models.length > 0 && isDefaultModel) {
       const model = models.find(m => m.name === modelParam && m.provider === providerParam);
       if (model) {
@@ -316,6 +344,20 @@ export default function SimpleChatPage() {
           }
 
           setModels(modelList);
+
+          // Set default model to cheapest available if no model is currently set
+          // or if current model is the empty initial state
+          if (modelList.length > 0 && (!modelInfo.name || modelInfo.name === "")) {
+            const cheapestModel = getCheapestAvailableModel(modelList);
+            if (cheapestModel) {
+              console.log("[Chat] Setting default model to cheapest:", cheapestModel.name, "provider:", cheapestModel.provider, "price:", cheapestModel.price);
+              setModelInfo({
+                name: cheapestModel.name,
+                provider: cheapestModel.provider,
+                customConfig: cheapestModel.customConfig,
+              });
+            }
+          }
         }
       } catch (error) {
         console.error("Failed to load models:", error);

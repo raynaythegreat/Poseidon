@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ChatHistoryProvider } from "@/contexts/ChatHistoryContext";
@@ -25,14 +26,36 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+// Theme initialization script - runs before page paint to prevent flash
+const themeInitScript = `
+  (function() {
+    try {
+      const theme = localStorage.getItem('theme');
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (theme === 'dark' || (!theme && systemDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {
+      // localStorage may not be available in all environments
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (systemDark) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       <body className="antialiased overflow-x-hidden">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
         <ThemeProvider>
           <UserSettingsProvider>
             <ChatHistoryProvider>

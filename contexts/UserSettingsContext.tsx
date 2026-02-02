@@ -70,7 +70,8 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     saveSettings(newSettings);
   };
 
-  if (!isLoaded) return null;
+  // Don't block rendering - render children with default settings immediately
+  // Data will be loaded asynchronously via useEffect
 
   return (
     <UserSettingsContext.Provider value={{ settings, updateUsername, updateEmail, updateTheme }}>
