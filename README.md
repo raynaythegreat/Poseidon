@@ -89,6 +89,7 @@ After installation, configure your API keys in Poseidon:
 - **Claude** (Anthropic) - Get key: https://console.anthropic.com/settings/keys
 - **OpenAI** - Get key: https://platform.openai.com/api-keys
 - **Google Gemini** - Get key: https://aistudio.google.com/app/apikey
+- **GLM (Zhipu AI)** - Get key: https://z.ai/manage-apikey/apikey-list
 - **Groq** - Get key: https://console.groq.com/keys
 - **OpenRouter** - Get key: https://openrouter.ai/keys
 - **Fireworks** - Get key: https://fireworks.ai/account/api-keys
@@ -103,6 +104,7 @@ For advanced users, you can also configure via `.env.local` file:
 CLAUDE_API_KEY=your_key_here
 OPENAI_API_KEY=your_key_here
 GOOGLE_API_KEY=your_key_here
+GLM_API_KEY=your_key_here
 GROQ_API_KEY=your_key_here
 OPENROUTER_API_KEY=your_key_here
 FIREWORKS_API_KEY=your_key_here
