@@ -88,6 +88,14 @@ npm run build
 echo "   - Rebuilding Electron app..."
 npm run dist:linux:appimage
 
+# Create/update symlink for desktop entry
+echo "   - Creating AppImage symlink..."
+APPIMAGE=$(ls dist/Poseidon-*.AppImage 2>/dev/null | head -1)
+if [ -n "$APPIMAGE" ]; then
+    ln -sf "$(pwd)/$APPIMAGE" dist/Poseidon.AppImage
+    echo "   ✓ Created symlink: Poseidon.AppImage"
+fi
+
 # Make scripts executable
 chmod +x poseidon.sh
 chmod +x uninstall.sh
@@ -103,16 +111,21 @@ grep '"version"' package.json | head -1
 echo ""
 echo "🚀 Starting Poseidon..."
 
-# Find and launch the built AppImage
-APPIMAGE=$(ls dist/Poseidon-*.AppImage 2>/dev/null | head -1)
+# Launch the built AppImage using the fixed-name symlink
+APPIMAGE="dist/Poseidon.AppImage"
 
-if [ -n "$APPIMAGE" ]; then
+if [ -f "$APPIMAGE" ]; then
     chmod +x "$APPIMAGE"
     "$APPIMAGE" &
     sleep 3
 
     echo ""
     echo "✨ Poseidon has been updated and restarted!"
+    echo ""
+    echo "   The production Electron app has launched"
+    echo ""
+    echo "   To start again: $APPIMAGE"
+    echo "   Or from your application menu"
 else
     echo ""
     echo "⚠️  AppImage not found. Starting with npm..."
