@@ -107,6 +107,11 @@ echo ""
 echo "🔨 Building application for production..."
 npm run build
 
+# Build production Electron app
+echo ""
+echo "📦 Building production Electron app..."
+npm run dist:linux:appimage
+
 # Create desktop entry for easy launch
 echo ""
 echo "🖥️  Creating desktop shortcut..."
@@ -119,7 +124,7 @@ Version=1.0
 Type=Application
 Name=Poseidon AI
 Comment=AI-powered development command center
-Exec=$HOME/Poseidon/poseidon.sh start
+Exec=$HOME/Poseidon/dist/Poseidon-*.AppImage
 Icon=$HOME/Poseidon/build/icon.png
 Terminal=false
 Categories=Development;IDE;
@@ -161,23 +166,32 @@ chmod +x install.sh
 echo ""
 echo "✅ Production Installation Complete!"
 echo ""
-echo "🚀 Starting Poseidon..."
+echo "🚀 Starting Poseidon production app..."
 
-# Start Poseidon in background, redirect to log
+# Find and launch the built AppImage
 cd "$HOME/Poseidon"
-./poseidon.sh start
+APPIMAGE=$(ls dist/Poseidon-*.AppImage 2>/dev/null | head -1)
 
-# Wait a moment for server to start
-sleep 3
+if [ -n "$APPIMAGE" ]; then
+    chmod +x "$APPIMAGE"
+    "$APPIMAGE" &
+    sleep 3
 
-echo ""
-echo "✨ Poseidon desktop app is now running!"
-echo ""
-echo "   The Electron window should have opened automatically"
-echo ""
-echo "   To stop: ./poseidon.sh stop"
-echo "   To restart: ./poseidon.sh restart"
-echo ""
+    echo ""
+    echo "✨ Poseidon desktop app is now running!"
+    echo ""
+    echo "   The production Electron app has launched"
+    echo ""
+    echo "   To start again: $APPIMAGE"
+    echo "   Or from your application menu"
+    echo ""
+else
+    echo ""
+    echo "⚠️  AppImage not found. You can start manually:"
+    echo "   cd ~/Poseidon && npm run electron"
+    echo ""
+fi
+
 echo "📖 For documentation and updates:"
 echo "   https://github.com/raynaythegreat/Poseidon"
 echo ""

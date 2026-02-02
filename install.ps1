@@ -111,6 +111,11 @@ Write-Host ""
 Write-Host "🔨 Building application for production..." -ForegroundColor Cyan
 npm run build
 
+# Build production Electron app
+Write-Host ""
+Write-Host "📦 Building production Electron app..." -ForegroundColor Cyan
+npm run dist:win
+
 # Create desktop shortcut
 Write-Host ""
 Write-Host "🖥️  Creating desktop shortcut..." -ForegroundColor Cyan
@@ -157,24 +162,29 @@ git config core.fileMode false
 Write-Host ""
 Write-Host "✅ Production Installation Complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "🚀 Starting Poseidon..." -ForegroundColor Cyan
+Write-Host "🚀 Starting Poseidon production app..." -ForegroundColor Cyan
 
-# Start Poseidon
+# Find and launch the built .exe
 Set-Location $installDir
-Start-Process -FilePath "pwsh.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$installDir\poseidon.sh`" start" -WindowStyle Hidden
+$exePath = Get-ChildItem -Path "dist" -Filter "Poseidon Setup *.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
 
-# Wait for startup
-Start-Sleep -Seconds 3
+if ($exePath) {
+    Start-Process -FilePath $exePath.FullName -Wait
+    Write-Host ""
+    Write-Host "✨ Poseidon desktop app is now running!" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "   The production Electron app has launched"
+    Write-Host ""
+    Write-Host "   To start again: Run the installer from dist folder"
+    Write-Host "   Or use the desktop/Start Menu shortcuts"
+    Write-Host ""
+} else {
+    Write-Host ""
+    Write-Host "⚠️  Built app not found. You can start manually:" -ForegroundColor Yellow
+    Write-Host "   cd Poseidon; npm run electron"
+    Write-Host ""
+}
 
-Write-Host ""
-Write-Host "✨ Poseidon desktop app is now running!" -ForegroundColor Green
-Write-Host ""
-Write-Host "   The Electron window should have opened automatically"
-Write-Host ""
-Write-Host "   To stop: .\poseidon.sh stop"
-Write-Host "   To restart: .\poseidon.sh restart"
-Write-Host "   Or use the desktop/Start Menu shortcuts"
-Write-Host ""
 Write-Host "📖 For documentation and updates:"
 Write-Host "   https://github.com/raynaythegreat/Poseidon"
 Write-Host ""

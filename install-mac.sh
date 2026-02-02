@@ -111,6 +111,11 @@ echo ""
 echo "🔨 Building application for production..."
 npm run build
 
+# Build production Electron app
+echo ""
+echo "📦 Building production Electron app..."
+npm run dist:mac
+
 # Create .app bundle for macOS
 echo ""
 echo "🖥️  Creating Poseidon.app bundle..."
@@ -189,24 +194,31 @@ chmod +x "$INSTALL_DIR/install-mac.sh"
 echo ""
 echo "✅ Production Installation Complete!"
 echo ""
-echo "🚀 Starting Poseidon..."
+echo "🚀 Starting Poseidon production app..."
 
-# Start Poseidon in background
+# Find and launch the built .app
 cd "$INSTALL_DIR"
-./poseidon.sh start
+DMG_APP=$(ls dist/*.dmg 2>/dev/null | head -1)
 
-# Wait a moment for server to start
-sleep 3
+if [ -d "dist/Poseidon.app" ]; then
+    open "dist/Poseidon.app" &
+    sleep 3
 
-echo ""
-echo "✨ Poseidon desktop app is now running!"
-echo ""
-echo "   The Electron window should have opened automatically"
-echo ""
-echo "   To stop: ./poseidon.sh stop"
-echo "   To restart: ./poseidon.sh restart"
-echo "   Or double-click Poseidon.app in Finder"
-echo ""
+    echo ""
+    echo "✨ Poseidon desktop app is now running!"
+    echo ""
+    echo "   The production Electron app has launched"
+    echo ""
+    echo "   To start again: open ~/Poseidon/Poseidon.app"
+    echo "   Or from Applications folder in Finder"
+    echo ""
+else
+    echo ""
+    echo "⚠️  Built app not found. You can start manually:"
+    echo "   cd ~/Poseidon && npm run electron"
+    echo ""
+fi
+
 echo "📖 For documentation and updates:"
 echo "   https://github.com/raynaythegreat/Poseidon"
 echo ""
