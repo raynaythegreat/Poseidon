@@ -255,6 +255,29 @@ function createWindow() {
   // Load the app - always use localhost:1998 (bundled server in production, dev server in development)
   const startUrl = "http://localhost:1998"
 
+  // Inject Electron detection script when DOM is ready (before React hydrates)
+  mainWindow.webContents.on('dom-ready', () => {
+    // Execute JavaScript in the page context to set the Electron flag
+    // This runs before React hydration, ensuring the flag is available
+    mainWindow.webContents.executeJavaScript(`
+      (function() {
+        // Set flag on window object for detection
+        Object.defineProperty(window, '__IS_ELECTRON__', {
+          value: true,
+          writable: false,
+          configurable: false,
+          enumerable: true
+        });
+        // Also set on document element
+        if (document.documentElement) {
+          document.documentElement.setAttribute('data-electron', 'true');
+        }
+      })();
+    `).catch((err) => {
+      console.error('Failed to inject Electron flag:', err);
+    });
+  });
+
   mainWindow.loadURL(startUrl)
 
   // Track if window has been shown
