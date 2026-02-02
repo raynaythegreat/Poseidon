@@ -5,23 +5,29 @@ import { homedir } from "os";
 /**
  * Get the correct path for .env.local file
  *
- * In production (AppImage/Electron), the app directory is read-only,
+ * In production (AppImage/Electron/deb), the app directory is read-only,
  * so we must use a user-writable config directory.
  *
  * - AppImage: ~/.config/poseidon/.env.local
+ * - deb package: ~/.config/poseidon/.env.local
  * - Development: {project}/.env.local
  */
 export function getEnvFilePath(): string {
   const cwd = process.cwd();
 
-  // Detect if running in AppImage (mounted read-only filesystem)
-  // AppImages mount to /tmp/.mount_<Appname>XXXXXX
-  const isAppImage = cwd.includes("/.mount_") ||
-                     cwd.includes("tmp/.mount") ||
-                     process.env.APPIMAGE !== undefined ||
-                     process.env.APPDIR !== undefined;
+  // Detect if running in production environment
+  const isProduction =
+    // AppImage detection
+    cwd.includes("/.mount_") ||
+    cwd.includes("tmp/.mount") ||
+    process.env.APPIMAGE !== undefined ||
+    process.env.APPDIR !== undefined ||
+    // deb package detection (installed to /opt/Poseidon)
+    cwd.includes("/opt/Poseidon") ||
+    // Electron app detection
+    process.env.ELECTRON_IS_DEV === undefined && process.env.NODE_ENV === 'production';
 
-  if (isAppImage) {
+  if (isProduction) {
     // Use XDG config directory for user config
     const configDir = join(homedir(), ".config", "poseidon");
 
@@ -48,12 +54,15 @@ export function getEnvFilePath(): string {
  */
 export function getConfigDir(): string {
   const cwd = process.cwd();
-  const isAppImage = cwd.includes("/.mount_") ||
-                     cwd.includes("tmp/.mount") ||
-                     process.env.APPIMAGE !== undefined ||
-                     process.env.APPDIR !== undefined;
+  const isProduction =
+    cwd.includes("/.mount_") ||
+    cwd.includes("tmp/.mount") ||
+    process.env.APPIMAGE !== undefined ||
+    process.env.APPDIR !== undefined ||
+    cwd.includes("/opt/Poseidon") ||
+    (process.env.ELECTRON_IS_DEV === undefined && process.env.NODE_ENV === 'production');
 
-  if (isAppImage) {
+  if (isProduction) {
     const configDir = join(homedir(), ".config", "poseidon");
     if (!existsSync(configDir)) {
       mkdirSync(configDir, { recursive: true });

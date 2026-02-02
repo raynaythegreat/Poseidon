@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import MainPage from "./MainPage";
 
 function LoadingFallback() {
@@ -9,7 +10,7 @@ function LoadingFallback() {
           <svg className="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 2L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
         <div className="flex items-center gap-2 text-ink-muted">
@@ -24,10 +25,29 @@ function LoadingFallback() {
   );
 }
 
-export default function Page() {
+async function checkIsElectronSSR(): Promise<boolean> {
+  try {
+    const headersList = await headers();
+    const electronHeader = headersList.get('x-electron-app');
+    return electronHeader === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export default async function Page() {
+  // Check if running in Electron during SSR
+  const isElectronSSR = await checkIsElectronSSR();
+
+  // For Electron, skip Suspense and render directly
+  // This prevents the "Loading..." state during SSR
+  if (isElectronSSR) {
+    return <MainPage isElectronSSR={true} />;
+  }
+
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <MainPage />
+      <MainPage isElectronSSR={false} />
     </Suspense>
   );
 }

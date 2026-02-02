@@ -13,9 +13,12 @@ import HomePage from "@/components/home/HomePage";
 import TridentLogo from "@/components/ui/TridentLogo";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 
-// Helper function to check if running in Electron
-// This runs during component initialization before first render
-function checkIsElectron(): boolean {
+interface MainPageProps {
+  isElectronSSR?: boolean;
+}
+
+// Helper function to check if running in Electron (client-side only)
+function checkIsElectronClient(): boolean {
   if (typeof window === 'undefined') return false;
 
   // Check electronAPI exposed by contextBridge (most reliable)
@@ -35,12 +38,13 @@ function checkIsElectron(): boolean {
   return false;
 }
 
-export default function MainPage() {
+export default function MainPage({ isElectronSSR = false }: MainPageProps) {
   const searchParams = useSearchParams();
 
   // Initialize state based on Electron detection
-  // In Electron, we're always authenticated and don't need loading
-  const isElectron = checkIsElectron();
+  // isElectronSSR comes from server-side check (x-electron-app header)
+  // checkIsElectronClient() is used as fallback during client-side hydration
+  const isElectron = isElectronSSR || checkIsElectronClient();
   const [activeTab, setActiveTab] = useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(isElectron);
   const [isLoading, setIsLoading] = useState(false);
