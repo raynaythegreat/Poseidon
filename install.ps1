@@ -167,9 +167,9 @@ Start-Process -FilePath "pwsh.exe" -ArgumentList "-ExecutionPolicy Bypass -File 
 Start-Sleep -Seconds 3
 
 Write-Host ""
-Write-Host "✨ Poseidon is now running!" -ForegroundColor Green
+Write-Host "✨ Poseidon desktop app is now running!" -ForegroundColor Green
 Write-Host ""
-Write-Host "   App URL: http://localhost:1998"
+Write-Host "   The Electron window should have opened automatically"
 Write-Host ""
 Write-Host "   To stop: .\poseidon.sh stop"
 Write-Host "   To restart: .\poseidon.sh restart"

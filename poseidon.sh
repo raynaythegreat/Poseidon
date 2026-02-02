@@ -90,7 +90,7 @@ function start_processes() {
   fi
   
   echo "✅ Poseidon is running!"
-  echo "   - App: http://localhost:1998"
+  echo "   - Electron desktop app opened"
 }
 
 case "$1" in

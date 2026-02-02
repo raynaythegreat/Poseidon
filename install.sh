@@ -171,9 +171,9 @@ cd "$HOME/Poseidon"
 sleep 3
 
 echo ""
-echo "✨ Poseidon is now running!"
+echo "✨ Poseidon desktop app is now running!"
 echo ""
-echo "   App URL: http://localhost:1998"
+echo "   The Electron window should have opened automatically"
 echo ""
 echo "   To stop: ./poseidon.sh stop"
 echo "   To restart: ./poseidon.sh restart"
