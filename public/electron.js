@@ -255,29 +255,7 @@ function createWindow() {
   // Load the app - always use localhost:1998 (bundled server in production, dev server in development)
   const startUrl = "http://localhost:1998"
 
-  // Inject Electron detection script when DOM is ready (before React hydrates)
-  mainWindow.webContents.on('dom-ready', () => {
-    // Execute JavaScript in the page context to set the Electron flag
-    // This runs before React hydration, ensuring the flag is available
-    mainWindow.webContents.executeJavaScript(`
-      (function() {
-        // Set flag on window object for detection
-        Object.defineProperty(window, '__IS_ELECTRON__', {
-          value: true,
-          writable: false,
-          configurable: false,
-          enumerable: true
-        });
-        // Also set on document element
-        if (document.documentElement) {
-          document.documentElement.setAttribute('data-electron', 'true');
-        }
-      })();
-    `).catch((err) => {
-      console.error('Failed to inject Electron flag:', err);
-    });
-  });
-
+  // Load the URL
   mainWindow.loadURL(startUrl)
 
   // Track if window has been shown
@@ -287,20 +265,21 @@ function createWindow() {
     if (!windowShown && mainWindow && !mainWindow.isDestroyed()) {
       windowShown = true
       mainWindow.show()
-      if (isDev) {
-        mainWindow.webContents.openDevTools()
-      }
+
+      // Always open DevTools in production for debugging
+      // User can close it with F12
+      mainWindow.webContents.openDevTools()
     }
   }
 
   // Show window when ready to prevent visual flash
   mainWindow.once("ready-to-show", showWindow)
 
-  // Safety timeout: show window after 5 seconds even if ready-to-show doesn't fire
+  // Safety timeout: show window after 2 seconds even if ready-to-show doesn't fire
   // This prevents the window from never appearing if the page has loading issues
   setTimeout(() => {
     showWindow()
-  }, 5000)
+  }, 2000)
 
   // Handle window closed
   mainWindow.on("closed", () => {

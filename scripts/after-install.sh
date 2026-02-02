@@ -11,6 +11,22 @@ rm -f /opt/Poseidon/resources/app/tsconfig.json
 # Allow the app to write temporary files
 chmod -R u+w /opt/Poseidon/resources/app/
 
+# Install app icons to system icon directories
+# This ensures the icon appears in the application launcher
+ICON_SOURCE="/opt/Poseidon/resources/app/public/icon.png"
+if [ -f "$ICON_SOURCE" ]; then
+    for SIZE in 512x512 256x256 128x128 64x64 48x48 32x32; do
+        ICON_DIR="/usr/share/icons/hicolor/$SIZE/apps"
+        mkdir -p "$ICON_DIR"
+        cp "$ICON_SOURCE" "$ICON_DIR/poseidon.png"
+    done
+
+    # Update icon cache
+    if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+        gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+    fi
+fi
+
 # Install the wrapper script
 cat > /opt/Poseidon/poseidon-wrapper.sh << 'WRAPPER_EOF'
 #!/bin/bash

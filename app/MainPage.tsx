@@ -13,11 +13,37 @@ import HomePage from "@/components/home/HomePage";
 import TridentLogo from "@/components/ui/TridentLogo";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
 
+// Helper function to check if running in Electron
+// This runs during component initialization before first render
+function checkIsElectron(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  // Check electronAPI exposed by contextBridge (most reliable)
+  const electronAPI = (window as any).electronAPI;
+  if (electronAPI?.isElectron === true) return true;
+  if (electronAPI) return true;
+
+  // Fallback: check for __IS_ELECTRON__ flag
+  if ((window as any).__IS_ELECTRON__ === true) return true;
+
+  // Fallback: check document attribute
+  if (typeof document !== 'undefined' &&
+      document.documentElement.getAttribute('data-electron') === 'true') {
+    return true;
+  }
+
+  return false;
+}
+
 export default function MainPage() {
   const searchParams = useSearchParams();
+
+  // Initialize state based on Electron detection
+  // In Electron, we're always authenticated and don't need loading
+  const isElectron = checkIsElectron();
   const [activeTab, setActiveTab] = useState("home");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(isElectron);
+  const [isLoading, setIsLoading] = useState(false);
   const { loadSession, clearCurrentSession } = useChatHistory();
 
   // Define checkAuth before using it in useEffect
@@ -81,42 +107,16 @@ export default function MainPage() {
     }
   }, [searchParams]);
 
+  // Only run auth check for web version (not Electron)
   useEffect(() => {
-    // Multiple methods to detect Electron environment for reliability
-    let isElectron = false;
-
-    if (typeof window !== 'undefined') {
-      // Method 1: Check for __IS_ELECTRON__ flag set by preload script
-      if ((window as any).__IS_ELECTRON__ === true) {
-        isElectron = true;
-      }
-      // Method 2: Check for electronAPI object
-      else if (!!(window as any).electronAPI) {
-        isElectron = true;
-      }
-      // Method 3: Check for data-electron attribute on document
-      else if (typeof document !== 'undefined' &&
-               document.documentElement.getAttribute('data-electron') === 'true') {
-        isElectron = true;
-      }
-      // Method 4: Check for electronAPI.isElectron flag
-      else if ((window as any).electronAPI?.isElectron === true) {
-        isElectron = true;
-      }
-    }
-
-    // Skip auth for Electron app - always authenticated in desktop app
-    if (isElectron) {
-      setIsAuthenticated(true);
-      setIsLoading(false);
-    } else {
+    if (!isElectron) {
       checkAuth();
 
-      // Safety timeout: if auth check doesn't complete in 3 seconds, render anyway
+      // Safety timeout: if auth check doesn't complete in 2 seconds, render anyway
       const timeoutId = setTimeout(() => {
         setIsLoading(false);
         setIsAuthenticated(true);
-      }, 3000);
+      }, 2000);
 
       return () => clearTimeout(timeoutId);
     }
@@ -168,7 +168,7 @@ export default function MainPage() {
     }
   };
 
-  // Loading state
+  // Loading state (only for web version during auth check)
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -188,7 +188,7 @@ export default function MainPage() {
     );
   }
 
-  // Login page
+  // Login page (only for web version)
   if (!isAuthenticated) {
     return <LoginPage onLogin={handleLogin} />;
   }
