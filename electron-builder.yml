@@ -52,6 +52,7 @@ linux:
   maintainer: "raynaythegreat <contact@poseidon.dev>"
   vendor: "Poseidon"
   description: "AI-powered development command center for planning, building, and deploying web applications"
+  executableName: poseidon
   desktop:
     Name: Poseidon
     GenericName: AI Development Environment
@@ -59,4 +60,4 @@ linux:
     Keywords: "ai;development;ide;chat;assistant;deployment"
     StartupNotify: true
     StartupWMClass: poseidon
-    Exec: "/opt/Poseidon/poseidon-wrapper.sh %U"
+  afterInstall: scripts/after-install.sh
