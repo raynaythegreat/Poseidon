@@ -77,7 +77,8 @@ echo "🚀 Installing Poseidon AI..."
 
 if [ -d "Poseidon" ]; then
     echo "⚠️  Directory 'Poseidon' already exists."
-    read -p "Remove and reinstall? (y/n) " -n 1 -r
+    # Read from /dev/tty to handle piped input (curl | bash)
+    read -p "Remove and reinstall? (y/n) " -n 1 -r < /dev/tty
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         rm -rf Poseidon
@@ -116,6 +117,13 @@ npm run dist:linux:appimage
 echo ""
 echo "🖥️  Creating desktop shortcut..."
 
+# Create a symlink with a fixed name for the AppImage
+APPIMAGE=$(ls dist/Poseidon-*.AppImage 2>/dev/null | head -1)
+if [ -n "$APPIMAGE" ]; then
+    ln -sf "$(pwd)/$APPIMAGE" dist/Poseidon.AppImage
+    echo "✓ Created symlink: Poseidon.AppImage"
+fi
+
 mkdir -p ~/.local/share/applications
 
 cat > ~/.local/share/applications/poseidon.desktop <<EOF
@@ -124,7 +132,7 @@ Version=1.0
 Type=Application
 Name=Poseidon AI
 Comment=AI-powered development command center
-Exec=$HOME/Poseidon/dist/Poseidon-*.AppImage
+Exec=$HOME/Poseidon/dist/Poseidon.AppImage
 Icon=$HOME/Poseidon/build/icon.png
 Terminal=false
 Categories=Development;IDE;
@@ -168,11 +176,11 @@ echo "✅ Production Installation Complete!"
 echo ""
 echo "🚀 Starting Poseidon production app..."
 
-# Find and launch the built AppImage
+# Launch the built AppImage using the fixed-name symlink
 cd "$HOME/Poseidon"
-APPIMAGE=$(ls dist/Poseidon-*.AppImage 2>/dev/null | head -1)
+APPIMAGE="dist/Poseidon.AppImage"
 
-if [ -n "$APPIMAGE" ]; then
+if [ -f "$APPIMAGE" ]; then
     chmod +x "$APPIMAGE"
     "$APPIMAGE" &
     sleep 3
