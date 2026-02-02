@@ -10,6 +10,41 @@ const isDev = process.env.NODE_ENV === 'development' ||
 
 let nextServer = null
 
+// Helper function to kill any process using port 1998
+function killPort1998() {
+  try {
+    const { execFileSync } = require('child_process')
+    // Try to find and kill processes using port 1998
+    try {
+      execFileSync('fuser', ['-k', '1998/tcp'], { stdio: 'ignore' })
+      console.log('Killed process on port 1998')
+    } catch (e) {
+      // fuser might not be available or no process on port
+    }
+
+    // Alternative method using lsof
+    try {
+      const result = execFileSync('lsof', ['-ti', ':1998'], { encoding: 'utf-8' })
+      const pids = result.trim().split('\n').filter(Boolean)
+      for (const pid of pids) {
+        try {
+          process.kill(pid, 'SIGKILL')
+          console.log(`Killed PID ${pid} using port 1998`)
+        } catch (e) {
+          // Process might already be dead
+        }
+      }
+    } catch (e) {
+      // lsof might not be available or no process on port
+    }
+
+    // Wait a moment for port to be released
+    return new Promise(resolve => setTimeout(resolve, 500))
+  } catch (error) {
+    console.error('Error killing port 1998:', error)
+  }
+}
+
 // Start Next.js server in production mode
 async function startNextServer() {
   if (isDev) return // Don't start server in dev mode (user runs npm run electron-dev)
@@ -18,6 +53,9 @@ async function startNextServer() {
     const { spawn } = require('child_process')
     const { execFileSync } = require('child_process')
     const fs = require('fs')
+
+    // First, kill any existing process on port 1998
+    await killPort1998()
 
     // Find node executable
     let nodeExec = null

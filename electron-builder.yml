@@ -59,3 +59,4 @@ linux:
     Keywords: "ai;development;ide;chat;assistant;deployment"
     StartupNotify: true
     StartupWMClass: poseidon
+    Exec: "/opt/Poseidon/poseidon-wrapper.sh %U"
