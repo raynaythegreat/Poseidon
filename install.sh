@@ -161,13 +161,22 @@ chmod +x install.sh
 echo ""
 echo "✅ Production Installation Complete!"
 echo ""
-echo "Poseidon is now installed and ready to use."
+echo "🚀 Starting Poseidon..."
+
+# Start Poseidon in background, redirect to log
+cd "$HOME/Poseidon"
+./poseidon.sh start
+
+# Wait a moment for server to start
+sleep 3
+
 echo ""
-echo "To start Poseidon:"
-echo "  cd ~/Poseidon"
-echo "  ./poseidon.sh start"
+echo "✨ Poseidon is now running!"
 echo ""
-echo "The app will be available at: http://localhost:1998"
+echo "   App URL: http://localhost:1998"
+echo ""
+echo "   To stop: ./poseidon.sh stop"
+echo "   To restart: ./poseidon.sh restart"
 echo ""
 echo "📖 For documentation and updates:"
 echo "   https://github.com/raynaythegreat/Poseidon"

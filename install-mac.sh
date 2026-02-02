@@ -189,13 +189,23 @@ chmod +x "$INSTALL_DIR/install-mac.sh"
 echo ""
 echo "✅ Production Installation Complete!"
 echo ""
-echo "Poseidon is now installed and ready to use."
+echo "🚀 Starting Poseidon..."
+
+# Start Poseidon in background
+cd "$INSTALL_DIR"
+./poseidon.sh start
+
+# Wait a moment for server to start
+sleep 3
+
 echo ""
-echo "To start Poseidon:"
-echo "  • Open Poseidon.app from Finder"
-echo "  • Or run: cd ~/Poseidon && ./poseidon.sh start"
+echo "✨ Poseidon is now running!"
 echo ""
-echo "The app will be available at: http://localhost:1998"
+echo "   App URL: http://localhost:1998"
+echo ""
+echo "   To stop: ./poseidon.sh stop"
+echo "   To restart: ./poseidon.sh restart"
+echo "   Or use Poseidon.app from Finder"
 echo ""
 echo "📖 For documentation and updates:"
 echo "   https://github.com/raynaythegreat/Poseidon"

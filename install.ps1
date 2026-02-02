@@ -157,14 +157,23 @@ git config core.fileMode false
 Write-Host ""
 Write-Host "✅ Production Installation Complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "Poseidon is now installed and ready to use."
+Write-Host "🚀 Starting Poseidon..." -ForegroundColor Cyan
+
+# Start Poseidon
+Set-Location $installDir
+Start-Process -FilePath "pwsh.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$installDir\poseidon.sh`" start" -WindowStyle Hidden
+
+# Wait for startup
+Start-Sleep -Seconds 3
+
 Write-Host ""
-Write-Host "To start Poseidon:"
-Write-Host "  • Double-click the desktop shortcut"
-Write-Host "  • Or use the Start Menu shortcut"
-Write-Host "  • Or run: cd $installDir; .\poseidon.sh start"
+Write-Host "✨ Poseidon is now running!" -ForegroundColor Green
 Write-Host ""
-Write-Host "The app will be available at: http://localhost:1998"
+Write-Host "   App URL: http://localhost:1998"
+Write-Host ""
+Write-Host "   To stop: .\poseidon.sh stop"
+Write-Host "   To restart: .\poseidon.sh restart"
+Write-Host "   Or use the desktop/Start Menu shortcuts"
 Write-Host ""
 Write-Host "📖 For documentation and updates:"
 Write-Host "   https://github.com/raynaythegreat/Poseidon"
