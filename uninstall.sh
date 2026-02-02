@@ -65,10 +65,16 @@ echo "🗑️  Removing Poseidon directory..."
 rm -rf "$INSTALL_DIR"
 echo "✓ Removed $INSTALL_DIR"
 
+# Clean up leftover log and PID files
+echo ""
+echo "🧹 Cleaning up leftover files..."
+rm -f "$HOME/.poseidon.log" "$HOME/.poseidon.pids" "$HOME/.poseidon.log.old" 2>/dev/null || true
+echo "✓ Log and PID files removed"
+
 # Ask about configuration files
 echo ""
 CONFIG_FILE="$HOME/.env.local"
-if [ -f "$CONFIG_FILE" ] && grep -q "POSEISON\|CLAUDE_API_KEY\|OPENAI_API_KEY" "$CONFIG_FILE" 2>/dev/null; then
+if [ -f "$CONFIG_FILE" ] && grep -q "POSEIDON\|CLAUDE_API_KEY\|OPENAI_API_KEY" "$CONFIG_FILE" 2>/dev/null; then
     echo "⚠️  Configuration file found at $CONFIG_FILE"
     read -p "Remove configuration file too? (y/n) " REPLY < /dev/tty
     echo ""
@@ -100,8 +106,4 @@ echo ""
 echo "✅ Uninstallation Complete!"
 echo ""
 echo "Poseidon has been removed from your system."
-echo ""
-echo "Note: If you want to completely remove all traces:"
-echo "  - Check $HOME/.poseidon.log for any logs"
-echo "  - Check $HOME/.poseidon.pids for any PID files"
 echo ""
