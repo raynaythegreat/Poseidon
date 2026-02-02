@@ -124,6 +124,22 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
   const [configuringProvider, setConfiguringProvider] = useState<{ name: string; description: string } | null>(null);
   const [customProviders, setCustomProviders] = useState<CustomProviderConfig[]>([]);
 
+  // Update state
+  const [updateInfo, setUpdateInfo] = useState<{
+    hasUpdate: boolean;
+    currentVersion: string;
+    latestVersion: string;
+    updateUrl: string;
+    isDev: boolean;
+  } | null>(null);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<{
+    kind: "success" | "error" | "info";
+    text: string;
+  } | null>(null);
+  const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(false);
+  const [lastChecked, setLastChecked] = useState<string | null>(null);
+
   const fetchStatus = useCallback(async () => {
     try {
       const response = await fetch("/api/status");
@@ -357,6 +373,63 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
     setShowApiKeyModal(true);
   };
 
+  // Update functions
+  const checkForUpdates = useCallback(async () => {
+    setCheckingUpdate(true);
+    setUpdateMessage(null);
+    try {
+      const response = await fetch("/api/update");
+      const data = await response.json();
+
+      setUpdateInfo(data);
+
+      if (data.isDev) {
+        setUpdateMessage({
+          kind: "info",
+          text: "Running in development mode - updates disabled",
+        });
+      } else if (data.hasUpdate) {
+        setUpdateMessage({
+          kind: "success",
+          text: `Update available: ${data.latestVersion}`,
+        });
+      } else {
+        setUpdateMessage({
+          kind: "success",
+          text: "You're on the latest version",
+        });
+      }
+
+      // Update last checked time
+      setLastChecked(new Date().toISOString());
+      localStorage.setItem("poseidon_last_update_check", new Date().toISOString());
+    } catch (error) {
+      setUpdateMessage({
+        kind: "error",
+        text: "Failed to check for updates",
+      });
+    } finally {
+      setCheckingUpdate(false);
+    }
+  }, []);
+
+  const applyUpdate = useCallback(async () => {
+    if (!updateInfo?.updateUrl) return;
+
+    setUpdateMessage({
+      kind: "info",
+      text: "Opening update instructions...",
+    });
+
+    // Open the update URL in a new tab
+    window.open(updateInfo.updateUrl, "_blank");
+  }, [updateInfo]);
+
+  const toggleAutoUpdate = useCallback((enabled: boolean) => {
+    setAutoUpdateEnabled(enabled);
+    localStorage.setItem("poseidon_auto_update", enabled.toString());
+  }, []);
+
   // Load custom providers on mount
   useEffect(() => {
     try {
@@ -382,6 +455,31 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
     const interval = setInterval(fetchStatus, 15000);
     return () => clearInterval(interval);
   }, [fetchStatus]);
+
+  // Load auto-update preference and last checked time
+  useEffect(() => {
+    const autoUpdate = localStorage.getItem("poseidon_auto_update");
+    if (autoUpdate) {
+      setAutoUpdateEnabled(autoUpdate === "true");
+    }
+
+    const lastCheck = localStorage.getItem("poseidon_last_update_check");
+    if (lastCheck) {
+      setLastChecked(lastCheck);
+    }
+
+    // Check for updates on mount if enabled
+    if (autoUpdate === "true") {
+      // Check if at least 24 hours have passed since last check
+      const lastCheckTime = lastCheck ? new Date(lastCheck).getTime() : 0;
+      const now = Date.now();
+      const hoursSinceLastCheck = (now - lastCheckTime) / (1000 * 60 * 60);
+
+      if (hoursSinceLastCheck >= 24) {
+        checkForUpdates();
+      }
+    }
+  }, [checkForUpdates]);
 
   type ProviderCategory = "deployment" | "ai" | "custom";
 
@@ -1206,6 +1304,86 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
                 label=""
               />
             </div>
+          </div>
+        </section>
+
+        {/* Updates */}
+        <section>
+          <h3 className="text-lg font-semibold text-ink mb-4">
+            Updates
+          </h3>
+          <div className="card rounded-none p-4 space-y-4">
+            {/* Current version and check button */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-medium text-ink">
+                  Current Version
+                </h4>
+                <p className="text-sm text-ink-muted">
+                  {updateInfo?.currentVersion || "Loading..."}
+                  {updateInfo?.isDev && " (dev)"}
+                </p>
+              </div>
+              <button
+                onClick={checkForUpdates}
+                disabled={checkingUpdate}
+                className="px-3 py-1.5 rounded-sm text-sm font-medium bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {checkingUpdate ? "Checking..." : "Check for Updates"}
+              </button>
+            </div>
+
+            {/* Update message */}
+            {updateMessage && (
+              <div className={`p-3 rounded-sm text-sm ${
+                updateMessage.kind === "success"
+                  ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300"
+                  : updateMessage.kind === "error"
+                  ? "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                  : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300"
+              }`}>
+                {updateMessage.text}
+              </div>
+            )}
+
+            {/* Update available notification */}
+            {updateInfo?.hasUpdate && !updateInfo.isDev && (
+              <div className="p-3 rounded-sm bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
+                <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                  New version available: {updateInfo.latestVersion}
+                </p>
+                <button
+                  onClick={applyUpdate}
+                  className="mt-2 px-4 py-2 rounded-sm text-sm font-medium bg-green-600 dark:bg-green-500 text-white dark:text-white hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                >
+                  Get Update
+                </button>
+              </div>
+            )}
+
+            {/* Auto-update toggle */}
+            <div className="flex items-center justify-between pt-2 border-t border-line/40">
+              <div>
+                <h4 className="font-medium text-ink">
+                  Auto-update
+                </h4>
+                <p className="text-sm text-ink-muted">
+                  Automatically check for updates daily
+                </p>
+              </div>
+              <RotatingCardsToggle
+                checked={autoUpdateEnabled}
+                onChange={toggleAutoUpdate}
+                label=""
+              />
+            </div>
+
+            {/* Last checked */}
+            {lastChecked && (
+              <p className="text-xs text-ink-muted">
+                Last checked: {new Date(lastChecked).toLocaleString()}
+              </p>
+            )}
           </div>
         </section>
 

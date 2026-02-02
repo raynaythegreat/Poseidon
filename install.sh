@@ -87,9 +87,15 @@ if [ -d "Poseidon" ]; then
     fi
 fi
 
-# Clone the repository
-git clone https://github.com/raynaythegreat/Poseidon.git
+# Clone the repository (fetch latest main branch)
+git clone -b main --single-branch https://github.com/raynaythegreat/Poseidon.git
 cd Poseidon
+
+# Ensure we're at the latest commit on main
+echo "📥 Fetching latest updates..."
+git fetch origin main
+git reset --hard origin/main
+echo "✓ Updated to latest commit: $(git log -1 --format='%h - %s')"
 
 # Install npm dependencies
 echo ""
@@ -123,6 +129,12 @@ EOF
 
 chmod +x ~/.local/share/applications/poseidon.desktop
 echo "✓ Desktop shortcut created"
+
+# Update desktop database so the app appears in application menu
+if command -v update-desktop-database &> /dev/null; then
+    update-desktop-database ~/.local/share/applications 2>/dev/null || true
+    echo "✓ Application menu updated"
+fi
 
 # Add to PATH if not already there
 SHELL_RC=""

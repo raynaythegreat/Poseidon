@@ -10,29 +10,40 @@ Poseidon is a cyber-styled AI development environment that combines powerful cha
 
 ## 🚀 Quick Start - One-Click Installation
 
-**Linux Debian/Ubuntu (Recommended):**
-
-Install Poseidon with a single command - everything is automated:
+**Linux Debian/Ubuntu:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/install.sh | bash
 ```
 
-That's it! Poseidon will:
-- ✅ Install Node.js (if needed)
+**macOS:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/install-mac.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/raynaythegreat/Poseidon/main/install.ps1 | iex
+```
+
+All installers will:
+- ✅ Install Node.js if needed
+- ✅ Fetch the latest version from GitHub
 - ✅ Install all dependencies
 - ✅ Build for production
-- ✅ Create desktop shortcut
+- ✅ Create desktop/application menu shortcuts
 - ✅ Launch automatically
 
-**After installation**, the app will be running at:
+**After installation**, the app will be available at:
 ```
 http://localhost:1998
 ```
 
 ---
 
-**macOS / Windows:**
+**Manual Installation (Any Platform):**
 
 ```bash
 # Clone the repository
@@ -310,13 +321,23 @@ dist\Poseidon Setup 1.0.0.exe
 
 ## Cross-Platform Support
 
-Poseidon supports three major platforms:
+Poseidon supports three major platforms with one-click installers:
 
-| Platform | Status | Format |
-|----------|--------|--------|
-| Linux Debian/Ubuntu | ✅ Full support | AppImage |
-| macOS | ✅ Full support | DMG (Intel + Apple Silicon) |
-| Windows | ✅ Full support | NSIS Installer |
+| Platform | Installer Command | Status |
+|----------|-------------------|--------|
+| Linux Debian/Ubuntu | `curl ...install.sh \| bash` | ✅ Full support |
+| macOS | `curl ...install-mac.sh \| bash` | ✅ Full support |
+| Windows | `irm ...install.ps1 \| iex` | ✅ Full support |
+
+### Production Binaries
+
+Production builds are available as downloadable binaries from [GitHub Releases](https://github.com/raynaythegreat/Poseidon/releases):
+
+| Platform | Format |
+|----------|--------|
+| Linux | AppImage, deb, rpm |
+| macOS | DMG (Intel + Apple Silicon) |
+| Windows | NSIS Installer |
 
 ## API Usage Tracking
 
