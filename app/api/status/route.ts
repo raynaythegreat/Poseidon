@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getNgrokPublicUrl } from "@/lib/ngrok";
 import { readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { getEnvFilePath } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
 // Helper to read .env.local file directly (for dynamic config without restart)
 function readEnvLocal(): Record<string, string> {
-  const envPath = join(process.cwd(), ".env.local");
+  const envPath = getEnvFilePath();
   if (!existsSync(envPath)) {
     return {};
   }

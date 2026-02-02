@@ -8,13 +8,46 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const NGROK_API = 'http://127.0.0.1:4040/api/tunnels';
 const NGROK_START_API = 'http://127.0.0.1:1998/api/ollama/ngrok';
 const SYNC_API = 'http://127.0.0.1:1998/api/ollama/ngrok/sync';
 const HEADERS_SYNC_API = 'http://127.0.0.1:1998/api/ollama/headers/sync';
 const CHECK_INTERVAL = 5000; // Check every 5 seconds (more responsive)
-const ENV_FILE = path.join(process.cwd(), '.env.local');
+
+// Get the correct .env.local path (handles AppImage read-only filesystem)
+function getEnvFilePath() {
+  const cwd = process.cwd();
+
+  // Detect if running in AppImage (mounted read-only filesystem)
+  const isAppImage = cwd.includes('/.mount_') ||
+                     cwd.includes('tmp/.mount') ||
+                     process.env.APPIMAGE !== undefined ||
+                     process.env.APPDIR !== undefined;
+
+  if (isAppImage) {
+    // Use XDG config directory for user config
+    const configDir = path.join(os.homedir(), '.config', 'poseidon');
+
+    // Ensure config directory exists
+    if (!fs.existsSync(configDir)) {
+      try {
+        fs.mkdirSync(configDir, { recursive: true });
+      } catch (error) {
+        // Fallback to home directory
+        return path.join(os.homedir(), '.poseidon.env');
+      }
+    }
+
+    return path.join(configDir, '.env.local');
+  }
+
+  // Development: use project directory
+  return path.join(cwd, '.env.local');
+}
+
+const ENV_FILE = getEnvFilePath();
 
 let lastNgrokUrl = null;
 let lastHeadersJson = null;

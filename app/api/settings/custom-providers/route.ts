@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { getEnvFilePath } from "@/lib/env";
 
-const ENV_FILE = join(process.cwd(), ".env.local");
+const ENV_FILE = getEnvFilePath();
 
 // Helper to read and parse .env.local
 function readEnvFile(): Record<string, string> {
