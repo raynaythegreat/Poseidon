@@ -38,24 +38,6 @@ All installers will:
 
 **After installation**, the Poseidon desktop app window will open automatically.
 
----
-
-**Manual Installation (Any Platform):**
-
-```bash
-# Clone the repository
-git clone https://github.com/raynaythegreat/Poseidon.git
-cd Poseidon
-
-# Install dependencies
-npm install
-
-# Start the app
-./poseidon.sh start
-```
-
----
-
 ## Features
 
 ### AI-Powered Development
@@ -94,63 +76,39 @@ Use slash commands for specialized workflows:
 <!-- Add your screenshots here -->
 > *Coming soon - AI chat interface, GitHub integration, deployment workflow*
 
-## Installation
+## Configuration
 
-### Prerequisites
-- Node.js 18+ and npm
-- Git (for GitHub integration)
-- (Optional) Ollama for local AI models
+After installation, configure your API keys in Poseidon:
 
-### Quick Start
+1. **Open Poseidon** (desktop app or http://localhost:1998)
+2. **Go to Settings**
+3. **Configure providers** by clicking "Configure" on each provider card
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/raynaythegreat/poseidon.git
-   cd poseidon
-   ```
+### Supported Providers
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+- **Claude** (Anthropic) - Get key: https://console.anthropic.com/settings/keys
+- **OpenAI** - Get key: https://platform.openai.com/api-keys
+- **Google Gemini** - Get key: https://aistudio.google.com/app/apikey
+- **Groq** - Get key: https://console.groq.com/keys
+- **OpenRouter** - Get key: https://openrouter.ai/keys
+- **Fireworks** - Get key: https://fireworks.ai/account/api-keys
+- **Ollama** - Local models: http://localhost:11434 (requires Ollama installed)
+- **Custom Providers** - Add any OpenAI-compatible endpoint
 
-3. **Configure API keys**
+### Environment Variables (Optional)
 
-   Create a `.env.local` file in the root directory (or copy `.env.example`):
-   ```bash
-   # Claude (Anthropic)
-   CLAUDE_API_KEY=your_key_here
+For advanced users, you can also configure via `.env.local` file:
 
-   # OpenAI
-   OPENAI_API_KEY=your_key_here
-
-   # Gemini (Google AI)
-   GOOGLE_API_KEY=your_key_here
-
-   # Groq
-   GROQ_API_KEY=your_key_here
-
-   # OpenRouter
-   OPENROUTER_API_KEY=your_key_here
-
-   # Fireworks
-   FIREWORKS_API_KEY=your_key_here
-
-   # Ollama (local)
-   OLLAMA_BASE_URL=http://localhost:11434
-
-   # GitHub
-   GITHUB_TOKEN=ghp_your_token_here
-   ```
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open Poseidon**
-   - **Option A:** Run `./poseidon.sh start` to launch the Electron desktop app
-   - **Option B:** Navigate to [http://localhost:1998](http://localhost:1998) in your browser
+```bash
+CLAUDE_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here
+GOOGLE_API_KEY=your_key_here
+GROQ_API_KEY=your_key_here
+OPENROUTER_API_KEY=your_key_here
+FIREWORKS_API_KEY=your_key_here
+OLLAMA_BASE_URL=http://localhost:11434
+GITHUB_TOKEN=ghp_your_token_here
+```
 
 ## Usage
 
