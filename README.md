@@ -34,12 +34,9 @@ All installers will:
 - ✅ Install all dependencies
 - ✅ Build for production
 - ✅ Create desktop/application menu shortcuts
-- ✅ Launch automatically
+- ✅ Launch the Electron desktop app automatically
 
-**After installation**, the app will be available at:
-```
-http://localhost:1998
-```
+**After installation**, the Poseidon desktop app window will open automatically.
 
 ---
 
@@ -151,8 +148,9 @@ Use slash commands for specialized workflows:
    npm run dev
    ```
 
-5. **Open your browser**
-   Navigate to [http://localhost:1998](http://localhost:1998)
+5. **Open Poseidon**
+   - **Option A:** Run `./poseidon.sh start` to launch the Electron desktop app
+   - **Option B:** Navigate to [http://localhost:1998](http://localhost:1998) in your browser
 
 ## Usage
 
