@@ -61,15 +61,27 @@ fi
 
 # Remove Poseidon directory
 echo ""
-echo "🗑️  Removing Poseidon directory..."
+echo "🗑️  Removing Poseidon directories..."
 rm -rf "$INSTALL_DIR"
 echo "✓ Removed $INSTALL_DIR"
+
+# Remove alternate clone locations
+rm -rf "$HOME/poseidon" 2>/dev/null || true
+rm -rf "$HOME/.poseidon" 2>/dev/null || true
+
+# Remove config directories
+rm -rf "$HOME/.config/poseidon" 2>/dev/null || true
+rm -rf "$HOME/.config/superpowers/conversation-archive/-home-*-Poseidon" 2>/dev/null || true
+
+# Remove cache directories
+rm -rf "$HOME/.cache/claude-cli-nodejs/-home-*-Poseidon" 2>/dev/null || true
+rm -rf "$HOME/.claude/projects/-home-*-Poseidon" 2>/dev/null || true
 
 # Clean up leftover log and PID files
 echo ""
 echo "🧹 Cleaning up leftover files..."
 rm -f "$HOME/.poseidon.log" "$HOME/.poseidon.pids" "$HOME/.poseidon.log.old" 2>/dev/null || true
-echo "✓ Log and PID files removed"
+echo "✓ Config, cache, and log files removed"
 
 # Ask about configuration files
 echo ""
