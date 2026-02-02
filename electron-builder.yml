@@ -60,4 +60,5 @@ linux:
     Keywords: "ai;development;ide;chat;assistant;deployment"
     StartupNotify: true
     StartupWMClass: poseidon
+deb:
   afterInstall: scripts/after-install.sh
