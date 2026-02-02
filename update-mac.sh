@@ -63,7 +63,8 @@ echo "📦 Updates available:"
 git log --oneline $CURRENT_COMMIT..origin/main | head -5
 
 echo ""
-read -p "Update to latest version? (y/n) " -n 1 -r
+# Read from terminal when piped
+read -p "Update to latest version? (y/n) " REPLY < /dev/tty
 echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Update cancelled."

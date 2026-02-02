@@ -57,6 +57,7 @@ Write-Host "📦 Updates available:" -ForegroundColor Yellow
 & git log --oneline ($currentCommit + "..origin/main") | Select-Object -First 5
 
 Write-Host ""
+# Force interactive prompt even when piped
 $response = Read-Host "Update to latest version? (y/n)"
 if ($response -ne 'y') {
     Write-Host "Update cancelled."
